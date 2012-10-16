@@ -1,0 +1,10 @@
+<resources>
+
+    <string name="app_name">Lorris mobile</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="menu_settings">Settings</string>
+    <string name="title_activity_sessions">Sessions</string>
+    <string name="no_sessions">You have no sessions saved.</string>
+    <string name="create_session">Create session</string>
+
+</resources>

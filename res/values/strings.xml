@@ -6,5 +6,20 @@
     <string name="title_activity_sessions">Sessions</string>
     <string name="no_sessions">You have no sessions saved.</string>
     <string name="create_session">Create session</string>
+    <string name="cancel">Cancel</string>
+
+    <string name="session_name">Session name</string>
+    <string name="select_image">Select image file&#8230;</string>
+    <string name="take_photo">Take a photo&#8230;</string>
+    <string name="session_desc">Notes, description, &#8230;</string>
+    <string name="save_session">Save session</string>
+    <string name="new_session">New session</string>
+    <string name="edit_session">Edit session</string>
+    <string name="session_image_desc">Image or photo associated with this session.</string>
+    <string name="no_pick_handler">No application on this phone can select files. This option is unavailable.</string>
+    <string name="name_taken">This name is already taken.</string>
+    <string name="name_empty">Session name must not be empty.</string>
+    <string name="session_create_failed">Failed to create new session!</string>
+    
 
 </resources>

@@ -1,0 +1,10 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/cancel_edit_session"
+        android:title="@string/cancel"
+        android:showAsAction="always|withText"
+        android:icon="@drawable/navigation_cancel"/>
+    <item android:id="@+id/save_session"
+        android:title="@string/save_session"
+        android:showAsAction="always|withText"
+        android:icon="@drawable/content_save"/>
+</menu>

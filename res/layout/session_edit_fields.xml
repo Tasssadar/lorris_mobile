@@ -1,0 +1,78 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="15dp">
+        <ImageView
+            android:id="@+id/session_image"
+            android:layout_width="96dip"
+            android:layout_height="96dip"
+            android:contentDescription="@string/session_image_desc"
+            android:src="@drawable/photo_ph" />
+        <LinearLayout android:layout_width="0dip"
+            android:layout_height="fill_parent"
+            android:orientation="vertical"
+            android:paddingLeft="5dp"
+            android:layout_weight="1"
+            android:gravity="center|left">
+
+            <Button android:id="@+id/take_photo_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="#00000000"
+                android:drawableLeft="@drawable/device_access_camera"
+                android:text="@string/take_photo"
+                android:onClick="on_take_photo_bnt_clicked"
+                />
+            <Button android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="#00000000"
+                android:text="@string/select_image"
+                android:drawableLeft="@drawable/device_access_storage"
+                android:onClick="on_selectImg_clicked"
+                />
+        </LinearLayout>
+
+    </LinearLayout>
+    
+    <EditText
+        android:id="@+id/session_name_edit"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:hint="@string/session_name" >
+        <requestFocus />
+    </EditText>
+
+    <LinearLayout android:id="@+id/error_layout"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:visibility="gone">
+        <ImageView
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:src="@drawable/error" 
+            />
+        <TextView android:id="@+id/error_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
+
+    <EditText
+        android:id="@+id/session_notes"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:minHeight="300dp"
+        android:ems="10"
+        android:gravity="top"
+        android:hint="@string/session_desc"
+        android:inputType="textMultiLine" />
+
+</LinearLayout>

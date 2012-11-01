@@ -1,0 +1,39 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+    <RelativeLayout android:layout_width="fill_parent"
+        android:layout_height="45dip"
+        android:orientation="horizontal"
+        android:background="#323232"
+        android:gravity="center|left">
+
+        <ImageView android:id="@+id/action_bar_img"
+            android:layout_height="45dip"
+            android:layout_width="32dip"
+            android:gravity="center"
+            android:src="@drawable/ic_launcher" />
+
+        <TextView android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:text="@string/lorris"
+            android:textSize="18dp"
+            android:textColor="#FFFFFFFF"
+            android:layout_toRightOf="@id/action_bar_img" />
+
+        <Button android:id="@+id/save_session"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:text="@string/create_session"
+            android:background="#00000000"
+            android:layout_alignParentRight="true"
+            android:textColor="#FFFFFFFF"
+            android:textSize="16dp"
+            android:drawableLeft="@drawable/ic_content_new"
+            android:onClick="on_createSession_clicked" />
+
+    </RelativeLayout>
+    <include layout="@layout/session_list_base" />
+</LinearLayout>

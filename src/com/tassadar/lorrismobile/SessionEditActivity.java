@@ -1,5 +1,6 @@
 package com.tassadar.lorrismobile;
 
+import java.io.ByteArrayOutputStream;
 import java.util.List;
 
 import android.annotation.TargetApi;
@@ -18,6 +19,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnFocusChangeListener;
+import android.view.Window;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -33,8 +35,12 @@ public class SessionEditActivity extends Activity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.session_edit);
 
+        if(Build.VERSION.SDK_INT  < 11)
+            requestWindowFeature(Window.FEATURE_NO_TITLE);
+
+        setContentView(R.layout.session_edit);
+        
         if(Build.VERSION.SDK_INT >= 11)
             setUpActionBar();
 
@@ -50,6 +56,30 @@ public class SessionEditActivity extends Activity {
         TextView name_edit = (TextView)findViewById(R.id.session_name_edit);
         if(name_edit != null)
             name_edit.setOnFocusChangeListener(new NameFocusChangedAdapter());
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle savedInstanceState) {
+        if(m_image != null) {
+            ByteArrayOutputStream bs = new ByteArrayOutputStream();
+            m_image.compress(Bitmap.CompressFormat.PNG, 50, bs);
+
+            savedInstanceState.putByteArray("image", bs.toByteArray());
+        }
+        super.onSaveInstanceState(savedInstanceState);
+    }
+
+    public void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+
+        if(savedInstanceState.containsKey("image")) {
+            byte[] data = savedInstanceState.getByteArray("image");
+            m_image = BitmapFactory.decodeByteArray(data, 0, data.length);
+
+            ImageView w = (ImageView)findViewById(R.id.session_image);
+            if(w != null && m_image != null)
+                w.setImageBitmap(m_image);
+        }
     }
 
     @Override
@@ -173,7 +203,7 @@ public class SessionEditActivity extends Activity {
         }
     }
     
-    private void on_saveSession_clicked(View w) {
+    public void on_saveSession_clicked(View v) {
         TextView name = (TextView)findViewById(R.id.session_name_edit);
         TextView desc = (TextView)findViewById(R.id.session_notes);
 
@@ -207,6 +237,11 @@ public class SessionEditActivity extends Activity {
         session.save();
 
         setResult(RESULT_OK);
+        finish();
+    }
+    
+    public void on_cancel_clicked(View v) {
+        setResult(RESULT_CANCELED);
         finish();
     }
     

@@ -28,14 +28,16 @@ public class SessionEditActivity extends Activity {
     static final int ACTCODE_CAMERA = 1;
     static final int ACTCODE_SELECT_IMG = 2;
 
+    static final int SESSION_IMG_DIMENSION = 256;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.session_edit);
-        
+
         if(Build.VERSION.SDK_INT >= 11)
             setUpActionBar();
-        
+
         setTitle(R.string.new_session);
 
         // disable camera if not present
@@ -44,18 +46,18 @@ public class SessionEditActivity extends Activity {
             if(btn != null)
                 btn.setVisibility(View.GONE);
         }
-        
+
         TextView name_edit = (TextView)findViewById(R.id.session_name_edit);
         if(name_edit != null)
             name_edit.setOnFocusChangeListener(new NameFocusChangedAdapter());
     }
-    
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.session_edit, menu);
         return true;
     }
-    
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch(item.getItemId())
@@ -71,7 +73,7 @@ public class SessionEditActivity extends Activity {
         }
         return super.onOptionsItemSelected(item);
     }
-    
+
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if(resultCode != Activity.RESULT_OK)
@@ -82,7 +84,7 @@ public class SessionEditActivity extends Activity {
         case ACTCODE_CAMERA:
         {
             Bundle extras = data.getExtras();
-            Bitmap bmp = (Bitmap)extras.get("data");
+            Bitmap bmp = Utils.resizeBitmap((Bitmap)extras.get("data"), SESSION_IMG_DIMENSION, SESSION_IMG_DIMENSION);
             ImageView w = (ImageView)findViewById(R.id.session_image);
             if(w != null)
                 w.setImageBitmap(bmp);
@@ -92,10 +94,7 @@ public class SessionEditActivity extends Activity {
         case ACTCODE_SELECT_IMG:
         {
             Uri selectedImage = data.getData();
-            ImageView w = (ImageView)findViewById(R.id.session_image);
-            if(w != null)
-                w.setImageURI(selectedImage);
-            
+
             String[] filePathColumn = {MediaStore.Images.Media.DATA};
             Cursor cursor = getContentResolver().query(
                                selectedImage, filePathColumn, null, null, null);
@@ -105,7 +104,10 @@ public class SessionEditActivity extends Activity {
             String path = cursor.getString(columnIndex);
             cursor.close();
 
-            m_image = BitmapFactory.decodeFile(path);
+            m_image = Utils.resizeBitmap(BitmapFactory.decodeFile(path), SESSION_IMG_DIMENSION, SESSION_IMG_DIMENSION);
+            ImageView w = (ImageView)findViewById(R.id.session_image);
+            if(w != null && m_image != null)
+                w.setImageBitmap(m_image);
             break;
         }
         default:
@@ -151,7 +153,7 @@ public class SessionEditActivity extends Activity {
         Intent intent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.INTERNAL_CONTENT_URI);
         startActivityForResult(intent, ACTCODE_SELECT_IMG);
     }
-    
+
     public void setErrorText(boolean show, int textId) {
         LinearLayout l = (LinearLayout)findViewById(R.id.error_layout);
         TextView v = (TextView)findViewById(R.id.error_text);

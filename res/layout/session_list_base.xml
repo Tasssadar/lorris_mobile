@@ -3,10 +3,11 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent" >
 
-    <ListView android:id="@android:id/list"
+    <ListView android:id="@+id/session_list"
         android:layout_width="0dip"
         android:layout_height="match_parent"
         android:layout_weight="1"
+        android:choiceMode="singleChoice"
         android:drawSelectorOnTop="false"/>
 
      <LinearLayout android:id="@+id/layout_create_session"
@@ -31,6 +32,7 @@
                  android:layout_width="wrap_content"
                  android:layout_height="wrap_content"
                  android:textSize="20dip"
+                 android:gravity="center"
                  android:text="@string/no_sessions"/>
 
              <Button

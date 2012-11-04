@@ -42,7 +42,26 @@ public class SessionMgr {
         res.load();
         return res;
     }
-    
+
+    public static void deleteSession(Context ctx, String name) {
+        if(isNameAvailable(name))
+            return;
+
+        File extPath = Utils.getDataFolder(ctx);
+        if(extPath == null)
+            return;
+
+        File path = new File(extPath.getAbsolutePath() + "/" + name + "/");
+        if(!path.exists() || !path.isDirectory())
+            return;
+        
+        File[] files = path.listFiles();
+        for(File f : files) {
+            f.delete();
+        }
+        path.delete();
+    }
+
     public static boolean isNameAvailable(String name) {
         return !m_sessionNames.contains(name);
     }

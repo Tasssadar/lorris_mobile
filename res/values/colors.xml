@@ -1,0 +1,4 @@
+<resources>
+      <drawable name="list_selected">#33B5E5</drawable>
+      <drawable name="transparent">#00000000</drawable>
+</resources>

@@ -6,7 +6,11 @@
     <string name="title_activity_sessions">Sessions</string>
     <string name="no_sessions">You have no sessions saved.</string>
     <string name="create_session">Create session</string>
+    <string name="ok">OK</string>
     <string name="cancel">Cancel</string>
+    <string name="erase_session_title">Erase session?</string>
+    <string name="erase_session_text">Session \"%1$s\" will be permanently deleted!</string>
+    <string name="erase_session_toast">Session \"%1$s\" was deleted.</string>
 
     <string name="session_name">Session name</string>
     <string name="select_image">Select image file&#8230;</string>
@@ -21,5 +25,14 @@
     <string name="name_empty">Session name must not be empty.</string>
     <string name="session_create_failed">Failed to create new session!</string>
     
+    <string name="opened_tabs">Opened tabs:</string>
+    <string name="delete">Delete</string>
+    <string name="edit">Edit</string>
+    <string name="load_session">Load session</string>
+
+    <string-array name="session_options">
+        <item>Edit</item>
+        <item>Erase</item>
+    </string-array>
 
 </resources>

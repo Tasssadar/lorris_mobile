@@ -146,7 +146,7 @@ public class Session extends SQLiteOpenHelper {
     }
     
     public void setImage(Bitmap img) {
-        if(m_image != null && m_image.equals(img))
+        if(m_image != null && m_image.sameAs(img))
             return;
         m_changed |= CHANGED_IMG;
         m_image = img;

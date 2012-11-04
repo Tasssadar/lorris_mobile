@@ -23,11 +23,11 @@
             android:textColor="#FFFFFFFF"
             android:layout_toRightOf="@id/action_bar_img" />
 
-        <Button android:id="@+id/save_session"
+        <Button android:id="@+id/create_session"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:text="@string/create_session"
-            android:background="#00000000"
+            android:background="@drawable/transparent_btn"
             android:layout_alignParentRight="true"
             android:textColor="#FFFFFFFF"
             android:textSize="16dp"

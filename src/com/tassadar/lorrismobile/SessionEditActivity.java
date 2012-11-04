@@ -46,6 +46,8 @@ public class SessionEditActivity extends Activity {
 
         setTitle(R.string.new_session);
 
+        m_edit_name = null;
+
         // disable camera if not present
         if (!canTakePhoto()) {
             View btn = findViewById(R.id.take_photo_btn);
@@ -56,6 +58,12 @@ public class SessionEditActivity extends Activity {
         TextView name_edit = (TextView)findViewById(R.id.session_name_edit);
         if(name_edit != null)
             name_edit.setOnFocusChangeListener(new NameFocusChangedAdapter());
+        
+        if(getIntent() != null && getIntent().getExtras() != null && getIntent().getExtras().containsKey("edit_session"))
+        {
+            m_edit_name = getIntent().getExtras().getString("edit_session");
+            loadSession(m_edit_name);
+        }
     }
 
     @Override
@@ -194,15 +202,19 @@ public class SessionEditActivity extends Activity {
         l.setVisibility(show ? View.VISIBLE : View.GONE);
         v.setText(textId);
     }
-    
+
     private class NameFocusChangedAdapter implements OnFocusChangeListener {
         @Override
         public void onFocusChange(View v, boolean hasFocus) {
             String text = ((TextView)v).getText().toString();
-            setErrorText(!SessionMgr.isNameAvailable(text), R.string.name_taken);
+            setErrorText(!isNameAvailable(text), R.string.name_taken);
         }
     }
-    
+
+    private boolean isNameAvailable(String name) {
+        return name.equals(m_edit_name) || SessionMgr.isNameAvailable(name);
+    }
+
     public void on_saveSession_clicked(View v) {
         TextView name = (TextView)findViewById(R.id.session_name_edit);
         TextView desc = (TextView)findViewById(R.id.session_notes);
@@ -217,26 +229,42 @@ public class SessionEditActivity extends Activity {
             return;
         }
             
-        if(!SessionMgr.isNameAvailable(name_str)) {
+        if(!isNameAvailable(name_str)) {
             setErrorText(true, R.string.name_taken);
             return;
         }
 
         setErrorText(false, R.string.name_taken);
 
-        Session session = SessionMgr.create(this, name_str);
+        Session session = null;
+        
+        if(m_edit_name == null)
+            session = SessionMgr.create(this, name_str);
+        else {
+            session = SessionMgr.get(this, m_edit_name);
+            if(session != null && !m_edit_name.equals(name_str)) {
+                session = null;
+                SessionMgr.deleteSession(this, m_edit_name);
+                session = SessionMgr.create(this, name_str);
+            }
+        }
+
         if(session == null)
         {
             Toast.makeText(this, R.string.session_create_failed, Toast.LENGTH_SHORT).show();
             return;
         }
 
+        session.setName(name_str);
         session.setDesc(desc.getText().toString());
         session.setImage(m_image);
 
         session.save();
 
-        setResult(RESULT_OK);
+        Intent i = new Intent();
+        i.putExtra("session_name", session.getName());
+
+        setResult(RESULT_OK, i);
         finish();
     }
     
@@ -244,6 +272,30 @@ public class SessionEditActivity extends Activity {
         setResult(RESULT_CANCELED);
         finish();
     }
-    
+
+    private void loadSession(String name) {
+        Session s = SessionMgr.get(this, name);
+        if(s == null)
+            return;
+        
+        TextView nameView = (TextView)findViewById(R.id.session_name_edit);
+        TextView desc = (TextView)findViewById(R.id.session_notes);
+        ImageView image = (ImageView)findViewById(R.id.session_image);
+        
+        if(nameView != null)
+            nameView.setText(name);
+        if(desc != null)
+            desc.setText(s.getDesc());
+        
+        m_image = s.getImage();
+        if(image != null) {
+            if(m_image != null)
+                image.setImageBitmap(m_image);
+            else
+                image.setImageResource(R.drawable.photo_ph);
+        }
+    }
+
     private Bitmap m_image;
+    private String m_edit_name;
 }

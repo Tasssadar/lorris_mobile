@@ -53,11 +53,9 @@ public class SessionListActivity extends FragmentActivity implements OnSessionCh
         // FIXME: there must be way to do this correctly
         if(Build.VERSION.SDK_INT >= 11)
             fixActionBarTitle();
-        else {
-            getListView().setLongClickable(true);
-            getListView().setOnItemLongClickListener(new OnSessionLongClick());
-        }
 
+        getListView().setLongClickable(true);
+        getListView().setOnItemLongClickListener(new OnSessionLongClick());
         getListView().setOnItemClickListener(new OnSessionClickListener());
 
         loadSessions();
@@ -68,8 +66,7 @@ public class SessionListActivity extends FragmentActivity implements OnSessionCh
         
         if(m_last_selected == ListView.INVALID_POSITION && getListView().getCount() != 0)
             m_last_selected = 0;
-            
-        
+
         if(m_last_selected != ListView.INVALID_POSITION)
         {
             getListView().setItemChecked(m_last_selected, true);
@@ -89,7 +86,7 @@ public class SessionListActivity extends FragmentActivity implements OnSessionCh
         getMenuInflater().inflate(R.menu.session_list, menu);
         return true;
     }
-    
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch(item.getItemId())
@@ -267,7 +264,7 @@ public class SessionListActivity extends FragmentActivity implements OnSessionCh
                 else
                     d = getResources().getDrawable(R.drawable.photo_ph);
 
-                d.setBounds(0,  0, 64, 64);
+                d.setBounds(0, 0, 64, 64);
                 checked_name.setCompoundDrawables(d, null, null, null);
             } else {
                 TextView name = (TextView)v.findViewById(R.id.session_name);

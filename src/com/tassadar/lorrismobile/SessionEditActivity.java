@@ -184,12 +184,16 @@ public class SessionEditActivity extends Activity {
     }
 
     public void on_selectImg_clicked(View v) {
-        if(!isIntentAvailable(Intent.ACTION_PICK)) {
-            Toast.makeText(this, R.string.no_pick_handler, Toast.LENGTH_SHORT).show();
-            return;
+        if(isIntentAvailable(Intent.ACTION_PICK)) {
+            Intent intent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.INTERNAL_CONTENT_URI);
+            startActivityForResult(intent, ACTCODE_SELECT_IMG);
         }
-        Intent intent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.INTERNAL_CONTENT_URI);
-        startActivityForResult(intent, ACTCODE_SELECT_IMG);
+        else {
+            Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+            intent.setType("image/*");
+            startActivityForResult(Intent.createChooser(intent,
+                    "Select Picture"), ACTCODE_SELECT_IMG);
+        }
     }
 
     public void setErrorText(boolean show, int textId) {

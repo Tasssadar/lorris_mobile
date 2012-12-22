@@ -219,7 +219,7 @@ public class SessionListActivity extends FragmentActivity implements OnSessionCh
 
     private void loadSessionDetail(int pos) {
         Fragment f = getSupportFragmentManager().findFragmentById(R.id.detail_fragment);
-        if(f == null || m_adapter == null || !f.isVisible())
+        if(f == null || m_adapter == null || m_adapter.isEmpty())
             return;
 
         m_last_selected = pos;

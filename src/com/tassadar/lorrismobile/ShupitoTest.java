@@ -36,8 +36,10 @@ public class ShupitoTest extends Activity implements SerialDeviceMgrListener,Ser
         super.onPause();
 
         m_devMgr.unregisterReceiver(this);
-        m_dev.close();
-        m_dev = null;
+        if(m_dev != null) {
+            m_dev.close();
+            m_dev = null;
+        }
     }
 
     @Override
@@ -48,16 +50,14 @@ public class ShupitoTest extends Activity implements SerialDeviceMgrListener,Ser
     }
 
     @Override
-    public boolean onNewDevice(SerialDevice dev) {
+    public void onNewDevice(SerialDevice dev) {
         
         try {
-            dev.open();
+            dev.open(this);
         } catch(IOException ex) {
             m_out.setText(ex.getMessage());
-            return false;
+            return;
         }
-
-        dev.startPolling(this);
 
         try {
             m_out.append("Sending \"?\" command to Shupito...\n");
@@ -70,12 +70,12 @@ public class ShupitoTest extends Activity implements SerialDeviceMgrListener,Ser
             m_out.append(ex.getMessage());
         }
         m_dev = dev;
-        return true;
     }
 
     @Override
     public void onDataRead(byte[] data) {
-        m_out.append(new String(data));
+        m_out.append("Read: ");
+        m_out.append(new String(data) + "\n");
     }
 
     private TextView m_out;

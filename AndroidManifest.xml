@@ -1,10 +1,10 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.tassadar.lorrismobile"
-    android:versionCode="5"
+    android:versionCode="6"
     android:versionName="1.0" >
 
     <uses-sdk
-        android:minSdkVersion="5"
+        android:minSdkVersion="8"
         android:targetSdkVersion="15" />
 
     <uses-feature android:name="android.hardware.camera" android:required="false" />

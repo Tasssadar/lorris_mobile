@@ -27,6 +27,7 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.CheckedTextView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -185,7 +186,7 @@ public class SessionListActivity extends FragmentActivity implements OnSessionCh
 
         Fragment f = getSupportFragmentManager().findFragmentById(R.id.detail_fragment);
         if(f != null)
-            f.getView().setVisibility(empty ? View.GONE : View.VISIBLE);
+            ((SessionDetailFragment)f).setVisible(!empty);
     }
 
     @TargetApi(11)
@@ -218,7 +219,7 @@ public class SessionListActivity extends FragmentActivity implements OnSessionCh
 
     private void loadSessionDetail(int pos) {
         Fragment f = getSupportFragmentManager().findFragmentById(R.id.detail_fragment);
-        if(f == null || m_adapter == null)
+        if(f == null || m_adapter == null || !f.isVisible())
             return;
 
         m_last_selected = pos;

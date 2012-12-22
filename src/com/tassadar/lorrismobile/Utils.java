@@ -1,5 +1,6 @@
 package com.tassadar.lorrismobile;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 
 import android.content.Context;
@@ -40,6 +41,34 @@ public class Utils {
         matrix.postScale(scale, scale);
 
         return Bitmap.createBitmap(bmp, 0, 0, w, h, matrix, false);
+    }
+    
+    public static boolean compareBitmap(Bitmap bitmap1, Bitmap bitmap2){
+        if(bitmap1 == bitmap2)
+            return true;
+
+        if(bitmap1 == null || bitmap2 == null)
+            return false;
+
+        try{
+            ByteArrayOutputStream stream1 = new ByteArrayOutputStream();
+            bitmap1.compress(Bitmap.CompressFormat.JPEG, 100, stream1);
+            stream1.flush();
+            byte[] bitmapdata1 = stream1.toByteArray();
+            stream1.close();
+
+            ByteArrayOutputStream stream2 = new ByteArrayOutputStream();
+            bitmap2.compress(Bitmap.CompressFormat.JPEG, 100, stream2);
+            stream2.flush();
+            byte[] bitmapdata2 = stream2.toByteArray();
+            stream2.close();
+
+            return bitmapdata1.equals(bitmapdata2);
+        }
+        catch (Exception e) {
+            // TODO: handle exception
+        }
+        return false;
     }
 
 }

@@ -42,6 +42,7 @@ public class SessionDetailFragment extends Fragment {
     @Override
     public void onCreateOptionsMenu (Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.session_details, menu);
+        m_menu = menu;
     }
 
     @Override
@@ -97,5 +98,21 @@ public class SessionDetailFragment extends Fragment {
             image.setImageResource(R.drawable.photo_ph);
     }
 
+    public void setVisible(boolean visible) {
+        if(m_menu != null)
+        {
+            final int[] items = { R.id.edit_session, R.id.delete_session };
+            for(int i = 0; i < items.length; ++i)
+            {
+                MenuItem it = m_menu.findItem(items[i]);
+                if(it != null)
+                    it.setVisible(visible);
+            }
+        }
+        getView().setVisibility(visible ? View.VISIBLE : View.GONE);
+    }
+    
+
     private String m_session_name;
+    private Menu m_menu;
 }

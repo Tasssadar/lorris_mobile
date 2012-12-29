@@ -10,8 +10,8 @@
         android:gravity="center"
         android:layout_marginTop="20dp">
         <ImageView android:id="@+id/session_image"
-            android:layout_width="256dp"
-            android:layout_height="256dp"
+            android:layout_width="192dp"
+            android:layout_height="192dp"
             android:src="@drawable/photo_ph"
             android:contentDescription="@string/session_image_desc"/>
         <TextView android:id="@+id/session_name"
@@ -54,7 +54,8 @@
         android:layout_height="0dp"
         android:layout_weight="1" />
 
-    <Button android:layout_width="match_parent"
+    <Button android:id="@+id/load_session" 
+        android:layout_width="match_parent"
         android:layout_height="100dp"
         android:text="@string/load_session"
         android:layout_marginBottom="20dp"/>

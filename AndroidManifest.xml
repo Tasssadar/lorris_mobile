@@ -24,6 +24,7 @@
             </intent-filter>
         </activity>
         <activity android:name="SessionEditActivity"></activity>
+        <activity android:name="WorkspaceActivity"></activity>
         <activity android:name="ShupitoTest" android:label="@string/app_name">
             <intent-filter>
                 <action android:name="android.hardware.usb.action.USB_DEVICE_ATTACHED" />

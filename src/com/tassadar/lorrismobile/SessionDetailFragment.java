@@ -12,6 +12,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -36,7 +37,10 @@ public class SessionDetailFragment extends Fragment {
 
     @Override
     public View onCreateView (LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.session_detail, container, false);
+        View v = inflater.inflate(R.layout.session_detail, container, false);
+        Button b = (Button)v.findViewById(R.id.load_session);
+        b.setOnClickListener(new LoadSessionListener());
+        return v;
     }
 
     @Override
@@ -96,6 +100,13 @@ public class SessionDetailFragment extends Fragment {
             image.setImageBitmap(session.getImage());
         else
             image.setImageResource(R.drawable.photo_ph);
+    }
+    
+    private class LoadSessionListener implements View.OnClickListener {
+        @Override
+        public void onClick(View v) {
+            startActivity(new Intent(getActivity(), WorkspaceActivity.class));
+        }
     }
 
     public void setVisible(boolean visible) {

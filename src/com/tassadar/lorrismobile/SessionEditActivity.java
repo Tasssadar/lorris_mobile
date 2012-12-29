@@ -156,8 +156,7 @@ public class SessionEditActivity extends Activity {
     }
 
     @TargetApi(11)
-    private void setUpActionBar()
-    {
+    private void setUpActionBar() {
         getActionBar().setDisplayHomeAsUpEnabled(true);
     }
 

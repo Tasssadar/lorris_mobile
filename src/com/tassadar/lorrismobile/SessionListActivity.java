@@ -27,7 +27,6 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.CheckedTextView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -231,7 +230,11 @@ public class SessionListActivity extends FragmentActivity implements OnSessionCh
     private class OnSessionClickListener implements OnItemClickListener {
         @Override
         public void onItemClick(AdapterView<?> parent, View v, int pos, long id) {
-            loadSessionDetail(pos);
+            Fragment f = getSupportFragmentManager().findFragmentById(R.id.detail_fragment);
+            if(f != null)
+                loadSessionDetail(pos);
+            else
+                startActivity(new Intent(SessionListActivity.this, WorkspaceActivity.class));
         }
     }
 

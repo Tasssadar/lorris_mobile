@@ -6,10 +6,11 @@ import java.io.File;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Matrix;
+import android.os.Environment;
 
 public class Utils {
 
-    public static File getDataFolder(Context ctx) {
+    public static File getDataFolder(Context ctx) { 
         File f = ctx.getExternalFilesDir(null);
 
         if(f != null && f.exists())
@@ -19,7 +20,8 @@ public class Utils {
         if(f != null && f.exists())
             return f;
 
-        f = new File("/sdcard/Android/data/com.tassadar.lorrismobile/files/");
+        f = new File(Environment.getExternalStorageDirectory().getPath() +
+                "/Android/data/com.tassadar.lorrismobile/files/");
         f.mkdirs();
         if(f.exists())
             return f;

@@ -30,7 +30,8 @@
                 android:background="@drawable/transparent_btn"
                 android:drawableLeft="@drawable/ic_content_new"
                 android:textColor="#FFFFFF"
-                android:text="@string/new_tab" />
+                android:text="@string/new_tab"
+                android:onClick="on_add_tab_btn_clicked" />
         </LinearLayout>
     </LinearLayout>
     

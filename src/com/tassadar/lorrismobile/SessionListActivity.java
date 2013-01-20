@@ -97,7 +97,7 @@ public class SessionListActivity extends FragmentActivity implements OnSessionCh
         }
         return super.onOptionsItemSelected(item);
     }
-    
+
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if(resultCode != Activity.RESULT_OK)

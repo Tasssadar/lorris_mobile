@@ -3,6 +3,7 @@ package com.tassadar.lorrismobile;
 import java.util.ArrayList;
 
 import android.annotation.TargetApi;
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -24,12 +25,16 @@ import android.widget.LinearLayout;
 import android.widget.PopupMenu;
 import android.widget.PopupMenu.OnMenuItemClickListener;
 
+import com.tassadar.lorrismobile.connections.Connection;
+import com.tassadar.lorrismobile.connections.ConnectionMgr;
 import com.tassadar.lorrismobile.connections.ConnectionsActivity;
 import com.tassadar.lorrismobile.modules.Tab;
 import com.tassadar.lorrismobile.modules.Tab.TabSelectedListener;
 import com.tassadar.lorrismobile.modules.TabListItem;
 
 public class WorkspaceActivity extends FragmentActivity implements TabSelectedListener {
+
+    private static final int REQ_SET_CONN = 1;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -46,11 +51,19 @@ public class WorkspaceActivity extends FragmentActivity implements TabSelectedLi
 
         if(Build.VERSION.SDK_INT >= 11)
             setUpActionBar();
+        createNewTab(Tab.TAB_TERMINAL);
     }
 
     @TargetApi(11)
     private void setUpActionBar() {
         getActionBar().setDisplayHomeAsUpEnabled(true);
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        m_tabs.clear();
+        m_active_tab = -1;
     }
 
     @Override
@@ -65,10 +78,28 @@ public class WorkspaceActivity extends FragmentActivity implements TabSelectedLi
             case R.id.connection:
                 return true;
             case R.id.set_connection:
-                startActivity(new Intent(this, ConnectionsActivity.class));
+                Intent i = new Intent(this, ConnectionsActivity.class);
+                startActivityForResult(i, REQ_SET_CONN);
                 return true;
         }
         return false;
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if(resultCode != Activity.RESULT_OK)
+            return;
+        switch(requestCode) {
+            case REQ_SET_CONN:
+            {
+                if(data != null && !m_tabs.isEmpty()) {
+                    int id = data.getIntExtra("connId", -1);
+                    Connection conn = ConnectionMgr.getConnection(id); 
+                    m_tabs.get(m_active_tab).setConnection(conn);
+                }
+                break;
+            }
+        }
     }
 
     private void setTabPanelVisible(boolean visible) {

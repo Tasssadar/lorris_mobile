@@ -13,7 +13,11 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
-public class TCPConnFragment extends Fragment {
+public class TCPConnFragment extends ConnFragment {
+
+    public TCPConnFragment(ConnFragmentInterface in) {
+        super(in);
+    }
 
     
     @Override

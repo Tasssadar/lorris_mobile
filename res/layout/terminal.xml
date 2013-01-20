@@ -6,6 +6,12 @@
     
     <TextView android:gravity="center"
         android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
+        android:layout_height="wrap_content"
+        android:textColor="#FFFFFF"
         android:text="Terminal" />
+    <TextView android:id="@+id/data_view"
+        android:layout_width="fill_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:textColor="#FFFFFF" />
 </LinearLayout>

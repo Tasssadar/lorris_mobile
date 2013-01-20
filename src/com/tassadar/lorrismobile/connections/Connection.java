@@ -11,6 +11,8 @@ public class Connection {
     public static final int ST_CONNECTING   = 1;
     public static final int ST_CONNECTED    = 2;
 
+    private static Connection m_storedConn;
+
     protected Connection(int type) {
         m_type = type;
         m_state = ST_DISCONNECTED;
@@ -21,6 +23,14 @@ public class Connection {
     public void close() { }
 
     public boolean isOpen() { return m_state == ST_CONNECTED; }
+
+    public void addInterface(ConnectionInterface in) {
+        m_interfaces.add(in);
+    }
+
+    public void removeInterface(ConnectionInterface in) {
+        m_interfaces.remove(in);
+    }
 
     protected void sendConnected(boolean connected) {
         int len = m_interfaces.size();
@@ -46,8 +56,59 @@ public class Connection {
             m_interfaces.get(i).dataRead(data);
     }
 
+    public String getName() {
+        return "Connection";
+    }
 
+    public int getType() {
+        return m_type;
+    }
+
+    public void addRef() {
+        ++m_refCount;
+    }
+
+    public void rmRef() {
+        if(--m_refCount <= 0) {
+            close();
+            ConnectionMgr.removeConnection(m_id);
+        }
+    }
+
+    public void setId(int id) {
+        m_id = id;
+    }
+
+    public int getId() {
+        return m_id;
+    }
+
+    protected void setState(int state) {
+        if(m_state == state)
+            return;
+
+        sendStateChanged(state);
+
+        switch(state) {
+            case ST_CONNECTED:
+                sendConnected(true);
+                break;
+            case ST_DISCONNECTED:
+                if(m_state == Connection.ST_CONNECTED)
+                    sendConnected(false);
+                break;
+        }
+
+        m_state = state;
+    }
+
+    public void write(byte[] data) {
+
+    } 
+
+    protected int m_id;
     protected int m_type;
     protected int m_state;
+    protected int m_refCount;
     protected ArrayList<ConnectionInterface> m_interfaces;
 }

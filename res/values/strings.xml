@@ -41,10 +41,13 @@
     <string name="paired_devices">Paired devices</string>
     <string name="new_devices">New devices</string>
     <string name="find_devices">Find new devices</string>
-    
+    <string name="bt_not_enabled">Bluetooth is not enabled.</string>
+    <string name="enable">Enable</string>
+    <string name="no_bt_adapter">This device does not have bluetooth capabilities.</string>
+
     <string name="saved_connections">Saved connections</string>
     <string name="add_tcp_conn">Add TCP connection</string>
-    
+
     <string name="connected_devices">Connected devices</string>
 
     <string-array name="session_options">

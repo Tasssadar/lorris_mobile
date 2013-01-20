@@ -32,6 +32,14 @@
             android:textColor="#FFFFFFFF"
             android:layout_toRightOf="@id/action_bar_img" />
 
+        <ProgressBar android:id="@+id/progress"
+            android:layout_width="45dp"
+            android:layout_height="45dp"
+            android:visibility="gone"
+            android:padding="3dp"
+            android:indeterminateOnly="true"
+            android:layout_alignParentRight="true" />
+
     </RelativeLayout>
     <include layout="@layout/connections_base" />
 </LinearLayout>

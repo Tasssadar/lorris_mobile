@@ -13,9 +13,12 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
-public class USBConnFragment extends Fragment {
+public class USBConnFragment extends ConnFragment {
 
-    
+    public USBConnFragment(ConnFragmentInterface in) {
+        super(in);
+    }
+
     @Override
     public void onCreate (Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

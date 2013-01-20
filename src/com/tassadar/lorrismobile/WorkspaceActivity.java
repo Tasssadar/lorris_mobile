@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import android.annotation.TargetApi;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
@@ -12,12 +13,18 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GestureDetectorCompat;
 import android.view.GestureDetector;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.Window;
 import android.view.animation.AnimationUtils;
 import android.widget.LinearLayout;
+import android.widget.PopupMenu;
+import android.widget.PopupMenu.OnMenuItemClickListener;
 
+import com.tassadar.lorrismobile.connections.ConnectionsActivity;
 import com.tassadar.lorrismobile.modules.Tab;
 import com.tassadar.lorrismobile.modules.Tab.TabSelectedListener;
 import com.tassadar.lorrismobile.modules.TabListItem;
@@ -44,6 +51,24 @@ public class WorkspaceActivity extends FragmentActivity implements TabSelectedLi
     @TargetApi(11)
     private void setUpActionBar() {
         getActionBar().setDisplayHomeAsUpEnabled(true);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.workspace, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected (MenuItem item) {
+        switch(item.getItemId()) {
+            case R.id.connection:
+                return true;
+            case R.id.set_connection:
+                startActivity(new Intent(this, ConnectionsActivity.class));
+                return true;
+        }
+        return false;
     }
 
     private void setTabPanelVisible(boolean visible) {
@@ -150,7 +175,32 @@ public class WorkspaceActivity extends FragmentActivity implements TabSelectedLi
         }
     }
 
-    public void on_add_tab_btn_clicked(View v) {
+    private class CreateTabListener implements OnMenuItemClickListener {
+        @Override
+        public boolean onMenuItemClick(MenuItem item) {
+            switch(item.getItemId()) {
+            case R.id.analyzer:
+                createNewTab(Tab.TAB_ANALYZER);
+                return true;
+            case R.id.terminal:
+                createNewTab(Tab.TAB_TERMINAL);
+                return true;
+            }
+            return false;
+        }
+        
+    }
+
+    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
+    private void showCreateTabMenuICS(View v) {
+        PopupMenu popup = new PopupMenu(this, v);
+        popup.setOnMenuItemClickListener(new CreateTabListener());
+        MenuInflater inflater = popup.getMenuInflater();
+        inflater.inflate(R.menu.create_tab, popup.getMenu());
+        popup.show();
+    }
+
+    private void showCreateTabMenuLegacy() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle(R.string.new_tab)
             .setItems(R.array.tab_names, new DialogInterface.OnClickListener() {
@@ -160,6 +210,13 @@ public class WorkspaceActivity extends FragmentActivity implements TabSelectedLi
                 }
             });
         builder.create().show();
+    }
+
+    public void on_add_tab_btn_clicked(View v) {
+        if(Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB)
+            showCreateTabMenuLegacy();
+        else
+            showCreateTabMenuICS(v);
     }
 
     private GestureDetectorCompat m_gest_detect;

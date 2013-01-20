@@ -1,0 +1,8 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/connect"
+        android:title="@string/connect"
+        android:showAsAction="always"/>
+    <item android:id="@+id/set_connection"
+        android:title="@string/set_connection"
+        android:showAsAction="always"/>
+</menu>

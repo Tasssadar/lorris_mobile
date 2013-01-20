@@ -31,6 +31,21 @@
     <string name="load_session">Load session</string>
     
     <string name="new_tab">New tab</string>
+    <string name="analyzer">Analyzer</string>
+    <string name="terminal">Terminal</string>
+    <string name="connection">Connection</string>
+    <string name="connect">Connect</string>
+    <string name="set_connection">Set connection</string>
+    <string name="connections">Connections</string>
+
+    <string name="paired_devices">Paired devices</string>
+    <string name="new_devices">New devices</string>
+    <string name="find_devices">Find new devices</string>
+    
+    <string name="saved_connections">Saved connections</string>
+    <string name="add_tcp_conn">Add TCP connection</string>
+    
+    <string name="connected_devices">Connected devices</string>
 
     <string-array name="session_options">
         <item>Edit</item>

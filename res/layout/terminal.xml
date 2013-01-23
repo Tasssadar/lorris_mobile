@@ -9,7 +9,8 @@
         android:layout_height="wrap_content"
         android:textColor="#FFFFFF"
         android:text="Terminal" />
-    <TextView android:id="@+id/data_view"
+    <jackpal.androidterm.emulatorview.EmulatorView
+        android:id="@+id/term"
         android:layout_width="fill_parent"
         android:layout_height="0dp"
         android:layout_weight="1"

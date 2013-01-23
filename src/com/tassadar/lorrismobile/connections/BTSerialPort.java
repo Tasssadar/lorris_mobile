@@ -54,12 +54,36 @@ public class BTSerialPort extends Connection {
             sendDisconnecting();
 
         setState(ST_DISCONNECTED);
-        try {
-            if(m_socket != null)
-                m_socket.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    if(m_writeThread != null) {
+                        synchronized(m_writeThread) {
+                            m_writeThread.wait(5000);
+                        }
+                    }
+                    if(m_pollThread != null) {
+                        synchronized(m_pollThread) {
+                            m_pollThread.wait(5000);
+                        }
+                    }
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+
+                m_writeThread = null;
+                m_pollThread = null;
+                try {
+                    if(m_socket != null)
+                        m_socket.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                m_socket = null;
+            }
+        }).start();
     }
 
     @Override
@@ -75,10 +99,10 @@ public class BTSerialPort extends Connection {
         return "";
     }
 
-    public void write(byte[] data) {
-        m_writeThread.getHandler().obtainMessage(WRITE_DATA, data.clone()).sendToTarget();
-    } 
-
+    @Override
+    public void write(byte[] data, int offset, int count) {
+        m_writeThread.getHandler().obtainMessage(WRITE_DATA, offset, count, data.clone()).sendToTarget();
+    }
 
     @Override
     public void setState(int state) {
@@ -100,8 +124,6 @@ public class BTSerialPort extends Connection {
                     return;
                 m_pollThread.stopPolling();
                 m_writeThread.getHandler().sendEmptyMessage(WRITE_STOP);
-                m_writeThread = null;
-                m_pollThread = null;
                 break;
             }
         }
@@ -139,6 +161,8 @@ public class BTSerialPort extends Connection {
                  {
                      if(msg.arg1 == STATE_OK)
                          p.sendDataRead((byte[])msg.obj);
+                     else
+                         p.close();
                      break;
                  }
              }
@@ -297,7 +321,7 @@ public class BTSerialPort extends Connection {
                  case WRITE_DATA:
                  {
                      try {
-                        out.write((byte[])msg.obj);
+                        out.write((byte[])msg.obj, msg.arg1, msg.arg2);
                      } catch (IOException e) {
                         e.printStackTrace();
                      }

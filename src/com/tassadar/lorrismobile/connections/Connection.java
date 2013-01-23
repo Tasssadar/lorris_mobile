@@ -101,8 +101,13 @@ public class Connection {
     }
 
     public void write(byte[] data) {
+        write(data, 0, data.length);
+    }
+
+    public void write(byte[] data, int offset, int count) {
 
     } 
+    
 
     protected int m_id;
     protected int m_type;

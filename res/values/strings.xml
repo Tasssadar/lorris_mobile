@@ -29,6 +29,7 @@
     <string name="delete">Delete</string>
     <string name="edit">Edit</string>
     <string name="load_session">Load session</string>
+    <string name="toggle_keyboard">Toggle keyboard</string>
     
     <string name="new_tab">New tab</string>
     <string name="analyzer">Analyzer</string>

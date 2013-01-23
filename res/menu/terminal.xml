@@ -1,0 +1,7 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/toggle_keyboard"
+        android:title="@string/toggle_keyboard"
+        android:showAsAction="always"
+        android:menuCategory="system"
+        android:icon="@drawable/hardware_keyboard"/>
+</menu>

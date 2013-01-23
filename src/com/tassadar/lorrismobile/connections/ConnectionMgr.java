@@ -1,13 +1,14 @@
 package com.tassadar.lorrismobile.connections;
 
-import java.util.HashMap;
-
 import android.bluetooth.BluetoothDevice;
+import android.util.SparseArray;
 
 public class ConnectionMgr {
 
     static public BTSerialPort createBTSerial(BluetoothDevice dev) {
-        for(Connection c : m_connections.values()) {
+        int size = m_connections.size();
+        for(int i = 0; i < size; ++i) {
+            Connection c = m_connections.valueAt(i);
             if(c.getType() != Connection.CONN_BT_SP)
                 continue;
 
@@ -30,5 +31,5 @@ public class ConnectionMgr {
     }
 
     private static int m_idCounter = 0;
-    private static HashMap<Integer, Connection> m_connections = new HashMap<Integer, Connection>();
+    private static SparseArray<Connection> m_connections = new SparseArray<Connection>();
 }

@@ -58,20 +58,11 @@ public class SessionListActivity extends FragmentActivity implements OnSessionCh
         getListView().setOnItemLongClickListener(new OnSessionLongClick());
         getListView().setOnItemClickListener(new OnSessionClickListener());
 
-        loadSessions();
-
         m_last_selected = ListView.INVALID_POSITION;
         if(savedInstanceState != null)
             m_last_selected = savedInstanceState.getInt("selected_idx", ListView.INVALID_POSITION);
-        
-        if(m_last_selected == ListView.INVALID_POSITION && getListView().getCount() != 0)
-            m_last_selected = 0;
 
-        if(m_last_selected != ListView.INVALID_POSITION)
-        {
-            getListView().setItemChecked(m_last_selected, true);
-            loadSessionDetail(m_last_selected);
-        }
+        loadSessions();
     }
 
     @Override
@@ -194,22 +185,45 @@ public class SessionListActivity extends FragmentActivity implements OnSessionCh
     }
 
     private void loadSessions() {
+        // FIXME: to make sure user does not see some bullshit?
+        //setListEmpty(true);
 
-        SessionMgr.loadAvailableNames(this);
+        new Thread(new Runnable(){
+            @Override
+            public void run() {
+                SessionMgr.loadAvailableNames(SessionListActivity.this);
+                runOnUiThread(new Runnable() {
+                    public void run() {
+                        onSessionNamesLoaded();
+                    }
+                });
+            }
+        }).start();
+    }
 
-        ArrayList<Session> sessions = new ArrayList<Session>();
+    private void onSessionNamesLoaded() { 
         LinkedList<String> names = SessionMgr.getSessionNames();
 
-        for(String name : names) {
-            Session s = SessionMgr.get(this, name);
-            if(s == null)
-                continue;
-            sessions.add(s);
-        }
+        setListEmpty(names.isEmpty());
 
-        setListEmpty(sessions.isEmpty());
-        m_adapter = new SessionListAdapter(this, R.layout.session_list_item, sessions);
-        getListView().setAdapter(m_adapter);
+        if(!names.isEmpty()) {
+            ArrayList<Session> sessions = new ArrayList<Session>();
+            for(String name : names) {
+                Session s = SessionMgr.get(this, name);
+                if(s == null)
+                    continue;
+                sessions.add(s);
+            }
+
+            m_adapter = new SessionListAdapter(this, R.layout.session_list_item, sessions);
+            getListView().setAdapter(m_adapter);
+
+            if(m_last_selected < 0 || m_last_selected >= sessions.size())
+                m_last_selected = 0;
+
+            getListView().setItemChecked(m_last_selected, true);
+            loadSessionDetail(m_last_selected);
+        }
     }
 
     private ListView getListView() {

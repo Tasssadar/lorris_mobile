@@ -11,8 +11,6 @@ public class Connection {
     public static final int ST_CONNECTING   = 1;
     public static final int ST_CONNECTED    = 2;
 
-    private static Connection m_storedConn;
-
     protected Connection(int type) {
         m_type = type;
         m_state = ST_DISCONNECTED;

@@ -39,9 +39,13 @@ public class ConnectionsActivity extends FragmentActivity implements ConnFragmen
         m_connBtns[Connection.CONN_USB] = (ImageButton)findViewById(R.id.con_usb_btn);
         
         m_currType = Connection.CONN_BT_SP;
-        if(savedInstanceState != null)
+        if(savedInstanceState != null) {
             m_currType = savedInstanceState.getInt("currType", m_currType);
-        switchFragment(m_currType);
+            Fragment f = getSupportFragmentManager().findFragmentById(R.id.conn_fragment_area);
+            if(f != null)
+                ((ConnFragment)f).setConnInterface(this);
+        } else
+            switchFragment(m_currType);
         m_connBtns[m_currType].setSelected(true);
     }
 
@@ -94,20 +98,22 @@ public class ConnectionsActivity extends FragmentActivity implements ConnFragmen
     }
 
     private void switchFragment(int type) {
-        Fragment f;
+        ConnFragment f;
         switch(type) {
             case Connection.CONN_BT_SP:
-                f = new BTConnFragment(this);
+                f = new BTConnFragment();
                 break;
             case Connection.CONN_TCP:
-                f = new TCPConnFragment(this);
+                f = new TCPConnFragment();
                 break;
             case Connection.CONN_USB:
-                f = new USBConnFragment(this);
+                f = new USBConnFragment();
                 break;
             default:
                 return;
         }
+
+        f.setConnInterface(this);
 
         FragmentManager mgr = getSupportFragmentManager();
         FragmentTransaction transaction = mgr.beginTransaction();

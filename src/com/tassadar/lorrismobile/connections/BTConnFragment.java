@@ -26,10 +26,6 @@ import com.tassadar.lorrismobile.R;
 
 public class BTConnFragment extends ConnFragment {
 
-    public BTConnFragment(ConnFragmentInterface in) {
-        super(in);
-    }
-
     private static final int REQUEST_ENABLE_BT = 1;
 
     @Override 
@@ -37,7 +33,7 @@ public class BTConnFragment extends ConnFragment {
         super.onAttach(activity);
 
         IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
-        activity.registerReceiver(m_bt_receiver, filter); // Don't forget to unregister during onDestroy
+        activity.registerReceiver(m_bt_receiver, filter);
         
         filter = new IntentFilter(BluetoothAdapter.ACTION_DISCOVERY_STARTED);
         activity.registerReceiver(m_bt_receiver, filter);
@@ -50,7 +46,7 @@ public class BTConnFragment extends ConnFragment {
     public void onCreate (Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
-        
+
         m_displayedDevices = new ArrayList<String>();
     }
 
@@ -192,12 +188,11 @@ public class BTConnFragment extends ConnFragment {
     }
 
     private void setProgressVisible(boolean visible) {
-        try {
-            ConnectionsActivity act = (ConnectionsActivity)getActivity();
-            act.setProgressIndicator(visible);
-        } catch(ClassCastException ex) {
-            assert(false);
-        }
+        Activity act = getActivity();
+        if(act == null || !(act instanceof ConnectionsActivity))
+            return;
+        
+        ((ConnectionsActivity)act).setProgressIndicator(visible);
     }
 
     private class DeviceClickedLister implements OnClickListener {

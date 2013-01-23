@@ -1,11 +1,6 @@
 package com.tassadar.lorrismobile.connections;
 
-import com.tassadar.lorrismobile.R;
-import com.tassadar.lorrismobile.R.layout;
-import com.tassadar.lorrismobile.R.menu;
-
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -13,13 +8,10 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.tassadar.lorrismobile.R;
+
 public class TCPConnFragment extends ConnFragment {
 
-    public TCPConnFragment(ConnFragmentInterface in) {
-        super(in);
-    }
-
-    
     @Override
     public void onCreate (Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

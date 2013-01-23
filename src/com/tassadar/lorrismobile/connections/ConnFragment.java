@@ -4,7 +4,7 @@ import android.support.v4.app.Fragment;
 
 public class ConnFragment extends Fragment {
     
-    protected ConnFragment(ConnFragmentInterface in) {
+    public void setConnInterface(ConnFragmentInterface in) {
         m_interface = in;
     }
 

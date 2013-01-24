@@ -45,7 +45,7 @@ public class WorkspaceActivity extends FragmentActivity implements TabSelectedLi
 
         setContentView(R.layout.workspace);
 
-        m_gest_detect = new GestureDetectorCompat(this, new SwipeListener());
+        m_gest_detect = new GestureDetectorCompat(this, m_gestListener);
         m_tabs = new ArrayList<Tab>();
         m_active_tab = -1;
 
@@ -197,13 +197,17 @@ public class WorkspaceActivity extends FragmentActivity implements TabSelectedLi
         return super.onTouchEvent(event);
     }
 
-    private class SwipeListener extends GestureDetector.SimpleOnGestureListener {
+    private GestureDetector.SimpleOnGestureListener m_gestListener = new  GestureDetector.SimpleOnGestureListener() {
         @Override
         public boolean onFling(MotionEvent ev1, MotionEvent ev2, float velX, float velY) {
             if(Math.abs(velX) > Math.abs(velY))
                 setTabPanelVisible(velX > 0);
             return true;
         }
+    };
+
+    public GestureDetector.SimpleOnGestureListener getGestureListener() {
+        return m_gestListener;
     }
 
     private class CreateTabListener implements OnMenuItemClickListener {

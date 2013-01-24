@@ -9,6 +9,7 @@ import java.io.OutputStream;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
 
+import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
@@ -21,6 +22,7 @@ import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 
 import com.tassadar.lorrismobile.R;
+import com.tassadar.lorrismobile.WorkspaceActivity;
 
 public class Terminal extends Tab {
 
@@ -49,11 +51,18 @@ public class Terminal extends Tab {
     @Override
     public View onCreateView (LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.terminal, container, false);
+
         EmulatorView e = (EmulatorView)v.findViewById(R.id.term);
         e.attachSession(m_termSession);
+
         DisplayMetrics metrics = new DisplayMetrics();
         getActivity().getWindowManager().getDefaultDisplay().getMetrics(metrics);
         e.setDensity(metrics);
+
+        Activity act = getActivity();
+        if(act instanceof WorkspaceActivity)
+            e.setExtGestureListener(((WorkspaceActivity)act).getGestureListener());
+
         e.setTextSize(16);
         return v;
     }

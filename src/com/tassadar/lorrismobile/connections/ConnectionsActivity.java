@@ -37,7 +37,7 @@ public class ConnectionsActivity extends FragmentActivity implements ConnFragmen
         m_connBtns[Connection.CONN_BT_SP] = (ImageButton)findViewById(R.id.con_bt_btn);
         m_connBtns[Connection.CONN_TCP] = (ImageButton)findViewById(R.id.con_tcp_btn);
         m_connBtns[Connection.CONN_USB] = (ImageButton)findViewById(R.id.con_usb_btn);
-        
+
         m_currType = Connection.CONN_BT_SP;
         if(savedInstanceState != null) {
             m_currType = savedInstanceState.getInt("currType", m_currType);

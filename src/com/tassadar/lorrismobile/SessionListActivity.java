@@ -10,6 +10,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
@@ -62,6 +63,8 @@ public class SessionListActivity extends FragmentActivity implements OnSessionCh
         m_last_selected = ListView.INVALID_POSITION;
         if(savedInstanceState != null)
             m_last_selected = savedInstanceState.getInt("selected_idx", ListView.INVALID_POSITION);
+        else
+            m_last_selected = getPreferences(0).getInt("selected_idx", ListView.INVALID_POSITION);
 
         loadSessions();
     }
@@ -71,6 +74,14 @@ public class SessionListActivity extends FragmentActivity implements OnSessionCh
         super.onSaveInstanceState(savedInstanceState);
 
         savedInstanceState.putInt("selected_idx", m_last_selected);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        SharedPreferences.Editor editor = getPreferences(0).edit();
+        editor.putInt("selected_idx", m_last_selected);
+        editor.commit();
     }
 
     @Override

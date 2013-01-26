@@ -15,7 +15,7 @@ public class ConnectionMgr {
         void onConnRemoved(int id);
     }
 
-    static public synchronized BTSerialPort createBTSerial(BluetoothDevice dev) {
+    static public BTSerialPort createBTSerial(BluetoothDevice dev) {
         int size = m_connections.size();
         for(int i = 0; i < size; ++i) {
             Connection c = m_connections.valueAt(i);

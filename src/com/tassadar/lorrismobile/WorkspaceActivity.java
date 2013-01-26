@@ -242,8 +242,26 @@ public class WorkspaceActivity extends FragmentActivity implements TabSelectedLi
     }
 
     @Override
-    public void onConnsLoad(SparseArray<Connection> conns) {
-        ConnectionMgr.addConnsArray(conns);
+    public void onConnsLoad(ArrayList<ContentValues> values) {
+        runOnUiThread(new LoadConnsRunnable(values));
+    }
+
+    private class LoadConnsRunnable implements Runnable {
+        ArrayList<ContentValues> m_values;
+        public LoadConnsRunnable(ArrayList<ContentValues> values) {
+            m_values = values;
+        }
+
+        @Override
+        public void run() {
+            SparseArray<Connection> conns = new SparseArray<Connection>();
+            for(ContentValues vals : m_values) {
+                Connection c = ConnectionMgr.createFromVals(vals);
+                if(c != null)
+                    conns.append(c.getId(), c);
+            }
+            ConnectionMgr.addConnsArray(conns);
+        }
     }
 
     @Override

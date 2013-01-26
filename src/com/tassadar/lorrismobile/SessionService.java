@@ -21,7 +21,7 @@ import com.tassadar.lorrismobile.modules.Tab;
 public class SessionService extends Service {
 
     public interface SessionServiceListener {
-        public void onConnsLoad(SparseArray<Connection> conns);
+        public void onConnsLoad(ArrayList<ContentValues> values);
         public void onTabsLoad(ArrayList<ContentValues> values);
     }
 
@@ -128,17 +128,10 @@ public class SessionService extends Service {
         @Override
         public void run() {
             ArrayList<ContentValues> values = m_session.loadConnections();
-            SparseArray<Connection> conns = new SparseArray<Connection>();
-            for(ContentValues vals : values) {
-                Connection c = ConnectionMgr.createFromVals(vals);
-                if(c != null)
-                    conns.append(c.getId(), c);
-            }
 
             SessionServiceListener listener = m_listener.get();
             if(listener != null)
-                listener.onConnsLoad(conns);
-            conns = null;
+                listener.onConnsLoad(values);
 
             values = m_session.loadTabs();
             listener = m_listener.get();

@@ -17,9 +17,10 @@
 
         <TextView android:layout_width="wrap_content"
             android:layout_height="match_parent"
+            android:layout_marginLeft="5dp"
             android:gravity="center"
             android:text="@string/lorris"
-            android:textSize="18dp"
+            android:textSize="18sp"
             android:textColor="#FFFFFFFF"
             android:layout_toRightOf="@id/action_bar_img" />
 
@@ -30,7 +31,7 @@
             android:background="@drawable/transparent_btn"
             android:layout_alignParentRight="true"
             android:textColor="#FFFFFFFF"
-            android:textSize="16dp"
+            android:textSize="16sp"
             android:drawableLeft="@drawable/ic_content_new"
             android:onClick="on_createSession_clicked" />
 

@@ -23,7 +23,8 @@ public class SessionDetailFragment extends Fragment {
 
     public interface OnSessionChangedListener {
         public void onSessionsChanged();
-        public void deleteSession(Session s);
+        public void deleteSession(String name);
+        public void openSession(String name);
     }
 
     @Override
@@ -58,8 +59,7 @@ public class SessionDetailFragment extends Fragment {
             startActivityForResult(i, ACTCODE_EDIT_SESSION);
             return true;
         case R.id.delete_session:
-            Session s = SessionMgr.get(getActivity(), m_session_name);
-            ((OnSessionChangedListener)getActivity()).deleteSession(s);
+            ((OnSessionChangedListener)getActivity()).deleteSession(m_session_name);
             return true;
         }
         return false;
@@ -72,7 +72,7 @@ public class SessionDetailFragment extends Fragment {
         
         switch(requestCode) {
             case ACTCODE_EDIT_SESSION:
-                SessionMgr.loadAvailableNames(getActivity());
+                SessionMgr.ensureSessionsLoaded(getActivity());
                 Session s = SessionMgr.get(getActivity(), data.getExtras().getString("session_name"));
                 if(s != null)
                     loadSession(s);
@@ -105,7 +105,7 @@ public class SessionDetailFragment extends Fragment {
     private class LoadSessionListener implements View.OnClickListener {
         @Override
         public void onClick(View v) {
-            startActivity(new Intent(getActivity(), WorkspaceActivity.class));
+            ((OnSessionChangedListener)getActivity()).openSession(m_session_name);
         }
     }
 

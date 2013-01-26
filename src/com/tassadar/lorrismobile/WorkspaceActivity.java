@@ -5,14 +5,21 @@ import java.util.ArrayList;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.ComponentName;
+import android.content.ContentValues;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GestureDetectorCompat;
+import android.util.Log;
+import android.util.SparseArray;
 import android.view.GestureDetector;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -25,14 +32,17 @@ import android.widget.LinearLayout;
 import android.widget.PopupMenu;
 import android.widget.PopupMenu.OnMenuItemClickListener;
 
+import com.tassadar.lorrismobile.SessionService.SessionServiceListener;
 import com.tassadar.lorrismobile.connections.Connection;
 import com.tassadar.lorrismobile.connections.ConnectionMgr;
+import com.tassadar.lorrismobile.connections.ConnectionMgr.ConnMgrListener;
 import com.tassadar.lorrismobile.connections.ConnectionsActivity;
 import com.tassadar.lorrismobile.modules.Tab;
 import com.tassadar.lorrismobile.modules.Tab.TabSelectedListener;
 import com.tassadar.lorrismobile.modules.TabListItem;
+import com.tassadar.lorrismobile.modules.TabManager;
 
-public class WorkspaceActivity extends FragmentActivity implements TabSelectedListener {
+public class WorkspaceActivity extends FragmentActivity implements TabSelectedListener, ConnMgrListener, SessionServiceListener {
 
     private static final int REQ_SET_CONN = 1;
 
@@ -40,18 +50,36 @@ public class WorkspaceActivity extends FragmentActivity implements TabSelectedLi
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        SessionMgr.ensureSessionsLoaded(this);
+
         if(Build.VERSION.SDK_INT < 11)
             requestWindowFeature(Window.FEATURE_NO_TITLE);
 
         setContentView(R.layout.workspace);
 
         m_gest_detect = new GestureDetectorCompat(this, m_gestListener);
-        m_tabs = new ArrayList<Tab>();
         m_active_tab = -1;
 
         if(Build.VERSION.SDK_INT >= 11)
             setUpActionBar();
-        createNewTab(Tab.TAB_TERMINAL);
+
+        Session s = SessionMgr.getActiveSession();
+        if(s == null && savedInstanceState != null) {
+            s = SessionMgr.get(this, savedInstanceState.getString("activeSession"));
+            if(s == null) {
+                Log.e("Lorris", "Failed to get active session, will probably crash.\n");
+            }
+            SessionMgr.setActiveSession(s);
+        }
+
+        TabManager.setTabIdCounter(s.getMaxTabId()+1);
+        ConnectionMgr.setConnIdCounter(s.getMaxConnId()+1);
+        ConnectionMgr.setListener(this);
+
+        // Clear leftovers from previous session save
+        s.clearChanges();
+
+        bindService(new Intent(this, SessionService.class), m_sessionServiceConn, Context.BIND_AUTO_CREATE);
     }
 
     @TargetApi(11)
@@ -60,10 +88,30 @@ public class WorkspaceActivity extends FragmentActivity implements TabSelectedLi
     }
 
     @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        Session s =  SessionMgr.getActiveSession();
+        if(s != null)
+            outState.putString("activeSession",s.getName());
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        m_sessionService.saveSession(SessionMgr.getActiveSession(),
+                TabManager.cloneTabArray(), ConnectionMgr.cloneConnArray());
+    }
+
+    @Override
     public void onDestroy() {
         super.onDestroy();
-        m_tabs.clear();
+        setResult(RESULT_OK);
         m_active_tab = -1;
+        unbindService(m_sessionServiceConn);
+
+        TabManager.takeTabArray();
+        ConnectionMgr.takeConnArray();
     }
 
     @Override
@@ -92,15 +140,28 @@ public class WorkspaceActivity extends FragmentActivity implements TabSelectedLi
         switch(requestCode) {
             case REQ_SET_CONN:
             {
-                if(data != null && !m_tabs.isEmpty()) {
+                if(data != null && !TabManager.isEmpty()) {
                     int id = data.getIntExtra("connId", -1);
                     Connection conn = ConnectionMgr.getConnection(id); 
-                    m_tabs.get(m_active_tab).setConnection(conn);
+                    TabManager.getTabByPos(m_active_tab).setConnection(conn);
+                    conn.open();
                 }
                 break;
             }
         }
     }
+
+    @Override
+    public void onConnAdded(Connection c) {
+        SessionMgr.getActiveSession().addConn(c.getId());
+    }
+
+    @Override
+    public void onConnRemoved(int id) {
+        SessionMgr.getActiveSession().rmConn(id);
+        Log.e("Lorris", "Connection " + id + " removed \n");
+    }
+
 
     private void setTabPanelVisible(boolean visible) {
         LinearLayout l = (LinearLayout)findViewById(R.id.tab_panel);
@@ -117,27 +178,35 @@ public class WorkspaceActivity extends FragmentActivity implements TabSelectedLi
     }
 
     private void createNewTab(int type) {
-        Tab t = Tab.createTab(this, type);
+        Tab t = TabManager.createTab(this, type);
         assert(t != null);
 
-        String name = getResources().getStringArray(R.array.tab_names)[type];
+        t.setTabId(TabManager.generateTabId());
+        registerTab(t);
+
+        SessionMgr.getActiveSession().addTab(t.getTabId());
+        setActiveTab(TabManager.size()-1);
+    }
+
+    private void registerTab(Tab t) {
+        TabManager.addTab(t);
+
+        String name = getResources().getStringArray(R.array.tab_names)[t.getType()];
         TabListItem it = new TabListItem(this, null, name);
         t.setTabListItem(it);
 
         LinearLayout l = (LinearLayout)findViewById(R.id.tab_list);
         l.addView(it.getView());
-        m_tabs.add(t);
 
         FragmentManager mgr = getSupportFragmentManager();
         FragmentTransaction transaction = mgr.beginTransaction();
         transaction.add(R.id.tab_content_layout, t);
+        transaction.hide(t);
         transaction.commit();
-
-        setActiveTab(m_tabs.size()-1);
     }
 
     private void setActiveTab(int idx) {
-        if(idx < 0 || idx >= m_tabs.size())
+        if(idx < 0 || idx >= TabManager.size())
             return;
 
         if(idx == m_active_tab)
@@ -145,8 +214,8 @@ public class WorkspaceActivity extends FragmentActivity implements TabSelectedLi
 
         Tab old = null; 
         if(m_active_tab != -1)
-            old = m_tabs.get(m_active_tab);
-        Tab curr = m_tabs.get(idx); 
+            old = TabManager.getTabByPos(m_active_tab);
+        Tab curr = TabManager.getTabByPos(idx); 
 
         FragmentManager mgr = getSupportFragmentManager();
         FragmentTransaction transaction = mgr.beginTransaction();
@@ -161,34 +230,52 @@ public class WorkspaceActivity extends FragmentActivity implements TabSelectedLi
         curr.setActive(true);
 
         m_active_tab = idx;
-    }
-
-    private Tab findTabById(int tabId) {
-        int size = m_tabs.size();
-        Tab t;
-        for(int i = 0; i < size; ++i)
-        {
-            t = m_tabs.get(i);
-            if(t.getTabId() == tabId)
-                return t;
-        }
-        return null;
-    }
-
-    private int findTabIdxById(int tabId) {
-        int size = m_tabs.size();
-        for(int i = 0; i < size; ++i)
-            if(m_tabs.get(i).getTabId() == tabId)
-                return i;
-        return -1;
+        SessionMgr.getActiveSession().setCurrTab(curr.getTabId());
     }
 
     @Override
     public void onTabSelectedClicked(int tabId) {
-        int idx = findTabIdxById(tabId);
+        int idx = TabManager.getTabPos(tabId);
         if(idx == -1)
             return;
         setActiveTab(idx);
+    }
+
+    @Override
+    public void onConnsLoad(SparseArray<Connection> conns) {
+        ConnectionMgr.addConnsArray(conns);
+    }
+
+    @Override
+    public void onTabsLoad(ArrayList<ContentValues> values) {
+        for(ContentValues vals : values) {
+            runOnUiThread(new LoadTabRunnable(vals));
+        }
+    }
+
+    private class LoadTabRunnable implements Runnable {
+        private ContentValues m_vals;
+        public LoadTabRunnable(ContentValues vals) {
+            m_vals = vals;
+        }
+
+        @Override
+        public void run() {
+            Tab t = TabManager.createTab(WorkspaceActivity.this, m_vals.getAsInteger("type"));
+            if(t == null)
+                return;
+
+            t.setTabId(m_vals.getAsInteger("id"));
+            registerTab(t);
+            Log.i("Lorris", "Tab has connection id " + m_vals.getAsInteger("conn_id") + "\n");
+            Connection c = ConnectionMgr.getConnection(m_vals.getAsInteger("conn_id"));
+            if(c != null)
+                t.setConnection(c);
+            t.loadData(m_vals.getAsByteArray("data"));
+
+            if(SessionMgr.getActiveSession().getCurrTabId() == t.getTabId())
+                setActiveTab(TabManager.size()-1);
+        }
     }
 
     @Override 
@@ -215,10 +302,10 @@ public class WorkspaceActivity extends FragmentActivity implements TabSelectedLi
         public boolean onMenuItemClick(MenuItem item) {
             switch(item.getItemId()) {
             case R.id.analyzer:
-                createNewTab(Tab.TAB_ANALYZER);
+                createNewTab(TabManager.TAB_ANALYZER);
                 return true;
             case R.id.terminal:
-                createNewTab(Tab.TAB_TERMINAL);
+                createNewTab(TabManager.TAB_TERMINAL);
                 return true;
             }
             return false;
@@ -254,7 +341,18 @@ public class WorkspaceActivity extends FragmentActivity implements TabSelectedLi
             showCreateTabMenuICS(v);
     }
 
+    private ServiceConnection m_sessionServiceConn = new ServiceConnection() {
+        public void onServiceConnected(ComponentName className, IBinder service) {
+            m_sessionService = ((SessionService.SessionBinder)service).getService();
+            m_sessionService.loadSession(SessionMgr.getActiveSession(), WorkspaceActivity.this);
+        }
+
+        public void onServiceDisconnected(ComponentName className) {
+            m_sessionService = null;
+        }
+    };
+
+    private SessionService m_sessionService;
     private GestureDetectorCompat m_gest_detect;
-    private ArrayList<Tab> m_tabs;
     private int m_active_tab;
 }

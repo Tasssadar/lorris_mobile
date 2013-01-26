@@ -106,8 +106,11 @@ public class Connection {
 
     public void write(byte[] data, int offset, int count) {
 
-    } 
-    
+    }
+
+    public byte[] saveData() {
+        return null;
+    }
 
     protected int m_id;
     protected int m_type;

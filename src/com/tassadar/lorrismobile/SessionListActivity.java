@@ -38,8 +38,9 @@ import com.tassadar.lorrismobile.SessionDetailFragment.OnSessionChangedListener;
 
 public class SessionListActivity extends FragmentActivity implements OnSessionChangedListener {
 
-    private static final int ACTCODE_NEW_SESSION = 1;
+    private static final int ACTCODE_NEW_SESSION  = 1;
     private static final int ACTCODE_EDIT_SESSION = 2;
+    private static final int ACTCODE_OPEN_SESSION = 3;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -91,13 +92,12 @@ public class SessionListActivity extends FragmentActivity implements OnSessionCh
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if(resultCode != Activity.RESULT_OK)
-            return;
-
         switch(requestCode)
         {
         case ACTCODE_NEW_SESSION:
         {
+            if(resultCode != Activity.RESULT_OK)
+                break;
             loadSessions();
 
             int pos = m_adapter.getSessionPos(data.getStringExtra("session_name"));
@@ -108,6 +108,7 @@ public class SessionListActivity extends FragmentActivity implements OnSessionCh
             break;
         }
         case ACTCODE_EDIT_SESSION:
+        case ACTCODE_OPEN_SESSION:
             onSessionsChanged();
             break;
         default:
@@ -133,7 +134,11 @@ public class SessionListActivity extends FragmentActivity implements OnSessionCh
     }
 
     @Override
-    public void deleteSession(Session s) {
+    public void deleteSession(String name) {
+        deleteSession(m_adapter.getSession(name));
+    }
+
+    private void deleteSession(Session s) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
 
         String text = getResources().getString(R.string.erase_session_text);
@@ -146,7 +151,20 @@ public class SessionListActivity extends FragmentActivity implements OnSessionCh
 
         builder.create().show();
     }
-    
+
+    @Override
+    public void openSession(String name) {
+        openSession(m_adapter.getSession(name));
+    }
+
+    private void openSession(Session s) {
+        SessionMgr.setActiveSession(s);
+        s.setLastOpenTime();
+
+        Intent i = new Intent(this, WorkspaceActivity.class);
+        startActivityForResult(i,  ACTCODE_OPEN_SESSION);
+    }
+
     private class DeleteListener implements OnClickListener {
         public DeleteListener(Session s) {
             m_session = s;
@@ -191,7 +209,7 @@ public class SessionListActivity extends FragmentActivity implements OnSessionCh
         new Thread(new Runnable(){
             @Override
             public void run() {
-                SessionMgr.loadAvailableNames(SessionListActivity.this);
+                SessionMgr.ensureSessionsLoaded(SessionListActivity.this);
                 runOnUiThread(new Runnable() {
                     public void run() {
                         onSessionNamesLoaded();
@@ -248,7 +266,7 @@ public class SessionListActivity extends FragmentActivity implements OnSessionCh
             if(f != null)
                 loadSessionDetail(pos);
             else
-                startActivity(new Intent(SessionListActivity.this, WorkspaceActivity.class));
+                openSession(m_adapter.getSession(pos));
         }
     }
 
@@ -310,6 +328,13 @@ public class SessionListActivity extends FragmentActivity implements OnSessionCh
             return m_sessions.get(pos);
         }
 
+        public Session getSession(String name) {
+            int pos = getSessionPos(name);
+            if(pos != ListView.INVALID_POSITION)
+                return m_sessions.get(pos);
+            return null;
+        }
+
         public int getSessionPos(String name) { 
             for(int i = 0; i < m_sessions.size(); ++i) {
                 if(m_sessions.get(i).getName().equals(name))
@@ -360,7 +385,7 @@ public class SessionListActivity extends FragmentActivity implements OnSessionCh
 
         private Session m_session;
     }
-    
+
     private SessionListAdapter m_adapter;
     private int m_last_selected;
 }

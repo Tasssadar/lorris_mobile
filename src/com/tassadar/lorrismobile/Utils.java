@@ -6,7 +6,9 @@ import java.io.File;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Matrix;
+import android.os.Build;
 import android.os.Environment;
+import android.util.SparseArray;
 
 public class Utils {
 
@@ -73,4 +75,31 @@ public class Utils {
         return false;
     }
 
+    public static <E> SparseArray<E> cloneSparseArray(SparseArray<E> array) {
+        if(Build.VERSION.SDK_INT >= 14)
+            return array.clone();
+        else
+        {
+            SparseArray<E> res = new SparseArray<E>();
+            int size = array.size();
+            for(int i = 0; i < size; ++i)
+                res.append(array.keyAt(i), array.valueAt(i));
+            return res;
+        }
+    }
+
+    public static void writeIntToByteArray(int val, byte[] array, int offset) {
+        array[offset++] = (byte)(val >> 24);
+        array[offset++] = (byte)(val >> 16);
+        array[offset++] = (byte)(val >> 8);
+        array[offset++] = (byte)val;
+    }
+    
+    public static int readIntFromByteArray(byte[] array, int offset) {
+        int res = (array[offset++] & 0xFF) << 24;
+        res |= (array[offset++] & 0xFF) << 16;
+        res |= (array[offset++] & 0xFF) << 8;
+        res |= array[offset++] & 0xFF;
+        return res;
+    }
 }

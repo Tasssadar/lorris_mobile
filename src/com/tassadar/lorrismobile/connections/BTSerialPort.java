@@ -28,6 +28,24 @@ public class BTSerialPort extends Connection {
     private static final int WRITE_STOP = 0;
     private static final int WRITE_DATA = 1;
 
+    static public BTSerialPort fromData(byte[] data) {
+        BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
+        if(adapter == null)
+            return null;
+
+        
+        BluetoothDevice dev = null;
+        try {
+            dev = adapter.getRemoteDevice(new String(data));
+        }catch(IllegalArgumentException ex) {
+            ex.printStackTrace();
+            return null;
+        }
+
+        BTSerialPort sp = new BTSerialPort(dev);
+        return sp;
+    }
+
     public BTSerialPort(BluetoothDevice device) {
         super(Connection.CONN_BT_SP);
         m_device = device;
@@ -86,6 +104,10 @@ public class BTSerialPort extends Connection {
         }).start();
     }
 
+    public byte[] saveData() {
+        return m_device.getAddress().getBytes();
+    }
+
     @Override
     public String getName() {
         if(m_device == null)
@@ -135,6 +157,7 @@ public class BTSerialPort extends Connection {
         private final WeakReference<BTSerialPort> m_port; 
 
         StateHandler(BTSerialPort port) {
+            super(Looper.getMainLooper());
             m_port = new WeakReference<BTSerialPort>(port);
         }
 

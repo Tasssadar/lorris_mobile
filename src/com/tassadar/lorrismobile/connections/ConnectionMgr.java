@@ -1,11 +1,21 @@
 package com.tassadar.lorrismobile.connections;
 
+import java.lang.ref.WeakReference;
+
 import android.bluetooth.BluetoothDevice;
+import android.content.ContentValues;
 import android.util.SparseArray;
+
+import com.tassadar.lorrismobile.Utils;
 
 public class ConnectionMgr {
 
-    static public BTSerialPort createBTSerial(BluetoothDevice dev) {
+    public interface ConnMgrListener {
+        void onConnAdded(Connection c);
+        void onConnRemoved(int id);
+    }
+
+    static public synchronized BTSerialPort createBTSerial(BluetoothDevice dev) {
         int size = m_connections.size();
         for(int i = 0; i < size; ++i) {
             Connection c = m_connections.valueAt(i);
@@ -18,18 +28,69 @@ public class ConnectionMgr {
         }
         BTSerialPort p = new BTSerialPort(dev);
         p.setId(m_idCounter++);
-        m_connections.put(p.getId(), p);
+        addConnection(p);
         return p;
     }
 
-    static public void removeConnection(int id) {
+    static public Connection createFromVals(ContentValues vals) {
+        Connection c = null;
+        switch(vals.getAsInteger("type")) {
+            case Connection.CONN_BT_SP:
+                c = BTSerialPort.fromData(vals.getAsByteArray("data"));
+                break;
+            default:
+                return null;
+        }
+
+        if(c == null)
+            return null;
+
+        c.setId(vals.getAsInteger("id"));
+        return c;
+    }
+
+    static public synchronized void addConnection(Connection c) {
+        m_connections.put(c.getId(), c);
+
+        if(m_listener != null && m_listener.get() != null)
+            m_listener.get().onConnAdded(c);
+    }
+
+    static public synchronized void removeConnection(int id) {
+        if(m_listener != null && m_listener.get() != null)
+            m_listener.get().onConnRemoved(id);
         m_connections.remove(id);
     }
 
     static public Connection getConnection(int id) {
-        return m_connections.get(Integer.valueOf(id));
+        return m_connections.get(id);
+    }
+    
+    static public synchronized SparseArray<Connection> cloneConnArray() {
+        return Utils.cloneSparseArray(m_connections);
+    }
+
+    static public synchronized SparseArray<Connection> takeConnArray() {
+        SparseArray<Connection> res = m_connections;
+        m_connections = new SparseArray<Connection>();
+        return res;
+    }
+    
+    static public synchronized void addConnsArray(SparseArray<Connection> conns) {
+        int size = conns.size();
+        for(int i = 0; i < size; ++i)
+            m_connections.put(conns.keyAt(i), conns.valueAt(i));
+    }
+
+    static public void setConnIdCounter(int value) {
+        m_idCounter = value;
+    }
+
+    static public void setListener(ConnMgrListener listener) {
+        m_listener = new WeakReference<ConnMgrListener>(listener);
     }
 
     private static int m_idCounter = 0;
     private static SparseArray<Connection> m_connections = new SparseArray<Connection>();
+    private static WeakReference<ConnMgrListener> m_listener = null;
 }

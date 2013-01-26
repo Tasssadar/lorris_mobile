@@ -36,6 +36,8 @@ public class SessionEditActivity extends Activity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        SessionMgr.ensureSessionsLoaded(this);
+
         if(Build.VERSION.SDK_INT  < 11)
             requestWindowFeature(Window.FEATURE_NO_TITLE);
 
@@ -262,7 +264,7 @@ public class SessionEditActivity extends Activity {
         session.setDesc(desc.getText().toString());
         session.setImage(m_image);
 
-        session.save();
+        session.saveBase();
 
         Intent i = new Intent();
         i.putExtra("session_name", session.getName());

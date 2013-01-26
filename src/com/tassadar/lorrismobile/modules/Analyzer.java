@@ -13,9 +13,9 @@ import com.tassadar.lorrismobile.R;
 
 public class Analyzer extends Tab {
 
-    public Analyzer(TabSelectedListener listener) {
-        super(listener);
-        m_type = TAB_ANALYZER;
+    @Override
+    public int getType() {
+        return TabManager.TAB_ANALYZER;
     }
 
     @Override

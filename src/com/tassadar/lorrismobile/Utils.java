@@ -12,7 +12,10 @@ import android.util.SparseArray;
 
 public class Utils {
 
-    public static File getDataFolder(Context ctx) { 
+    public static File getDataFolder(Context ctx) {
+        if(ctx == null)
+            ctx = LorrisApplication.getAppContext();
+
         File f = ctx.getExternalFilesDir(null);
 
         if(f != null && f.exists())

@@ -159,6 +159,6 @@ public class Tab extends Fragment implements TabItemClicked, ConnectionInterface
     private TabListItem m_tab_list_it;
     private TabSelectedListener m_listener;
     protected Connection m_conn;
-    private byte[] m_loadData;
+    protected byte[] m_loadData;
     protected int m_lastConnId;
 }

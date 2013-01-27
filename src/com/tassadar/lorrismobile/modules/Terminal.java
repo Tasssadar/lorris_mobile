@@ -1,19 +1,20 @@
 package com.tassadar.lorrismobile.modules;
 
 
+import jackpal.androidterm.emulatorview.ByteQueue;
 import jackpal.androidterm.emulatorview.EmulatorView;
 import jackpal.androidterm.emulatorview.TermSession;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
 
 import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -21,6 +22,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.Toast;
 
 import com.tassadar.lorrismobile.BlobInputStream;
 import com.tassadar.lorrismobile.BlobOutputStream;
@@ -33,15 +35,10 @@ public class Terminal extends Tab {
         super();
         m_termSession = new TermSession();
 
-        PipedInputStream str = new PipedInputStream();
-        try {
-            m_outStr = new PipedOutputStream(str);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        m_outStr = new TermInStream();
 
-        m_termSession.setTermIn(str);
-        m_termSession.setTermOut(new TermStream());
+        m_termSession.setTermIn(m_outStr);
+        m_termSession.setTermOut(new TermOutStream());
         m_data = new ByteArrayOutputStream();
     }
 
@@ -100,21 +97,51 @@ public class Terminal extends Tab {
             case R.id.toggle_keyboard:
                 toggleKeyboard();
                 return true;
+            case R.id.clear:
+            {
+                if(m_loadThread != null && m_loadThread.isAlive()) {
+                    Toast.makeText(getActivity(), R.string.terminal_loading, Toast.LENGTH_SHORT).show();
+                    return true;
+                }
+
+                try {
+                    m_data.close();
+                } catch (IOException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+                m_data = new ByteArrayOutputStream();
+                m_termSession.finish();
+                
+                m_outStr = new TermInStream();
+
+                m_termSession = new TermSession();
+                m_termSession.setTermIn(m_outStr);
+                m_termSession.setTermOut(new TermOutStream());
+
+                EmulatorView e = (EmulatorView)getView().findViewById(R.id.term);
+                e.attachSession(m_termSession);
+                e.initialize();
+                return true;
+            }
+                
         }
         return false;
     }
 
     @Override
     public void dataRead(byte[] data) {
+        synchronized(m_outStr) {
         try {
             m_data.write(data);
             m_outStr.write(data);
         } catch (IOException e) {
             e.printStackTrace();
         }
+        }
     }
 
-    private class TermStream extends OutputStream {
+    private class TermOutStream extends OutputStream {
         @Override
         public void write(int oneByte) throws IOException {
             // not used
@@ -124,6 +151,81 @@ public class Terminal extends Tab {
         public void write (byte[] buffer, int offset, int count) throws IOException {
             if(m_conn != null)
                 m_conn.write(buffer, offset, count);
+        }
+    }
+
+    private class TermInStream extends InputStream {
+        private ByteQueue m_queue;
+        private Object m_queueLock;
+
+        public TermInStream() {
+            m_queue = new ByteQueue(4096);
+            m_queueLock = new Object();
+        }
+
+        @Override
+        public void close() {
+            synchronized(m_queueLock) {
+                m_queue = null;
+            }
+        }
+
+        public void write (byte[] buffer) throws IOException {
+            write(buffer, 0, buffer.length);
+        }
+
+        public void write (byte[] buffer, int offset, int count) throws IOException {
+            ByteQueue queue = null;
+            synchronized(m_queueLock) {
+                queue = m_queue;
+            }
+
+            if(queue == null)
+                return;
+
+            try {
+                while (count > 0) {
+                    int written = queue.write(buffer, offset, count);
+                    offset += written;
+                    count -= written;
+
+                    while(queue.getBytesAvailable() == 128)
+                        Thread.sleep(1);
+                }
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+
+        @Override
+        public int available() {
+            synchronized(m_queueLock) {
+                return m_queue.getBytesAvailable();
+            }
+        }
+
+        @Override
+        public int read() throws IOException {
+            return -1;
+        }
+
+        @Override
+        public int read(byte[] buffer, int offset, int length) {
+            ByteQueue queue = null;
+            synchronized(m_queueLock) {
+                queue = m_queue;
+            }
+
+            if(queue == null)
+                return -1;
+
+            int len = -1;
+            try {
+                len = queue.read(buffer, offset, length);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            return len;
         }
     }
     
@@ -152,7 +254,11 @@ public class Terminal extends Tab {
         super.loadDataStream(str);
         byte[] data = str.readByteArray("termData");
 
-        new LoadTermDataThread(data).start(); 
+        if(data != null) {
+            m_loadThread = new LoadTermDataThread(data);
+            m_loadThread.setName("LoadTermDataThread");
+            m_loadThread.start();
+        }
     }
 
     private class LoadTermDataThread extends Thread {
@@ -163,22 +269,22 @@ public class Terminal extends Tab {
 
         @Override
         public void run() {
-            dataRead(m_data);
+            Log.e("Lorris", "LoadTermDataThread started " + m_data.length);
             
-            // Wait for it to finish writing, because we are
-            // in different thread and it would cause "Pipe broken"
-            // exceptions
-            try {
-                synchronized(m_outStr) {
-                    m_outStr.wait();
-                }
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            if(m_conn != null)
+                m_conn.removeInterface(Terminal.this);
+
+            dataRead(m_data);
+
+            if(m_conn != null)
+                m_conn.addInterface(Terminal.this);
+
+            Log.e("Lorris", "LoadTermDataThread ended");
         }
     }
 
     private TermSession m_termSession;
-    private PipedOutputStream m_outStr;
+    private TermInStream m_outStr;
     private ByteArrayOutputStream m_data;
+    private LoadTermDataThread m_loadThread;
 }

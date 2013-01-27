@@ -4,4 +4,9 @@
         android:showAsAction="always"
         android:menuCategory="system"
         android:icon="@drawable/hardware_keyboard"/>
+    <item android:id="@+id/clear"
+        android:title="@string/clear"
+        android:showAsAction="always"
+        android:menuCategory="system"
+        android:icon="@drawable/content_discard"/>
 </menu>

@@ -143,7 +143,7 @@ public class BTSerialPort extends Connection {
             case Connection.ST_DISCONNECTED:
             {
                 if(m_pollThread == null)
-                    return;
+                    break;
                 m_pollThread.stopPolling();
                 m_writeThread.getHandler().sendEmptyMessage(WRITE_STOP);
                 break;
@@ -254,8 +254,8 @@ public class BTSerialPort extends Connection {
                     
                     byte[] out = new byte[bytes];
                     System.arraycopy(buffer, 0, out, 0, bytes);
-
-                    m_handler.obtainMessage(SRC_POLL_THREAD, STATE_OK, 0, out).sendToTarget();
+                    sendDataRead(out);
+                    //m_handler.obtainMessage(SRC_POLL_THREAD, STATE_OK, 0, out).sendToTarget();
                 } catch (IOException e) {
                     m_handler.obtainMessage(SRC_POLL_THREAD, STATE_FAILED, 1).sendToTarget();
                     break;

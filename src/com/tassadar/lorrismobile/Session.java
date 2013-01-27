@@ -1,6 +1,10 @@
 package com.tassadar.lorrismobile;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -80,8 +84,7 @@ public class Session extends SQLiteOpenHelper {
                 "id INTEGER UNIQUE NOT NULL," +
                 "type INTEGER NOT NULL," +
                 "name TEXT NOT NULL," +
-                "conn_id INTEGER NOT NULL DEFAULT '-1'," +
-                "data BLOB);");
+                "conn_id INTEGER NOT NULL DEFAULT '-1');");
 
         // Connections
         db.execSQL("CREATE TABLE connections (" +
@@ -164,10 +167,12 @@ public class Session extends SQLiteOpenHelper {
                         break;
                     }
                     dbCreateTab(t);
+                    createTabDataFile(t);
                     break;
                 }
                 case REMOVED:
                     dbRemoveTab(id);
+                    rmTabDataFile(id);
                     break;
             }
         }
@@ -213,7 +218,6 @@ public class Session extends SQLiteOpenHelper {
         vals.put("type", t.getType());
         vals.put("name", t.getName());
         vals.put("conn_id", t.getLastConnId());
-        vals.put("data", t.saveData());
         m_db.insert("tabs", null, vals);
     }
 
@@ -242,9 +246,22 @@ public class Session extends SQLiteOpenHelper {
 
             vals.put("name", t.getName());
             vals.put("conn_id", t.getConnId());
-            vals.put("data", t.saveData());
             Log.e("Lorris", "Tab connection id " + t.getConnId() + "\n");
             m_db.update("tabs", vals, "id="+ String.valueOf(t.getTabId()), null);
+
+            File f = getTabDataFile(t.getTabId(), true);
+            if(f != null) {
+                byte[] save = t.saveData();
+                try {
+                    FileOutputStream str = new FileOutputStream(f);
+                    str.write(save);
+                    str.close();
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
         }
     }
 
@@ -256,6 +273,47 @@ public class Session extends SQLiteOpenHelper {
             vals.put("data", c.saveData());
             m_db.update("connections", vals, "id="+ String.valueOf(c.getId()), null);
         }
+    }
+
+    private void createTabDataFile(Tab t) {
+        File dataFile = getTabDataFile(t.getTabId(), false);
+        if(dataFile.exists())
+            dataFile.delete();
+
+        try {
+            if(!dataFile.createNewFile())
+                Log.e("Lorris", "Failed to craete tab data file.");
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+    }
+
+    private void rmTabDataFile(int id) {
+        File f = getTabDataFile(id, true);
+        if(f == null) {
+            Log.e("Lorris", "Can't remove data file, it does not exist\n");
+        }
+        f.delete();
+    }
+
+    public File getTabDataFile(int id, boolean mustExist) {
+        File extPath = Utils.getDataFolder(null);
+        if(extPath == null) {
+            Log.e("Lorris", "Failed to get data folde!\n");
+            return null;
+        }
+
+        File path = new File(extPath.getAbsolutePath() + "/" + m_name + "/");
+        if(!path.exists()) {
+            Log.e("Lorris", "Failed to get data file, session folder does not exist!\n");
+            return null;
+        }
+
+        File f = new File(path, "tab_data_" + id);
+        if(mustExist && !f.exists())
+            return null;
+        return f;
     }
 
     public boolean loadBase() {
@@ -316,15 +374,31 @@ public class Session extends SQLiteOpenHelper {
         ArrayList<ContentValues> res = new ArrayList<ContentValues>();
 
         SQLiteDatabase db = getReadableDatabase();
-        //                             0   1     2     3        4
-        Cursor c = db.rawQuery("SELECT id, type, name, conn_id, data FROM tabs ORDER BY id;", null);
+        //                             0   1     2     3
+        Cursor c = db.rawQuery("SELECT id, type, name, conn_id FROM tabs ORDER BY id;", null);
         while(c.moveToNext()) {
             ContentValues vals = new ContentValues();
             vals.put("id", c.getInt(0));
             vals.put("type", c.getInt(1));
             vals.put("name", c.getString(2));
             vals.put("conn_id", c.getInt(3));
-            vals.put("data", c.getBlob(4));
+
+            byte[] data = new byte[0];
+            File f = getTabDataFile(c.getInt(0), true);
+            if(f != null) {
+                try {
+                    FileInputStream str = new FileInputStream(f);
+                    data = new byte[(int) f.length()];
+                    str.read(data);
+                    str.close();
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            vals.put("data", data);
             res.add(vals);
         }
         c.close();

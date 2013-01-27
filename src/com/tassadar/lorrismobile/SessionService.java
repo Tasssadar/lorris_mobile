@@ -15,7 +15,6 @@ import android.util.Log;
 import android.util.SparseArray;
 
 import com.tassadar.lorrismobile.connections.Connection;
-import com.tassadar.lorrismobile.connections.ConnectionMgr;
 import com.tassadar.lorrismobile.modules.Tab;
 
 public class SessionService extends Service {
@@ -142,5 +141,4 @@ public class SessionService extends Service {
 
     private final IBinder m_binder = new SessionBinder();
     private NotificationManager m_notificationMgr;
-    private Object m_sessionLock = new Object();
 }

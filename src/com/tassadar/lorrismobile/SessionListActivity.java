@@ -107,15 +107,8 @@ public class SessionListActivity extends FragmentActivity implements OnSessionCh
         {
         case ACTCODE_NEW_SESSION:
         {
-            if(resultCode != Activity.RESULT_OK)
-                break;
-            loadSessions();
-
-            int pos = m_adapter.getSessionPos(data.getStringExtra("session_name"));
-            if(pos != ListView.INVALID_POSITION) {
-                getListView().setItemChecked(pos, true);
-                loadSessionDetail(pos);
-            }
+            if(resultCode == Activity.RESULT_OK)
+                loadSessions();
             break;
         }
         case ACTCODE_EDIT_SESSION:

@@ -239,10 +239,15 @@ public class Session extends SQLiteOpenHelper {
     }
 
     private void dbSaveTabs(SparseArray<Tab> tabs) {
+        m_maxTabId = -1;
+
         int size = tabs.size();
         ContentValues vals = new ContentValues();
         for(int i = 0; i < size; ++i) {
             Tab t = tabs.valueAt(i);
+
+            if(t.getTabId() > m_maxTabId)
+                m_maxTabId = t.getTabId();
 
             vals.put("name", t.getName());
             vals.put("conn_id", t.getConnId());
@@ -266,10 +271,16 @@ public class Session extends SQLiteOpenHelper {
     }
 
     private void dbSaveConns(SparseArray<Connection> conns) {
+        m_maxConnId = -1;
+
         int size = conns.size();
         ContentValues vals = new ContentValues();
         for(int i = 0; i < size; ++i) {
             Connection c = conns.valueAt(i);
+
+            if(c.getId() > m_maxConnId)
+                m_maxConnId = c.getId();
+
             vals.put("data", c.saveData());
             m_db.update("connections", vals, "id="+ String.valueOf(c.getId()), null);
         }

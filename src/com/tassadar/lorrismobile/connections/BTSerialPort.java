@@ -77,16 +77,11 @@ public class BTSerialPort extends Connection {
             @Override
             public void run() {
                 try {
-                    if(m_writeThread != null) {
-                        synchronized(m_writeThread) {
-                            m_writeThread.wait(5000);
-                        }
-                    }
-                    if(m_pollThread != null) {
-                        synchronized(m_pollThread) {
-                            m_pollThread.wait(5000);
-                        }
-                    }
+                    if(m_writeThread != null)
+                        m_writeThread.join();
+
+                    if(m_pollThread != null)
+                        m_pollThread.join();
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }

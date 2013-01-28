@@ -9,6 +9,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.lang.ref.WeakReference;
 
 import android.app.Activity;
 import android.content.Context;
@@ -33,6 +34,8 @@ public class Terminal extends Tab {
 
     public Terminal() {
         super();
+        m_loadThread = new WeakReference<LoadTermDataThread>(null);
+
         m_termSession = new TermSession();
 
         m_outStr = new TermInStream();
@@ -99,7 +102,8 @@ public class Terminal extends Tab {
                 return true;
             case R.id.clear:
             {
-                if(m_loadThread != null && m_loadThread.isAlive()) {
+                LoadTermDataThread t = m_loadThread.get();
+                if(t != null && t.isAlive()){
                     Toast.makeText(getActivity(), R.string.terminal_loading, Toast.LENGTH_SHORT).show();
                     return true;
                 }
@@ -255,9 +259,10 @@ public class Terminal extends Tab {
         byte[] data = str.readByteArray("termData");
 
         if(data != null) {
-            m_loadThread = new LoadTermDataThread(data);
-            m_loadThread.setName("LoadTermDataThread");
-            m_loadThread.start();
+            LoadTermDataThread t = new LoadTermDataThread(data);
+            m_loadThread = new WeakReference<LoadTermDataThread>(t);
+            t.setName("LoadTermDataThread");
+            t.start();
         }
     }
 
@@ -275,6 +280,7 @@ public class Terminal extends Tab {
                 m_conn.removeInterface(Terminal.this);
 
             dataRead(m_data);
+            m_data = null;
 
             if(m_conn != null)
                 m_conn.addInterface(Terminal.this);
@@ -286,5 +292,5 @@ public class Terminal extends Tab {
     private TermSession m_termSession;
     private TermInStream m_outStr;
     private ByteArrayOutputStream m_data;
-    private LoadTermDataThread m_loadThread;
+    private WeakReference<LoadTermDataThread> m_loadThread;
 }

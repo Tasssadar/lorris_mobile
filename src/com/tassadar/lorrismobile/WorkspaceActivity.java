@@ -11,6 +11,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.content.res.Resources;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
@@ -20,6 +21,7 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GestureDetectorCompat;
 import android.util.Log;
 import android.util.SparseArray;
+import android.util.TypedValue;
 import android.view.GestureDetector;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -27,8 +29,10 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.Window;
+import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.LinearLayout;
+import android.widget.LinearLayout.LayoutParams;
 import android.widget.PopupMenu;
 import android.widget.PopupMenu.OnMenuItemClickListener;
 
@@ -164,16 +168,52 @@ public class WorkspaceActivity extends FragmentActivity implements TabSelectedLi
 
 
     private void setTabPanelVisible(boolean visible) {
-        LinearLayout l = (LinearLayout)findViewById(R.id.tab_panel);
-        if(visible == (l.getVisibility() == View.VISIBLE))
+        LinearLayout menuLayout = (LinearLayout)findViewById(R.id.tab_panel);
+        LinearLayout contentLayout = (LinearLayout)findViewById(R.id.tab_content_layout);
+
+        LayoutParams pContent = (LayoutParams) contentLayout.getLayoutParams();
+        LayoutParams pMenu = (LayoutParams) menuLayout.getLayoutParams();
+
+        if(visible == (pMenu.leftMargin == 0))
             return;
 
+        Resources r = getResources();
+        // FIXME: should use real size
+        int px = (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 200, r.getDisplayMetrics());
+
         if(visible){
-            l.setVisibility(View.VISIBLE);
-            l.startAnimation(AnimationUtils.loadAnimation(this, R.anim.tab_panel_show));
+            pMenu.leftMargin = 0;
+            pContent.rightMargin = -px;
+            menuLayout.startAnimation(AnimationUtils.loadAnimation(this, R.anim.tab_panel_show));
+            contentLayout.requestLayout();
+            menuLayout.requestLayout();
         }else {
-            l.setVisibility(View.GONE);
-            l.startAnimation(AnimationUtils.loadAnimation(this, R.anim.tab_panel_hide));
+            Animation a = AnimationUtils.loadAnimation(this, R.anim.tab_panel_hide);
+            menuLayout.startAnimation(a);
+            menuLayout.postDelayed(new PanRunnable(contentLayout, menuLayout, -px, 0),
+                    a.computeDurationHint());
+        }
+    }
+    
+    private class PanRunnable implements Runnable {
+        private LinearLayout m_content, m_menu;
+        private int m_menuLeft, m_contentRight;
+
+        public PanRunnable(LinearLayout content, LinearLayout menu, int menuLeft, int contentRight) {
+            m_menu = menu;
+            m_content = content;
+            m_menuLeft = menuLeft;
+            m_contentRight = contentRight;
+        }
+
+        @Override
+        public void run() {
+            LayoutParams pContent = (LayoutParams) m_content.getLayoutParams();
+            LayoutParams pMenu = (LayoutParams) m_menu.getLayoutParams();
+            pMenu.leftMargin = m_menuLeft;
+            pContent.rightMargin = m_contentRight;
+            m_content.requestLayout();
+            m_menu.requestLayout();
         }
     }
 

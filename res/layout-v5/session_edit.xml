@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical" >
-    <RelativeLayout android:layout_width="fill_parent"
+    <RelativeLayout android:layout_width="match_parent"
         android:layout_height="45dip"
         android:orientation="horizontal"
         android:background="#323232"
@@ -12,7 +12,7 @@
         <Button android:id="@+id/action_bar_back_btn"
             android:layout_width="wrap_content"
             android:background="@drawable/transparent_btn"
-            android:layout_height="fill_parent"
+            android:layout_height="match_parent"
             android:drawableLeft="@drawable/navigation_previous_item"
             android:onClick="on_cancel_clicked" />
 

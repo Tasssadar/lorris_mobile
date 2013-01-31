@@ -7,11 +7,11 @@
     android:background="@drawable/transparent_btn"
     android:padding="5dp">
     <TextView android:id="@+id/device_name"
-        android:layout_width="fill_parent"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textSize="20sp" />
     <TextView android:id="@+id/mac_address"
-        android:layout_width="fill_parent"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textSize="10sp"
         android:textColor="#888888" />

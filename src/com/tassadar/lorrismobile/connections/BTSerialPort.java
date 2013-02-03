@@ -6,6 +6,9 @@ import java.io.OutputStream;
 import java.lang.ref.WeakReference;
 import java.util.UUID;
 
+import com.tassadar.lorrismobile.BlobInputStream;
+import com.tassadar.lorrismobile.BlobOutputStream;
+
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
@@ -28,34 +31,23 @@ public class BTSerialPort extends Connection {
     private static final int WRITE_STOP = 0;
     private static final int WRITE_DATA = 1;
 
-    static public BTSerialPort fromData(byte[] data) {
-        BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
-        if(adapter == null)
-            return null;
-
-        
-        BluetoothDevice dev = null;
-        try {
-            dev = adapter.getRemoteDevice(new String(data));
-        }catch(IllegalArgumentException ex) {
-            ex.printStackTrace();
-            return null;
-        }
-
-        BTSerialPort sp = new BTSerialPort(dev);
-        return sp;
-    }
-
     public BTSerialPort(BluetoothDevice device) {
         super(Connection.CONN_BT_SP);
         m_device = device;
+        m_handler = new StateHandler(this);
+        m_connectThread = null;
+        m_name = device.getName();
+    }
+
+    public BTSerialPort() {
+        super(Connection.CONN_BT_SP);
         m_handler = new StateHandler(this);
         m_connectThread = null;
     }
 
     @Override
     public void open() {
-        if(m_state != ST_DISCONNECTED || m_connectThread != null)
+        if(m_device == null || m_state != ST_DISCONNECTED || m_connectThread != null)
             return;
 
         setState(Connection.ST_CONNECTING);
@@ -65,7 +57,7 @@ public class BTSerialPort extends Connection {
 
     @Override
     public void close() {
-        if(m_state == ST_DISCONNECTED)
+        if(m_device == null || m_state == ST_DISCONNECTED)
             return;
 
         if(m_state == ST_CONNECTED)
@@ -99,15 +91,44 @@ public class BTSerialPort extends Connection {
         }).start();
     }
 
-    public byte[] saveData() {
-        return m_device.getAddress().getBytes();
+    @Override
+    protected void saveDataStream(BlobOutputStream str) {
+        str.writeString("address", m_device.getAddress());
+        str.writeString("name", m_name);
+    }
+
+    @Override
+    protected void loadDataStream(BlobInputStream str) {
+        String address = str.readString("address");
+        if(address == null)
+            return;
+
+        BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
+        if(adapter == null)
+            return;
+
+        try {
+            m_device = adapter.getRemoteDevice(address);
+        }catch(IllegalArgumentException ex) {
+            ex.printStackTrace();
+            return;
+        }
+
+        String n = m_device.getName();
+        if(n != null && n.length() != 0)
+            m_name = n;
+        else
+            m_name = str.readString("name");
     }
 
     @Override
     public String getName() {
         if(m_device == null)
             return super.getName();
-        return m_device.getName();
+
+        if(m_name.length() == 0)
+            m_name = m_device.getName();
+        return m_name;
     }
 
     public String getAddress() {
@@ -352,6 +373,7 @@ public class BTSerialPort extends Connection {
     private BluetoothDevice m_device;
     private StateHandler m_handler;
     private BluetoothSocket m_socket;
+    private String m_name;
     private volatile ConnectThread m_connectThread;
     private volatile WriteThread m_writeThread;
     private volatile PollThread m_pollThread;

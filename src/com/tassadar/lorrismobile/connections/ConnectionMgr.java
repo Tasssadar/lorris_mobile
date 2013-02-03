@@ -36,15 +36,13 @@ public class ConnectionMgr {
         Connection c = null;
         switch(vals.getAsInteger("type")) {
             case Connection.CONN_BT_SP:
-                c = BTSerialPort.fromData(vals.getAsByteArray("data"));
+                c = new BTSerialPort();
                 break;
             default:
                 return null;
         }
 
-        if(c == null)
-            return null;
-
+        c.loadData(vals.getAsByteArray("data"));
         c.setId(vals.getAsInteger("id"));
         return c;
     }

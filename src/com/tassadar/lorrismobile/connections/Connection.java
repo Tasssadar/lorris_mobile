@@ -1,5 +1,8 @@
 package com.tassadar.lorrismobile.connections;
 
+import com.tassadar.lorrismobile.BlobInputStream;
+import com.tassadar.lorrismobile.BlobOutputStream;
+
 
 public class Connection {
     public static final int CONN_BT_SP   = 0;
@@ -133,8 +136,21 @@ public class Connection {
     }
 
     public byte[] saveData() {
-        return null;
+        BlobOutputStream str = new BlobOutputStream();
+        saveDataStream(str);
+        str.close();
+        return str.toByteArray();
     }
+
+    public void loadData(byte[] data) {
+        BlobInputStream str = new BlobInputStream(data);
+        str.loadKeys();
+        loadDataStream(str);
+        str.close();
+    }
+
+    protected void saveDataStream(BlobOutputStream str) { }
+    protected void loadDataStream(BlobInputStream str) { }
 
     protected int m_id;
     protected int m_type;

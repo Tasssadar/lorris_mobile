@@ -10,8 +10,12 @@ public class BlobOutputStream {
         m_str = new ByteArrayOutputStream();
     }
 
-    public void close() throws IOException {
-        m_str.close();
+    public void close() {
+        try {
+            m_str.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public byte[] toByteArray() {

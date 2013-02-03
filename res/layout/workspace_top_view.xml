@@ -1,4 +1,4 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="@dimen/act_bar_height"
@@ -12,4 +12,12 @@
         android:src="@drawable/av_add_to_queue"
         android:contentDescription="@string/tab_btn_desc"
         android:onClick="on_tabBtn_clicked"/>
-</LinearLayout>
+    
+    <ImageButton android:id="@+id/conn_btn" 
+        android:layout_width="@dimen/act_bar_height"
+        android:layout_height="@dimen/act_bar_height"
+        android:layout_alignParentRight="true"
+        android:background="@drawable/transparent_btn"
+        android:src="@drawable/conn_red"
+        android:contentDescription="@string/tab_btn_desc" />
+</RelativeLayout>

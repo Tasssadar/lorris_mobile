@@ -12,6 +12,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.os.Build;
 import android.os.Bundle;
@@ -30,6 +31,7 @@ import android.view.View;
 import android.view.Window;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.LinearLayout.LayoutParams;
 import android.widget.PopupMenu;
@@ -38,9 +40,9 @@ import android.widget.Toast;
 
 import com.tassadar.lorrismobile.SessionService.SessionServiceListener;
 import com.tassadar.lorrismobile.connections.Connection;
+import com.tassadar.lorrismobile.connections.ConnectionBtn;
 import com.tassadar.lorrismobile.connections.ConnectionMgr;
 import com.tassadar.lorrismobile.connections.ConnectionMgr.ConnMgrListener;
-import com.tassadar.lorrismobile.connections.ConnectionsActivity;
 import com.tassadar.lorrismobile.modules.Tab;
 import com.tassadar.lorrismobile.modules.Tab.TabSelectedListener;
 import com.tassadar.lorrismobile.modules.TabListItem;
@@ -48,7 +50,7 @@ import com.tassadar.lorrismobile.modules.TabManager;
 
 public class WorkspaceActivity extends FragmentActivity implements TabSelectedListener, ConnMgrListener, SessionServiceListener {
 
-    private static final int REQ_SET_CONN = 1;
+    public static final int REQ_SET_CONN = 1;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -60,6 +62,9 @@ public class WorkspaceActivity extends FragmentActivity implements TabSelectedLi
             requestWindowFeature(Window.FEATURE_NO_TITLE);
 
         setContentView(R.layout.workspace);
+
+        m_connBtn = new ConnectionBtn((ImageButton)findViewById(R.id.conn_btn));
+        m_connBtn.hide();
 
         m_active_tab = -1;
         m_tab_panel_visible = false;
@@ -119,25 +124,6 @@ public class WorkspaceActivity extends FragmentActivity implements TabSelectedLi
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.workspace, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected (MenuItem item) {
-        switch(item.getItemId()) {
-            case R.id.connection:
-                return true;
-            case R.id.set_connection:
-                Intent i = new Intent(this, ConnectionsActivity.class);
-                startActivityForResult(i, REQ_SET_CONN);
-                return true;
-        }
-        return false;
-    }
-    
-    @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         switch(keyCode) {
             case KeyEvent.KEYCODE_BACK:
@@ -162,11 +148,18 @@ public class WorkspaceActivity extends FragmentActivity implements TabSelectedLi
                     int id = data.getIntExtra("connId", -1);
                     Connection conn = ConnectionMgr.getConnection(id); 
                     TabManager.getTabByPos(m_active_tab).setConnection(conn);
+                    m_connBtn.setConnection(conn);
                     conn.open();
                 }
                 break;
             }
         }
+    }
+    
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        m_connBtn.closePopup();
     }
 
     @Override
@@ -251,6 +244,8 @@ public class WorkspaceActivity extends FragmentActivity implements TabSelectedLi
     private void registerTab(Tab t) {
         TabManager.addTab(t);
 
+        m_connBtn.show();
+
         String name = getResources().getStringArray(R.array.tab_names)[t.getType()];
         TabListItem it = new TabListItem(this, null, name);
         t.setTabListItem(it);
@@ -288,6 +283,7 @@ public class WorkspaceActivity extends FragmentActivity implements TabSelectedLi
         transaction.commit();
 
         curr.setActive(true);
+        m_connBtn.setConnection(curr.getConnection());
 
         m_active_tab = idx;
         SessionMgr.getActiveSession().setCurrTab(curr.getTabId());
@@ -306,6 +302,10 @@ public class WorkspaceActivity extends FragmentActivity implements TabSelectedLi
 
         TabManager.removeTab(t);
         SessionMgr.getActiveSession().rmTab(t.getTabId());
+        if(TabManager.isEmpty()) {
+            m_connBtn.setConnection(null);
+            m_connBtn.hide();
+        }
 
         FragmentManager mgr = getSupportFragmentManager();
         FragmentTransaction transaction = mgr.beginTransaction();
@@ -448,4 +448,5 @@ public class WorkspaceActivity extends FragmentActivity implements TabSelectedLi
     private int m_active_tab;
     private boolean m_tab_panel_visible;
     private long m_lastBackPress;
+    private ConnectionBtn m_connBtn;
 }

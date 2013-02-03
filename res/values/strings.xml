@@ -25,7 +25,7 @@
     <string name="name_taken">This name is already taken.</string>
     <string name="name_empty">Session name must not be empty.</string>
     <string name="session_create_failed">Failed to create new session!</string>
-    
+
     <string name="opened_tabs">Opened tabs:</string>
     <string name="tab_btn_desc">Show tab list</string>
     <string name="back_twice">Press BACK once again to close current session</string>
@@ -36,12 +36,14 @@
     <string name="toggle_keyboard">Toggle keyboard</string>
     <string name="clear">Clear</string>
     <string name="terminal_loading">Can\'t clear terminal during data load.</string>
-    
+
     <string name="new_tab">New tab</string>
     <string name="analyzer">Analyzer</string>
     <string name="terminal">Terminal</string>
     <string name="connection">Connection</string>
     <string name="connect">Connect</string>
+    <string name="disconnect">Disconnect</string>
+    <string name="connecting">Connecting</string>
     <string name="set_connection">Set connection</string>
     <string name="connections">Connections</string>
 

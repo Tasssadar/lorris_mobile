@@ -120,6 +120,10 @@ public class Connection {
         m_state = state;
     }
 
+    public int getState() {
+        return m_state;
+    }
+
     public void write(byte[] data) {
         write(data, 0, data.length);
     }

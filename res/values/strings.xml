@@ -27,6 +27,9 @@
     <string name="session_create_failed">Failed to create new session!</string>
     
     <string name="opened_tabs">Opened tabs:</string>
+    <string name="tab_btn_desc">Show tab list</string>
+    <string name="back_twice">Press BACK once again to close current session</string>
+    <string name="close_tab">Close tab</string>
     <string name="delete">Delete</string>
     <string name="edit">Edit</string>
     <string name="load_session">Load session</string>

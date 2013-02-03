@@ -15,6 +15,7 @@ import com.tassadar.lorrismobile.modules.TabListItem.TabItemClicked;
 public class Tab extends Fragment implements TabItemClicked, ConnectionInterface {
     public interface TabSelectedListener {
         void onTabSelectedClicked(int tabId);
+        void onTabCloseRequesteed(int tabId);
     }
 
     public Tab() {
@@ -34,7 +35,6 @@ public class Tab extends Fragment implements TabItemClicked, ConnectionInterface
             m_loadData = null;
         }
     }
-    
 
     @Override
     public void onDestroy() {
@@ -85,6 +85,12 @@ public class Tab extends Fragment implements TabItemClicked, ConnectionInterface
     public void onTabItemClicked() {
         if(m_listener != null)
             m_listener.onTabSelectedClicked(getTabId());
+    }
+
+    @Override
+    public void onTabCloseRequested() {
+        if(m_listener != null)
+            m_listener.onTabCloseRequesteed(getTabId());
     }
 
     public void setConnection(Connection conn) {

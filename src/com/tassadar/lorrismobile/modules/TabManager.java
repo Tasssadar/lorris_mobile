@@ -40,7 +40,7 @@ public class TabManager {
     }
 
     public static synchronized void removeTab(Tab tab) {
-        m_tabs.remove(tab.getId());
+        m_tabs.remove(tab.getTabId());
     }
 
     public static synchronized void clearTabs() {

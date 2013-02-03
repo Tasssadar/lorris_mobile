@@ -1,0 +1,15 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="@dimen/act_bar_height"
+    android:orientation="horizontal"
+    android:background="#2d2d2d" >
+    <ImageButton 
+        android:layout_width="@dimen/act_bar_height"
+        android:layout_height="@dimen/act_bar_height"
+        android:background="@drawable/transparent_btn"
+        android:padding="0dp"
+        android:src="@drawable/av_add_to_queue"
+        android:contentDescription="@string/tab_btn_desc"
+        android:onClick="on_tabBtn_clicked"/>
+</LinearLayout>

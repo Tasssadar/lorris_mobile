@@ -1,6 +1,7 @@
 package com.tassadar.lorrismobile;
 
 import java.util.ArrayList;
+import java.util.Date;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
@@ -18,15 +19,13 @@ import android.os.IBinder;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v4.view.GestureDetectorCompat;
 import android.util.Log;
 import android.util.SparseArray;
 import android.util.TypedValue;
-import android.view.GestureDetector;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.Window;
 import android.view.animation.Animation;
@@ -35,6 +34,7 @@ import android.widget.LinearLayout;
 import android.widget.LinearLayout.LayoutParams;
 import android.widget.PopupMenu;
 import android.widget.PopupMenu.OnMenuItemClickListener;
+import android.widget.Toast;
 
 import com.tassadar.lorrismobile.SessionService.SessionServiceListener;
 import com.tassadar.lorrismobile.connections.Connection;
@@ -61,8 +61,8 @@ public class WorkspaceActivity extends FragmentActivity implements TabSelectedLi
 
         setContentView(R.layout.workspace);
 
-        m_gest_detect = new GestureDetectorCompat(this, m_gestListener);
         m_active_tab = -1;
+        m_tab_panel_visible = false;
 
         if(Build.VERSION.SDK_INT >= 11)
             setUpActionBar();
@@ -88,7 +88,7 @@ public class WorkspaceActivity extends FragmentActivity implements TabSelectedLi
 
     @TargetApi(11)
     private void setUpActionBar() {
-        getActionBar().setDisplayHomeAsUpEnabled(true);
+        getActionBar().hide();
     }
 
     @Override
@@ -136,6 +136,20 @@ public class WorkspaceActivity extends FragmentActivity implements TabSelectedLi
         }
         return false;
     }
+    
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        switch(keyCode) {
+            case KeyEvent.KEYCODE_BACK:
+                long curr = new Date().getTime();
+                if(curr - m_lastBackPress < 2000)
+                    return super.onKeyDown(keyCode, event);
+                Toast.makeText(this, R.string.back_twice, Toast.LENGTH_SHORT).show();
+                m_lastBackPress = curr;
+                return true;
+        }
+        return super.onKeyDown(keyCode, event);
+    }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -166,16 +180,22 @@ public class WorkspaceActivity extends FragmentActivity implements TabSelectedLi
         Log.e("Lorris", "Connection " + id + " removed \n");
     }
 
+    public void on_tabBtn_clicked(View v) {
+        setTabPanelVisible(!m_tab_panel_visible);
+        v.setSelected(m_tab_panel_visible);
+    }
 
     private void setTabPanelVisible(boolean visible) {
+        if(visible == m_tab_panel_visible)
+            return;
+        
+        m_tab_panel_visible = visible;
+
         LinearLayout menuLayout = (LinearLayout)findViewById(R.id.tab_panel);
         LinearLayout contentLayout = (LinearLayout)findViewById(R.id.tab_content_layout);
 
         LayoutParams pContent = (LayoutParams) contentLayout.getLayoutParams();
         LayoutParams pMenu = (LayoutParams) menuLayout.getLayoutParams();
-
-        if(visible == (pMenu.leftMargin == 0))
-            return;
 
         Resources r = getResources();
         // FIXME: should use real size
@@ -273,12 +293,45 @@ public class WorkspaceActivity extends FragmentActivity implements TabSelectedLi
         SessionMgr.getActiveSession().setCurrTab(curr.getTabId());
     }
 
+    private void closeTab(int idx) {
+        if(idx < 0 || idx >= TabManager.size())
+            return;
+
+        Tab t = TabManager.getTabByPos(idx);
+        if(t == null)
+            return;
+
+        LinearLayout l = (LinearLayout)findViewById(R.id.tab_list);
+        l.removeView(t.getTabListItem().getView());
+
+        TabManager.removeTab(t);
+        SessionMgr.getActiveSession().rmTab(t.getTabId());
+
+        FragmentManager mgr = getSupportFragmentManager();
+        FragmentTransaction transaction = mgr.beginTransaction();
+        transaction.remove(t);
+        transaction.commit();
+
+        if(idx == m_active_tab) {
+            m_active_tab = -1;
+            setActiveTab(0);
+        }
+    }
+
     @Override
     public void onTabSelectedClicked(int tabId) {
         int idx = TabManager.getTabPos(tabId);
         if(idx == -1)
             return;
         setActiveTab(idx);
+    }
+
+    @Override
+    public void onTabCloseRequesteed(int tabId) {
+        int idx = TabManager.getTabPos(tabId);
+        if(idx == -1)
+            return;
+        closeTab(idx);
     }
 
     @Override
@@ -334,25 +387,6 @@ public class WorkspaceActivity extends FragmentActivity implements TabSelectedLi
             if(SessionMgr.getActiveSession().getCurrTabId() == t.getTabId())
                 setActiveTab(TabManager.size()-1);
         }
-    }
-
-    @Override 
-    public boolean onTouchEvent(MotionEvent event){ 
-        m_gest_detect.onTouchEvent(event);
-        return super.onTouchEvent(event);
-    }
-
-    private GestureDetector.SimpleOnGestureListener m_gestListener = new  GestureDetector.SimpleOnGestureListener() {
-        @Override
-        public boolean onFling(MotionEvent ev1, MotionEvent ev2, float velX, float velY) {
-            if(Math.abs(velX) > Math.abs(velY))
-                setTabPanelVisible(velX > 0);
-            return true;
-        }
-    };
-
-    public GestureDetector.SimpleOnGestureListener getGestureListener() {
-        return m_gestListener;
     }
 
     private class CreateTabListener implements OnMenuItemClickListener {
@@ -411,6 +445,7 @@ public class WorkspaceActivity extends FragmentActivity implements TabSelectedLi
     };
 
     private SessionService m_sessionService;
-    private GestureDetectorCompat m_gest_detect;
     private int m_active_tab;
+    private boolean m_tab_panel_visible;
+    private long m_lastBackPress;
 }

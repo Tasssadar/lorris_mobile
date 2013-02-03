@@ -304,6 +304,7 @@ public class Session extends SQLiteOpenHelper {
         File f = getTabDataFile(id, true);
         if(f == null) {
             Log.e("Lorris", "Can't remove data file, it does not exist\n");
+            return;
         }
         f.delete();
     }

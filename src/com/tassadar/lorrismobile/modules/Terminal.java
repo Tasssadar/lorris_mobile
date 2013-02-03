@@ -11,7 +11,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.ref.WeakReference;
 
-import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
@@ -28,7 +27,6 @@ import android.widget.Toast;
 import com.tassadar.lorrismobile.BlobInputStream;
 import com.tassadar.lorrismobile.BlobOutputStream;
 import com.tassadar.lorrismobile.R;
-import com.tassadar.lorrismobile.WorkspaceActivity;
 
 public class Terminal extends Tab {
 
@@ -66,10 +64,6 @@ public class Terminal extends Tab {
         DisplayMetrics metrics = new DisplayMetrics();
         getActivity().getWindowManager().getDefaultDisplay().getMetrics(metrics);
         e.setDensity(metrics);
-
-        Activity act = getActivity();
-        if(act instanceof WorkspaceActivity)
-            e.setExtGestureListener(((WorkspaceActivity)act).getGestureListener());
 
         e.setTextSize(16);
         return v;

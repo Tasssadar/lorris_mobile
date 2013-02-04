@@ -24,13 +24,10 @@ import android.util.Log;
 import android.util.SparseArray;
 import android.util.TypedValue;
 import android.view.KeyEvent;
-import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.LinearLayout.LayoutParams;
@@ -192,42 +189,18 @@ public class WorkspaceActivity extends FragmentActivity implements TabSelectedLi
 
         Resources r = getResources();
         // FIXME: should use real size
-        int px = (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 200, r.getDisplayMetrics());
+        int px = (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 201, r.getDisplayMetrics());
 
         if(visible){
             pMenu.leftMargin = 0;
             pContent.rightMargin = -px;
-            menuLayout.startAnimation(AnimationUtils.loadAnimation(this, R.anim.tab_panel_show));
-            contentLayout.requestLayout();
-            menuLayout.requestLayout();
+            
         }else {
-            Animation a = AnimationUtils.loadAnimation(this, R.anim.tab_panel_hide);
-            menuLayout.startAnimation(a);
-            menuLayout.postDelayed(new PanRunnable(contentLayout, menuLayout, -px, 0),
-                    a.computeDurationHint());
+            pMenu.leftMargin = -px;
+            pContent.rightMargin = 0;
         }
-    }
-    
-    private class PanRunnable implements Runnable {
-        private LinearLayout m_content, m_menu;
-        private int m_menuLeft, m_contentRight;
-
-        public PanRunnable(LinearLayout content, LinearLayout menu, int menuLeft, int contentRight) {
-            m_menu = menu;
-            m_content = content;
-            m_menuLeft = menuLeft;
-            m_contentRight = contentRight;
-        }
-
-        @Override
-        public void run() {
-            LayoutParams pContent = (LayoutParams) m_content.getLayoutParams();
-            LayoutParams pMenu = (LayoutParams) m_menu.getLayoutParams();
-            pMenu.leftMargin = m_menuLeft;
-            pContent.rightMargin = m_contentRight;
-            m_content.requestLayout();
-            m_menu.requestLayout();
-        }
+        contentLayout.requestLayout();
+        menuLayout.requestLayout();
     }
 
     private void createNewTab(int type) {

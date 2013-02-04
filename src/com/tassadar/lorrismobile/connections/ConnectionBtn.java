@@ -53,6 +53,8 @@ public class ConnectionBtn implements ConnectionInterface, OnClickListener {
         if(m_conn != null) {
             m_conn.addInterface(this);
             setIconByState(m_conn.getState());
+        } else {
+            stateChanged(Connection.ST_DISCONNECTED);
         }
     }
 
@@ -97,7 +99,7 @@ public class ConnectionBtn implements ConnectionInterface, OnClickListener {
         Resources r = m_btn.getContext().getResources();
         // FIXME: should use real size
         int w = (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 250, r.getDisplayMetrics());
-        int h = (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 120, r.getDisplayMetrics());
+        int h = (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 130, r.getDisplayMetrics());
 
         m_connPopup = new PopupWindow(layout, w, h);
         m_connPopup.setOutsideTouchable(true);

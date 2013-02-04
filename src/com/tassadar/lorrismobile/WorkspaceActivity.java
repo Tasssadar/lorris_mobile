@@ -17,6 +17,7 @@ import android.content.res.Resources;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -229,6 +230,11 @@ public class WorkspaceActivity extends FragmentActivity implements TabSelectedLi
         FragmentManager mgr = getSupportFragmentManager();
         FragmentTransaction transaction = mgr.beginTransaction();
         transaction.add(R.id.tab_content_layout, t);
+
+        Fragment m = t.getMenuFragment();
+        if(m != null)
+            transaction.add(R.id.menu_layout, m);
+
         transaction.hide(t);
         transaction.commit();
     }
@@ -250,9 +256,19 @@ public class WorkspaceActivity extends FragmentActivity implements TabSelectedLi
 
         if(old != null) {
             transaction.hide(old);
+
+            Fragment m = old.getMenuFragment();
+            if(m != null)
+                transaction.hide(m);
+
             old.setActive(false);
         }
         transaction.show(curr);
+
+        Fragment m = curr.getMenuFragment();
+        if(m != null)
+            transaction.show(m);
+
         transaction.commit();
 
         curr.setActive(true);
@@ -282,6 +298,11 @@ public class WorkspaceActivity extends FragmentActivity implements TabSelectedLi
 
         FragmentManager mgr = getSupportFragmentManager();
         FragmentTransaction transaction = mgr.beginTransaction();
+
+        Fragment m = t.getMenuFragment();
+        if(m != null)
+            transaction.remove(m);
+
         transaction.remove(t);
         transaction.commit();
 

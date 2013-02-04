@@ -74,6 +74,10 @@ public class Tab extends Fragment implements TabItemClicked, ConnectionInterface
         return m_tab_list_it;
     }
 
+    public Fragment getMenuFragment() {
+        return null;
+    }
+
     public void setActive(boolean active) {
         if(m_tab_list_it != null)
             m_tab_list_it.setActive(active);

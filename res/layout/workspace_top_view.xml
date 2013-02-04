@@ -20,4 +20,16 @@
         android:background="@drawable/transparent_btn"
         android:src="@drawable/conn_red"
         android:contentDescription="@string/tab_btn_desc" />
+    
+    <View android:id="@+id/separator"
+        android:layout_width="2dp"
+        android:layout_height="match_parent"
+        android:layout_margin="8dp"
+        android:background="#555555" 
+        android:layout_toLeftOf="@id/conn_btn"/>
+    
+    <LinearLayout android:id="@+id/menu_layout"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_toLeftOf="@id/separator" />
 </RelativeLayout>

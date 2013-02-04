@@ -13,6 +13,7 @@ import java.lang.ref.WeakReference;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -27,8 +28,9 @@ import android.widget.Toast;
 import com.tassadar.lorrismobile.BlobInputStream;
 import com.tassadar.lorrismobile.BlobOutputStream;
 import com.tassadar.lorrismobile.R;
+import com.tassadar.lorrismobile.modules.TerminalMenu.TerminalMenuListener;
 
-public class Terminal extends Tab {
+public class Terminal extends Tab implements TerminalMenuListener {
 
     public Terminal() {
         super();
@@ -41,17 +43,14 @@ public class Terminal extends Tab {
         m_termSession.setTermIn(m_outStr);
         m_termSession.setTermOut(new TermOutStream());
         m_data = new ByteArrayOutputStream();
+
+        m_menu = new TerminalMenu();
+        m_menu.setListener(this);
     }
 
     @Override
     public int getType() {
         return TabManager.TAB_TERMINAL;
-    }
-
-    @Override
-    public void onCreate (Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setHasOptionsMenu(true);
     }
 
     @Override
@@ -84,58 +83,14 @@ public class Terminal extends Tab {
     }
 
     @Override
-    public void onCreateOptionsMenu (Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.terminal, menu);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected (MenuItem item) {
-        switch(item.getItemId()) {
-            case R.id.toggle_keyboard:
-                toggleKeyboard();
-                return true;
-            case R.id.clear:
-            {
-                LoadTermDataThread t = m_loadThread.get();
-                if(t != null && t.isAlive()){
-                    Toast.makeText(getActivity(), R.string.terminal_loading, Toast.LENGTH_SHORT).show();
-                    return true;
-                }
-
-                try {
-                    m_data.close();
-                } catch (IOException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                }
-                m_data = new ByteArrayOutputStream();
-                m_termSession.finish();
-                
-                m_outStr = new TermInStream();
-
-                m_termSession = new TermSession();
-                m_termSession.setTermIn(m_outStr);
-                m_termSession.setTermOut(new TermOutStream());
-
-                EmulatorView e = (EmulatorView)getView().findViewById(R.id.term);
-                e.attachSession(m_termSession);
-                e.initialize();
-                return true;
-            }
-                
-        }
-        return false;
-    }
-
-    @Override
     public void dataRead(byte[] data) {
         synchronized(m_outStr) {
-        try {
-            m_data.write(data);
-            m_outStr.write(data);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+            try {
+                m_data.write(data);
+                m_outStr.write(data);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -234,6 +189,43 @@ public class Terminal extends Tab {
             //m_conn.write(new byte[] { 0x74, 0x7E, 0x7A, 0x33 });
     }
 
+    public Fragment getMenuFragment() {
+        return m_menu;
+    }
+
+    @Override
+    public void onClearClicked() {
+        LoadTermDataThread t = m_loadThread.get();
+        if(t != null && t.isAlive()){
+            Toast.makeText(getActivity(), R.string.terminal_loading, Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        try {
+            m_data.close();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        m_data = new ByteArrayOutputStream();
+        m_termSession.finish();
+        
+        m_outStr = new TermInStream();
+
+        m_termSession = new TermSession();
+        m_termSession.setTermIn(m_outStr);
+        m_termSession.setTermOut(new TermOutStream());
+
+        EmulatorView e = (EmulatorView)getView().findViewById(R.id.term);
+        e.attachSession(m_termSession);
+        e.initialize();
+    }
+
+    @Override
+    public void onToggleKeyboardClicked() {
+        toggleKeyboard();
+    }
+
     private void toggleKeyboard() {
         InputMethodManager imm = (InputMethodManager)
                 getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
@@ -287,4 +279,5 @@ public class Terminal extends Tab {
     private TermInStream m_outStr;
     private ByteArrayOutputStream m_data;
     private WeakReference<LoadTermDataThread> m_loadThread;
+    private TerminalMenu m_menu;
 }

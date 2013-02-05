@@ -86,6 +86,16 @@ public class WorkspaceActivity extends FragmentActivity implements TabSelectedLi
         // Clear leftovers from previous session save
         s.clearChanges();
 
+        // Remove fragments restored by Android automatically
+        if(savedInstanceState != null && !m_preAttachedFragments.isEmpty()) {
+            FragmentManager mgr = getSupportFragmentManager();
+            FragmentTransaction t = mgr.beginTransaction();
+            for(Fragment f : m_preAttachedFragments)
+                t.remove(f);
+            t.commit();
+            m_preAttachedFragments.clear();
+        }
+
         bindService(new Intent(this, SessionService.class), m_sessionServiceConn, Context.BIND_AUTO_CREATE);
     }
 
@@ -108,6 +118,13 @@ public class WorkspaceActivity extends FragmentActivity implements TabSelectedLi
         super.onPause();
         m_sessionService.saveSession(SessionMgr.getActiveSession(),
                 TabManager.cloneTabArray(), ConnectionMgr.cloneConnArray());
+        m_preAttachedFragments.clear();
+    }
+
+    @Override
+    public void onAttachFragment(Fragment f) {
+        super.onAttachFragment(f);
+        m_preAttachedFragments.add(f);
     }
 
     @Override
@@ -232,8 +249,10 @@ public class WorkspaceActivity extends FragmentActivity implements TabSelectedLi
         transaction.add(R.id.tab_content_layout, t);
 
         Fragment m = t.getMenuFragment();
-        if(m != null)
+        if(m != null) {
             transaction.add(R.id.menu_layout, m);
+            transaction.hide(m);
+        }
 
         transaction.hide(t);
         transaction.commit();
@@ -443,4 +462,5 @@ public class WorkspaceActivity extends FragmentActivity implements TabSelectedLi
     private boolean m_tab_panel_visible;
     private long m_lastBackPress;
     private ConnectionBtn m_connBtn;
+    private ArrayList<Fragment> m_preAttachedFragments = new ArrayList<Fragment>();
 }

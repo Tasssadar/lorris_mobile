@@ -263,6 +263,12 @@ public class Terminal extends Tab implements TerminalMenuListener, TerminalSetti
     private void toggleKeyboard() {
         InputMethodManager imm = (InputMethodManager)
                 getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+
+        if(!imm.isActive()) {
+            EmulatorView e = (EmulatorView)getView().findViewById(R.id.term);
+            e.requestFocus();
+        }
+
         imm.toggleSoftInput(InputMethodManager.SHOW_FORCED,0);
     }
 

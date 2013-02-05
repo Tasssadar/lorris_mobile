@@ -24,7 +24,7 @@
             android:layout_marginTop="10dp"
             android:textColor="#FFFFFF" />
     </RelativeLayout>
-    <View android:layout_width="fill_parent"
+    <View android:layout_width="match_parent"
         android:layout_height="1dp"
         android:background="#1B1B1B" />
 </LinearLayout>

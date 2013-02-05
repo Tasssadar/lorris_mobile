@@ -53,10 +53,12 @@ public class SessionService extends Service {
         m_notificationMgr.cancel(R.string.service);
     }
 
+    // Notification.Builder is from API level 11
+    @SuppressWarnings("deprecation")
     private void showNotification() {
         String text = String.format(getText(R.string.service).toString(),
                 SessionMgr.getActiveSession().getName());
-
+ 
         Notification notification = new Notification(R.drawable.ic_launcher, text,
                 System.currentTimeMillis());
 

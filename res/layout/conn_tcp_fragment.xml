@@ -3,13 +3,13 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical" >
-    <ScrollView android:layout_width="fill_parent"
-            android:layout_height="fill_parent">
+    <ScrollView android:layout_width="match_parent"
+            android:layout_height="match_parent">
             <LinearLayout
-                android:layout_width="fill_parent"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
-                <TextView android:layout_width="fill_parent"
+                <TextView android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:textSize="25sp"
                     android:text="@string/saved_connections"
@@ -19,7 +19,7 @@
                     android:layout_gravity="center"
                     android:background="#1b1b1b" />
                 <LinearLayout android:id="@+id/tcp_conns"
-                    android:layout_width="fill_parent"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical" />
                 </LinearLayout>

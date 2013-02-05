@@ -4,7 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
-import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.ColorDrawable;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -121,7 +121,7 @@ public class ConnectionBtn implements ConnectionInterface, OnClickListener {
             t.setText(m_conn.getName());
 
         // This forces it to accept outside touch events. Probably hack.
-        m_connPopup.setBackgroundDrawable(new BitmapDrawable());
+        m_connPopup.setBackgroundDrawable(new ColorDrawable());
         m_connPopup.setTouchInterceptor(new OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {

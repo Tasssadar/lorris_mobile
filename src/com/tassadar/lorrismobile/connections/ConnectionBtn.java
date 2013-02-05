@@ -143,6 +143,8 @@ public class ConnectionBtn implements ConnectionInterface, OnClickListener {
 
     public void setVisible(boolean visible) {
         m_btn.setVisibility(visible ? View.VISIBLE : View.GONE);
+        View s = m_btn.getRootView().findViewById(R.id.separator);
+        s.setVisibility(visible ? View.VISIBLE : View.GONE);
     }
 
     public void hide() {

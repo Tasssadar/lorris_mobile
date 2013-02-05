@@ -14,6 +14,7 @@ public class TerminalMenu extends Fragment implements OnClickListener {
     public interface TerminalMenuListener {
         void onClearClicked();
         void onToggleKeyboardClicked();
+        void onShowSettingsClicked();
     }
 
     @Override
@@ -23,6 +24,8 @@ public class TerminalMenu extends Fragment implements OnClickListener {
         ImageButton b = (ImageButton)v.findViewById(R.id.clear_btn);
         b.setOnClickListener(this);
         b = (ImageButton)v.findViewById(R.id.toggle_keyboard);
+        b.setOnClickListener(this);
+        b = (ImageButton)v.findViewById(R.id.settings_btn);
         b.setOnClickListener(this);
         return v;
     }
@@ -42,6 +45,9 @@ public class TerminalMenu extends Fragment implements OnClickListener {
                 break;
             case R.id.toggle_keyboard:
                 m_listener.onToggleKeyboardClicked();
+                break;
+            case R.id.settings_btn:
+                m_listener.onShowSettingsClicked();
                 break;
         }
     }

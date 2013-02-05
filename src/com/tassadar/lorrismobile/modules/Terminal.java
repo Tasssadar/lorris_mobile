@@ -11,9 +11,13 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.ref.WeakReference;
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -26,15 +30,15 @@ import com.tassadar.lorrismobile.BlobInputStream;
 import com.tassadar.lorrismobile.BlobOutputStream;
 import com.tassadar.lorrismobile.R;
 import com.tassadar.lorrismobile.modules.TerminalMenu.TerminalMenuListener;
+import com.tassadar.lorrismobile.modules.TerminalSettingsDialog.TerminalSettingsListener;
 
-public class Terminal extends Tab implements TerminalMenuListener {
+public class Terminal extends Tab implements TerminalMenuListener, TerminalSettingsListener {
 
     public Terminal() {
         super();
         m_loadThread = new WeakReference<LoadTermDataThread>(null);
 
         m_termSession = new TermSession();
-
         m_outStr = new TermInStream();
 
         m_termSession.setTermIn(m_outStr);
@@ -43,11 +47,20 @@ public class Terminal extends Tab implements TerminalMenuListener {
 
         m_menu = new TerminalMenu();
         m_menu.setListener(this);
+
+        m_settings = new TerminalSettings();
     }
 
     @Override
     public int getType() {
         return TabManager.TAB_TERMINAL;
+    }
+
+    public void onAttach(Activity act) {
+        super.onAttach(act);
+
+        SharedPreferences p = act.getPreferences(0);
+        m_settings.load(p);
     }
 
     @Override
@@ -61,7 +74,8 @@ public class Terminal extends Tab implements TerminalMenuListener {
         getActivity().getWindowManager().getDefaultDisplay().getMetrics(metrics);
         e.setDensity(metrics);
 
-        e.setTextSize(16);
+        e.setTextSize(m_settings.fontSize);
+        e.setColorScheme(m_settings.getColorScheme());
         return v;
     }
 
@@ -99,7 +113,12 @@ public class Terminal extends Tab implements TerminalMenuListener {
 
         @Override
         public void write (byte[] buffer, int offset, int count) throws IOException {
-            if(m_conn != null)
+            if(m_conn == null)
+                return;
+
+            if(buffer[offset] == 10) // Enter key
+                m_conn.write(m_settings.getEnterKeyPressSeq());
+            else
                 m_conn.write(buffer, offset, count);
         }
     }
@@ -223,6 +242,24 @@ public class Terminal extends Tab implements TerminalMenuListener {
         toggleKeyboard();
     }
 
+    @Override
+    public void onShowSettingsClicked() {
+        FragmentActivity a = (FragmentActivity)getActivity();
+        FragmentManager mgr = a.getSupportFragmentManager();
+
+        TerminalSettingsDialog s = new TerminalSettingsDialog();
+        s.setSettings(m_settings);
+        s.setListener(this);
+        s.show(mgr, "TermSettings");
+    }
+
+    @Override
+    public void onSettingsChanged() {
+        EmulatorView e = (EmulatorView)getView().findViewById(R.id.term);
+        e.setTextSize(m_settings.fontSize);
+        e.setColorScheme(m_settings.getColorScheme());
+    }
+
     private void toggleKeyboard() {
         InputMethodManager imm = (InputMethodManager)
                 getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
@@ -233,12 +270,18 @@ public class Terminal extends Tab implements TerminalMenuListener {
     protected void saveDataStream(BlobOutputStream str) {
         super.saveDataStream(str);
 
+        m_settings.saveToStr(str);
+
         str.writeByteArray("termData", m_data.toByteArray());
     }
 
     @Override
     protected void loadDataStream(BlobInputStream str) {
         super.loadDataStream(str);
+
+        m_settings.loadFromStr(str);
+        onSettingsChanged();
+
         byte[] data = str.readByteArray("termData");
 
         if(data != null) {
@@ -277,4 +320,5 @@ public class Terminal extends Tab implements TerminalMenuListener {
     private ByteArrayOutputStream m_data;
     private WeakReference<LoadTermDataThread> m_loadThread;
     private TerminalMenu m_menu;
+    private TerminalSettings m_settings;
 }

@@ -40,14 +40,18 @@ public class BlobInputStream {
         return len;
     }
 
-    public String readString(String key) {
+    public String readString(String key, String def) {
         int len = getLen(key);
         if(len == -1)
-            return "";
+            return def;
 
         byte[] data = new byte[len];
         m_buff.get(data);
         return new String(data);
+    }
+
+    public String readString(String key) {
+        return readString(key, "");
     }
 
     public byte[] readByteArray(String key) {
@@ -60,22 +64,29 @@ public class BlobInputStream {
         return data;
     }
 
-    public int readInt(String key) {
+    public int readInt(String key, int def) {
         int len = getLen(key);
         if(len == -1)
-            return 0;
+            return def;
 
         return m_buff.getInt();
     }
 
-    public boolean readBool(String key) {
+    public int readInt(String key) {
+        return readInt(key, 0);
+    }
+
+    public boolean readBool(String key, boolean def) {
         int len = getLen(key);
         if(len == -1)
-            return false;
+            return def;
 
         return m_buff.get() == 1;
     }
 
+    public boolean readBool(String key) {
+        return readBool(key, false);
+    }
 
     public boolean containsKey(String key) {
         return m_keys.containsKey(key);

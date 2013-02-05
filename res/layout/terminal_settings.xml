@@ -1,0 +1,64 @@
+<ScrollView 
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="10dp">
+    <LinearLayout 
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+        <View android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1" />
+        <TableLayout 
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+            <TableRow >
+                <TextView android:id="@+id/font_size_desc"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="17sp"
+                    android:gravity="right"
+                    android:text="@string/font_size" />
+                <EditText android:id="@+id/font_size"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:inputType="number"/>
+            </TableRow>
+            <TableRow>
+                <TextView android:id="@+id/colors_desc"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="right"
+                    android:textSize="17sp"
+                    android:text="@string/colors"/>
+                <Spinner android:id="@+id/colors"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:entries="@array/term_colors"/>
+            </TableRow>
+            <TableRow>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="right"
+                    android:textSize="17sp"
+                    android:text="@string/enter_key_press"/>
+                <Spinner android:id="@+id/enter_key_press"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:entries="@array/enter_key_press"/>
+            </TableRow>
+            <TableRow android:gravity="center">
+                <Button android:id="@+id/save_btn"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/apply" />
+            </TableRow>
+        </TableLayout>
+        <View android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1" />
+    </LinearLayout>
+</ScrollView>

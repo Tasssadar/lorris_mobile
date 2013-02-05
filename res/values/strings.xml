@@ -35,6 +35,11 @@
     <string name="load_session">Load session</string>
     <string name="toggle_keyboard">Toggle keyboard</string>
     <string name="clear">Clear</string>
+    <string name="term_settings">Terminal settings</string>
+    <string name="font_size">Font size:</string>
+    <string name="colors">Colors:</string>
+    <string name="enter_key_press">On return key:</string>
+    <string name="apply">Apply</string>
     <string name="terminal_loading">Can\'t clear terminal during data load.</string>
 
     <string name="new_tab">New tab</string>
@@ -67,6 +72,20 @@
     <string-array name="tab_names">
         <item>Analyzer</item>
         <item>Terminal</item>
+    </string-array>
+
+    <string-array name="term_colors">
+        <item>Black+white text</item>
+        <item>White+black text</item>
+        <item>Blue+white text</item>
+        <item>Black+green text</item>
+    </string-array>
+
+    <string-array name="enter_key_press">
+        <item>Send \\r\\n</item>
+        <item>Send \\n</item>
+        <item>Send \\r</item>
+        <item>Send \\n\\r</item>
     </string-array>
 
 </resources>

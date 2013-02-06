@@ -15,6 +15,7 @@ public class TerminalMenu extends Fragment implements OnClickListener {
         void onClearClicked();
         void onToggleKeyboardClicked();
         void onShowSettingsClicked();
+        void onHexModeClicked();
     }
 
     @Override
@@ -27,11 +28,24 @@ public class TerminalMenu extends Fragment implements OnClickListener {
         b.setOnClickListener(this);
         b = (ImageButton)v.findViewById(R.id.settings_btn);
         b.setOnClickListener(this);
+        b = (ImageButton)v.findViewById(R.id.toggle_hex);
+        b.setOnClickListener(this);
+        b.setSelected(m_hexSelected);
         return v;
     }
 
     public void setListener(TerminalMenuListener listener) {
         m_listener = listener;
+    }
+
+    public void setHexSelected(boolean selected) {
+        View v = getView();
+        if(v != null) {
+            ImageButton b = (ImageButton)v.findViewById(R.id.toggle_hex);
+            if(b != null)
+                b.setSelected(selected);
+        }
+        m_hexSelected = selected;
     }
 
     @Override
@@ -49,8 +63,12 @@ public class TerminalMenu extends Fragment implements OnClickListener {
             case R.id.settings_btn:
                 m_listener.onShowSettingsClicked();
                 break;
+            case R.id.toggle_hex:
+                m_listener.onHexModeClicked();
+                break;
         }
     }
 
     private TerminalMenuListener m_listener;
+    private boolean m_hexSelected = false;
 }

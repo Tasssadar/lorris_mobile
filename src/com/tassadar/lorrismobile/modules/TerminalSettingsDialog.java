@@ -9,6 +9,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Spinner;
 
@@ -30,10 +31,12 @@ public class TerminalSettingsDialog extends DialogFragment implements OnClickLis
         EditText font = (EditText)v.findViewById(R.id.font_size);
         Spinner clr = (Spinner)v.findViewById(R.id.colors);
         Spinner enter = (Spinner)v.findViewById(R.id.enter_key_press);
+        CheckBox clrOnHex = (CheckBox)v.findViewById(R.id.clear_on_hex);
 
         font.setText(Integer.toString(m_settings.fontSize));
         clr.setSelection(m_settings.colors);
         enter.setSelection(m_settings.enterKeyPress);
+        clrOnHex.setChecked(m_settings.clearOnHex);
         return v;
     }
 
@@ -58,6 +61,7 @@ public class TerminalSettingsDialog extends DialogFragment implements OnClickLis
         EditText font = (EditText)v.findViewById(R.id.font_size);
         Spinner clr = (Spinner)v.findViewById(R.id.colors);
         Spinner enter = (Spinner)v.findViewById(R.id.enter_key_press);
+        CheckBox clrOnHex = (CheckBox)v.findViewById(R.id.clear_on_hex);
 
         try {
             m_settings.fontSize = Integer.valueOf(font.getText().toString());
@@ -67,6 +71,7 @@ public class TerminalSettingsDialog extends DialogFragment implements OnClickLis
 
         m_settings.colors = clr.getSelectedItemPosition();
         m_settings.enterKeyPress = enter.getSelectedItemPosition();
+        m_settings.clearOnHex = clrOnHex.isChecked();
 
         Activity a = getActivity();
         if(a != null)

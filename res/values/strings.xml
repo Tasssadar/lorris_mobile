@@ -36,10 +36,13 @@
     <string name="toggle_keyboard">Toggle keyboard</string>
     <string name="clear">Clear</string>
     <string name="term_settings">Terminal settings</string>
+    <string name="toggle_hex">Toggle hex mode</string>
     <string name="font_size">Font size:</string>
     <string name="colors">Colors:</string>
     <string name="enter_key_press">On return key:</string>
     <string name="apply">Apply</string>
+    <string name="term_loading">Loading terminal data, please wait&#8230;</string>
+    <string name="clear_on_hex">Clear data when\ntoggling hex mode:</string>
     <string name="terminal_loading">Can\'t clear terminal during data load.</string>
 
     <string name="new_tab">New tab</string>

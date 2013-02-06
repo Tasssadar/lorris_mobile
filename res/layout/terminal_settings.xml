@@ -50,6 +50,20 @@
                     android:layout_height="wrap_content"
                     android:entries="@array/enter_key_press"/>
             </TableRow>
+            <TableRow
+                android:baselineAligned="false">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="right|center"
+                    android:textSize="17sp"
+                    android:padding="8dp"
+                    android:text="@string/clear_on_hex"/>
+                <CheckBox android:id="@+id/clear_on_hex"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:text="@string/enable"/>
+            </TableRow>
             <TableRow android:gravity="center">
                 <Button android:id="@+id/save_btn"
                     android:layout_width="match_parent"

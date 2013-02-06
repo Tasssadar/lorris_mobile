@@ -1,4 +1,5 @@
 <resources>
-      <drawable name="list_selected">#33B5E5</drawable>
-      <drawable name="transparent">#00000000</drawable>
+    <drawable name="light_blue">#33B5E5</drawable>
+    <drawable name="dark_blue">#0099CC</drawable>
+    <drawable name="transparent">#00000000</drawable>
 </resources>

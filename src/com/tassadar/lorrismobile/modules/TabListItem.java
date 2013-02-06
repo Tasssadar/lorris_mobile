@@ -39,7 +39,7 @@ public class TabListItem {
         ViewGroup l = (ViewGroup)m_view.findViewById(R.id.tab_item_layout);
 
         if(active)
-            l.setBackgroundResource(R.drawable.list_selected);
+            l.setBackgroundResource(R.drawable.dark_blue);
         else
             l.setBackgroundResource(R.drawable.transparent_btn);
     }

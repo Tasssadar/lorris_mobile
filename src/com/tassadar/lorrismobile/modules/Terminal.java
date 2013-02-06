@@ -34,6 +34,8 @@ import com.tassadar.lorrismobile.modules.TerminalSettingsDialog.TerminalSettings
 
 public class Terminal extends Tab implements TerminalMenuListener, TerminalSettingsListener {
 
+    private static final int HEX_LINE = 16;
+
     public Terminal() {
         super();
         m_loadThread = new WeakReference<LoadTermDataThread>(null);
@@ -95,10 +97,49 @@ public class Terminal extends Tab implements TerminalMenuListener, TerminalSetti
 
     @Override
     public void dataRead(byte[] data) {
-        synchronized(m_outStr) {
+        synchronized(m_readStrLock) {
             try {
                 m_data.write(data);
-                m_outStr.write(data);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            readToTerm(data);
+        }
+    }
+
+    private void readToTerm(byte[] data) {
+        synchronized(m_outStr) {
+            try {
+                if(m_settings.hexMode) {
+                    // FIXME: This will copy the data byte array, which can be
+                    // big. This is not ideal.
+                    if(m_lastHexLine != null) {
+                        final byte[] cr = { '\r' };
+                        m_outStr.write(cr);
+
+                        byte [] tmp = new byte[data.length + m_lastHexLine.length];
+                        System.arraycopy(m_lastHexLine, 0, tmp, 0, m_lastHexLine.length);
+                        System.arraycopy(data, 0, tmp, m_lastHexLine.length, data.length);
+                        data = tmp;
+                        m_lastHexLine = null;
+                    } else {
+                        final byte[] nl = { '\n' };
+                        m_outStr.write(nl);
+                    }
+
+                    byte[] res = convertToHex(data, m_hexPos);
+                    m_hexPos += data.length;
+                    m_outStr.write(res);
+
+                    int l = m_hexPos%16;
+                    if(l != 0) {
+                        m_lastHexLine = new byte[l];
+                        System.arraycopy(data, data.length-l, m_lastHexLine, 0, l);
+                        m_hexPos -= l;
+                    }
+                } else {
+                    m_outStr.write(data);
+                }
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -116,7 +157,7 @@ public class Terminal extends Tab implements TerminalMenuListener, TerminalSetti
             if(m_conn == null)
                 return;
 
-            if(buffer[offset] == 10) // Enter key
+            if(buffer[offset] == 0x0D) // Enter key
                 m_conn.write(m_settings.getEnterKeyPressSeq());
             else
                 m_conn.write(buffer, offset, count);
@@ -135,6 +176,8 @@ public class Terminal extends Tab implements TerminalMenuListener, TerminalSetti
         @Override
         public void close() {
             synchronized(m_queueLock) {
+                if(m_queue != null)
+                    m_queue.close();
                 m_queue = null;
             }
         }
@@ -158,7 +201,7 @@ public class Terminal extends Tab implements TerminalMenuListener, TerminalSetti
                     offset += written;
                     count -= written;
 
-                    while(queue.getBytesAvailable() == 128)
+                    while(queue.getBytesAvailable() == 4096)
                         Thread.sleep(1);
                 }
             } catch (InterruptedException e) {
@@ -216,17 +259,27 @@ public class Terminal extends Tab implements TerminalMenuListener, TerminalSetti
             Toast.makeText(getActivity(), R.string.terminal_loading, Toast.LENGTH_SHORT).show();
             return;
         }
-
-        try {
-            m_data.close();
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+        synchronized(m_readStrLock) {
+            clearTerminal(true);
         }
-        m_data = new ByteArrayOutputStream();
+    }
+
+    private void clearTerminal(boolean clearData) {
+        if(clearData) {
+            try {
+                m_data.close();
+            } catch (IOException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+            m_data = new ByteArrayOutputStream();
+        }
+
         m_termSession.finish();
-        
+
         m_outStr = new TermInStream();
+        m_hexPos = 0;
+        m_lastHexLine = null;
 
         m_termSession = new TermSession();
         m_termSession.setTermIn(m_outStr);
@@ -258,16 +311,39 @@ public class Terminal extends Tab implements TerminalMenuListener, TerminalSetti
         EmulatorView e = (EmulatorView)getView().findViewById(R.id.term);
         e.setTextSize(m_settings.fontSize);
         e.setColorScheme(m_settings.getColorScheme());
+
+        m_menu.setHexSelected(m_settings.hexMode);
+    }
+
+    @Override
+    public void onHexModeClicked() {
+        LoadTermDataThread t = m_loadThread.get();
+        if(t != null && t.isAlive()){
+            Toast.makeText(getActivity(), R.string.terminal_loading, Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        synchronized(m_readStrLock) {
+            clearTerminal(m_settings.clearOnHex);
+    
+            if(!m_settings.clearOnHex) {
+                t = new LoadTermDataThread(m_data.toByteArray(), false);
+                m_loadThread = new WeakReference<LoadTermDataThread>(t);
+                t.setName("LoadTermDataThread");
+                t.start();
+            }
+    
+            m_settings.hexMode = !m_settings.hexMode;
+            m_menu.setHexSelected(m_settings.hexMode);
+        }
     }
 
     private void toggleKeyboard() {
         InputMethodManager imm = (InputMethodManager)
                 getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
 
-        if(!imm.isActive()) {
-            EmulatorView e = (EmulatorView)getView().findViewById(R.id.term);
-            e.requestFocus();
-        }
+        EmulatorView e = (EmulatorView)getView().findViewById(R.id.term);
+        e.requestFocus();
 
         imm.toggleSoftInput(InputMethodManager.SHOW_FORCED,0);
     }
@@ -291,28 +367,65 @@ public class Terminal extends Tab implements TerminalMenuListener, TerminalSetti
         byte[] data = str.readByteArray("termData");
 
         if(data != null) {
-            LoadTermDataThread t = new LoadTermDataThread(data);
+            LoadTermDataThread t = new LoadTermDataThread(data, true);
             m_loadThread = new WeakReference<LoadTermDataThread>(t);
             t.setName("LoadTermDataThread");
             t.start();
         }
     }
+    
+    private void setLoadBarVisiblity(boolean visible) {
+        View v = getView().findViewById(R.id.load_bar);
+        v.setVisibility(visible ? View.VISIBLE : View.GONE);
+    }
+
+    private class ShowLoadBarRunnable implements Runnable {
+        public volatile boolean execute = true;
+        @Override
+        public void run() {
+            if(execute)
+                setLoadBarVisiblity(true);
+        }
+    }
 
     private class LoadTermDataThread extends Thread {
         byte[] m_data;
-        public LoadTermDataThread(byte[] data) {
+        boolean m_putIntoData;
+        public LoadTermDataThread(byte[] data, boolean putIntoData) {
             m_data = data;
+            m_putIntoData = putIntoData;
         }
 
         @Override
         public void run() {
             Log.e("Lorris", "LoadTermDataThread started " + m_data.length);
-            
+
             if(m_conn != null)
                 m_conn.removeInterface(Terminal.this);
 
-            dataRead(m_data);
+            EmulatorView e = (EmulatorView)getView().findViewById(R.id.term);
+            e.setUpdateEnable(false);
+
+            ShowLoadBarRunnable r = new ShowLoadBarRunnable();
+            e.postDelayed(r,  100);
+
+            if(m_putIntoData)
+                dataRead(m_data);
+            else
+                readToTerm(m_data);
+
             m_data = null;
+
+            e.setUpdateEnable(true);
+            e.postInvalidate();
+
+            r.execute = false;
+            e.post(new Runnable() {
+                @Override
+                public void run() {
+                    setLoadBarVisiblity(false);
+                }
+            });
 
             if(m_conn != null)
                 m_conn.addInterface(Terminal.this);
@@ -321,10 +434,18 @@ public class Terminal extends Tab implements TerminalMenuListener, TerminalSetti
         }
     }
 
+    private native byte[] convertToHex(byte[] dataArray, int hexPos);
+    static {
+        System.loadLibrary("functions");
+    }
+
     private TermSession m_termSession;
     private TermInStream m_outStr;
     private ByteArrayOutputStream m_data;
     private WeakReference<LoadTermDataThread> m_loadThread;
     private TerminalMenu m_menu;
     private TerminalSettings m_settings;
+    private byte[] m_lastHexLine;
+    private int m_hexPos;
+    private Object m_readStrLock = new Object();
 }

@@ -10,11 +10,15 @@ public class TerminalSettings {
     public int fontSize;
     public int colors;
     public int enterKeyPress;
+    public boolean hexMode;
+    public boolean clearOnHex;
 
     public void load(SharedPreferences p) {
         fontSize = p.getInt("term_fontSize", 15);
         colors = p.getInt("term_colors", 0);
         enterKeyPress = p.getInt("term_enterPress", 0);
+        hexMode = false; // don't save this to preferences
+        clearOnHex = p.getBoolean("term_clearOnHex", true);
     }
 
     public void save(SharedPreferences p) {
@@ -22,6 +26,7 @@ public class TerminalSettings {
         e.putInt("term_fontSize", fontSize);
         e.putInt("term_colors", colors);
         e.putInt("term_enterPress", enterKeyPress);
+        e.putBoolean("term_clearOnHex", clearOnHex);
         e.commit();
     }
 
@@ -29,12 +34,16 @@ public class TerminalSettings {
         fontSize = str.readInt("fontSize", 15);
         colors = str.readInt("colors", 0);
         enterKeyPress = str.readInt("enterPress", 0);
+        hexMode = str.readBool("hexMode", false);
+        clearOnHex = str.readBool("clearOnHex", true);
     }
 
     public void saveToStr(BlobOutputStream str) {
         str.writeInt("fontSize", fontSize);
         str.writeInt("colors", colors);
         str.writeInt("enterPress", enterKeyPress);
+        str.writeBool("hexMode", hexMode);
+        str.writeBool("clearOnHex", clearOnHex);
     }
 
     public byte[] getEnterKeyPressSeq() {

@@ -443,14 +443,14 @@ public class Session extends SQLiteOpenHelper {
         m_changed |= CHANGED_DESC;
         m_desc = desc;
     }
-    
+
     public void setImage(Bitmap img) {
-        if(m_image != null && !Utils.compareBitmap(m_image, img))
+        if(m_image != null && Utils.compareBitmap(m_image, img))
             return;
         m_changed |= CHANGED_IMG;
         m_image = img;
     }
-    
+
     public void setLastOpenTime() {
         m_last_open = (int) (Calendar.getInstance().getTimeInMillis()/1000);
         m_changed |= CHANGED_LAST_OPEN;

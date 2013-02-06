@@ -123,18 +123,8 @@ public class SessionListActivity extends FragmentActivity implements OnSessionCh
 
     @Override
     public void onSessionsChanged() {
-        Session s = m_adapter.getSession(m_last_selected);
-        String name = s.getName();
-        s = null;
-
+        // FIXME: keep session selection
         loadSessions();
-        
-        m_last_selected = m_adapter.getSessionPos(name);
-        if(m_last_selected == ListView.INVALID_POSITION && getListView().getCount() != 0)
-            m_last_selected = 0;
-
-        getListView().setItemChecked(m_last_selected, true);
-        loadSessionDetail(m_last_selected);
     }
 
     @Override

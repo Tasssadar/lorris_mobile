@@ -325,6 +325,9 @@ public class Terminal extends Tab implements TerminalMenuListener, TerminalSetti
 
         synchronized(m_readStrLock) {
             clearTerminal(m_settings.clearOnHex);
+
+            m_settings.hexMode = !m_settings.hexMode;
+            m_menu.setHexSelected(m_settings.hexMode);
     
             if(!m_settings.clearOnHex) {
                 t = new LoadTermDataThread(m_data.toByteArray(), false);
@@ -332,9 +335,6 @@ public class Terminal extends Tab implements TerminalMenuListener, TerminalSetti
                 t.setName("LoadTermDataThread");
                 t.start();
             }
-    
-            m_settings.hexMode = !m_settings.hexMode;
-            m_menu.setHexSelected(m_settings.hexMode);
         }
     }
 

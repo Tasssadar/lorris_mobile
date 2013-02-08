@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:scrollbarAlwaysDrawVerticalTrack="true"
     android:padding="10dp">
     <LinearLayout 
         android:layout_width="match_parent"
@@ -63,6 +64,28 @@
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
                     android:text="@string/enable"/>
+            </TableRow>
+            <TableRow>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="right|center"
+                    android:textSize="17sp"
+                    android:padding="8dp"
+                    android:text="@string/hex_bpl"/>
+                <RadioGroup android:id="@+id/hex_bytes"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+                    <RadioButton android:id="@+id/hex8bytes"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/b8"/>
+                    <RadioButton android:id="@+id/hex16bytes"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/b16"/>
+                </RadioGroup>
             </TableRow>
             <TableRow android:gravity="center">
                 <Button android:id="@+id/save_btn"

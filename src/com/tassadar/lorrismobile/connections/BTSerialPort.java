@@ -139,7 +139,8 @@ public class BTSerialPort extends Connection {
 
     @Override
     public void write(byte[] data, int offset, int count) {
-        m_writeThread.getHandler().obtainMessage(WRITE_DATA, offset, count, data.clone()).sendToTarget();
+        if(isOpen())
+            m_writeThread.getHandler().obtainMessage(WRITE_DATA, offset, count, data.clone()).sendToTarget();
     }
 
     @Override

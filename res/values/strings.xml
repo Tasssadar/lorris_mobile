@@ -40,6 +40,9 @@
     <string name="font_size">Font size:</string>
     <string name="colors">Colors:</string>
     <string name="enter_key_press">On return key:</string>
+    <string name="hex_bpl">Hex bytes/line</string>
+    <string name="b8">8 B</string>
+    <string name="b16">16 B</string>
     <string name="apply">Apply</string>
     <string name="term_loading">Loading terminal data, please wait&#8230;</string>
     <string name="clear_on_hex">Clear data when\ntoggling hex mode:</string>

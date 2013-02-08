@@ -127,11 +127,16 @@ public class Terminal extends Tab implements TerminalMenuListener, TerminalSetti
                         m_outStr.write(nl);
                     }
 
-                    byte[] res = convertToHex(data, m_hexPos);
+                    byte[] res = null;
+                    if(m_settings.hex16bytes)
+                        res = convertToHex16(data, m_hexPos);
+                    else
+                        res = convertToHex8(data, m_hexPos);
+
                     m_hexPos += data.length;
                     m_outStr.write(res);
 
-                    int l = m_hexPos%16;
+                    int l = m_hexPos%(m_settings.hex16bytes ? 16 : 8);
                     if(l != 0) {
                         m_lastHexLine = new byte[l];
                         System.arraycopy(data, data.length-l, m_lastHexLine, 0, l);
@@ -434,7 +439,8 @@ public class Terminal extends Tab implements TerminalMenuListener, TerminalSetti
         }
     }
 
-    private native byte[] convertToHex(byte[] dataArray, int hexPos);
+    private native byte[] convertToHex16(byte[] dataArray, int hexPos);
+    private native byte[] convertToHex8(byte[] dataArray, int hexPos);
     static {
         System.loadLibrary("functions");
     }

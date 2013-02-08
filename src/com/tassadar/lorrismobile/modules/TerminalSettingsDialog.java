@@ -11,6 +11,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.RadioGroup;
 import android.widget.Spinner;
 
 import com.tassadar.lorrismobile.R;
@@ -32,11 +33,13 @@ public class TerminalSettingsDialog extends DialogFragment implements OnClickLis
         Spinner clr = (Spinner)v.findViewById(R.id.colors);
         Spinner enter = (Spinner)v.findViewById(R.id.enter_key_press);
         CheckBox clrOnHex = (CheckBox)v.findViewById(R.id.clear_on_hex);
+        RadioGroup hexBytes = (RadioGroup)v.findViewById(R.id.hex_bytes);
 
         font.setText(Integer.toString(m_settings.fontSize));
         clr.setSelection(m_settings.colors);
         enter.setSelection(m_settings.enterKeyPress);
         clrOnHex.setChecked(m_settings.clearOnHex);
+        hexBytes.check(m_settings.hex16bytes ? R.id.hex16bytes : R.id.hex8bytes);
         return v;
     }
 
@@ -58,10 +61,14 @@ public class TerminalSettingsDialog extends DialogFragment implements OnClickLis
     @Override
     public void onClick(View btn) {
         View v = getView();
+        if(v == null)
+            return;
+
         EditText font = (EditText)v.findViewById(R.id.font_size);
         Spinner clr = (Spinner)v.findViewById(R.id.colors);
         Spinner enter = (Spinner)v.findViewById(R.id.enter_key_press);
         CheckBox clrOnHex = (CheckBox)v.findViewById(R.id.clear_on_hex);
+        RadioGroup hexBytes = (RadioGroup)v.findViewById(R.id.hex_bytes);
 
         try {
             m_settings.fontSize = Integer.valueOf(font.getText().toString());
@@ -72,6 +79,7 @@ public class TerminalSettingsDialog extends DialogFragment implements OnClickLis
         m_settings.colors = clr.getSelectedItemPosition();
         m_settings.enterKeyPress = enter.getSelectedItemPosition();
         m_settings.clearOnHex = clrOnHex.isChecked();
+        m_settings.hex16bytes = (hexBytes.getCheckedRadioButtonId() == R.id.hex16bytes);
 
         Activity a = getActivity();
         if(a != null)

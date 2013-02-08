@@ -30,6 +30,8 @@
     <string name="tab_btn_desc">Show tab list</string>
     <string name="back_twice">Press BACK once again to close current session</string>
     <string name="close_tab">Close tab</string>
+    <string name="no_connection">no connection</string>
+    <string name="connected_to">connected to \"%1$s\"</string>
     <string name="delete">Delete</string>
     <string name="edit">Edit</string>
     <string name="load_session">Load session</string>

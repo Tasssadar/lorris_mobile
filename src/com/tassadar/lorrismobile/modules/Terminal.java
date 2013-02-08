@@ -58,6 +58,11 @@ public class Terminal extends Tab implements TerminalMenuListener, TerminalSetti
         return TabManager.TAB_TERMINAL;
     }
 
+    @Override
+    public String getName() {
+        return "Terminal";
+    }
+
     public void onAttach(Activity act) {
         super.onAttach(act);
 

@@ -1,11 +1,15 @@
 package com.tassadar.lorrismobile;
 
+import java.util.ArrayList;
+
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -14,6 +18,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 @TargetApi(11)
@@ -86,21 +91,68 @@ public class SessionDetailFragment extends Fragment {
         TextView name = (TextView)getView().findViewById(R.id.session_name);
         TextView desc = (TextView)getView().findViewById(R.id.session_desc);
         ImageView image = (ImageView)getView().findViewById(R.id.session_image);
+        LinearLayout tab_desc = (LinearLayout)getView().findViewById(R.id.open_tabs);
         
-        if(name == null || desc == null || image == null)
+        if(name == null || desc == null || image == null || tab_desc == null)
             return;
-        
+
         m_session_name = session.getName();
-        
+
         name.setText(m_session_name);
         desc.setText(session.getDesc());
-        
+
         Bitmap bmp = session.getImage();
         if(bmp != null)
             image.setImageBitmap(session.getImage());
         else
             image.setImageResource(R.drawable.photo_ph);
+
+        tab_desc.removeAllViews();
+        if(session.hasTabDescLoaded())
+            fillTabDetails(session.loadTabDesc());
+        else
+            new TabDescLoader().execute(session);
     }
+
+    private class TabDescLoader extends AsyncTask<Session, Void, ArrayList<String> > {
+        @Override
+        protected ArrayList<String> doInBackground(Session... s) {
+            ArrayList<String> res = s[0].loadTabDesc();
+            if(res.isEmpty())
+                return null;
+            return res;
+        }
+
+        @Override
+        protected void onPostExecute(ArrayList<String> res) {
+            fillTabDetails(res);
+        }
+    };
+
+    private void fillTabDetails(ArrayList<String> d) {
+        if(d == null || d.isEmpty())
+            return;
+
+        Activity act = getActivity();
+        if(act == null)
+            return;
+
+        LinearLayout tab_desc = (LinearLayout)getView().findViewById(R.id.open_tabs);
+
+        int size = d.size();
+        for(int i = 0; i < size; ++i) {
+            View v = View.inflate(act,  R.layout.opened_tab_item, null);
+
+            TextView t = (TextView)v.findViewById(R.id.desc_text);
+            t.setText(Html.fromHtml(d.get(i)));
+
+            if(i == size-1)
+                v.findViewById(R.id.separator).setVisibility(View.GONE);
+
+            tab_desc.addView(v);
+        }
+    }
+
     
     private class LoadSessionListener implements View.OnClickListener {
         @Override

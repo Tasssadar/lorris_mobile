@@ -65,7 +65,7 @@ public class SessionService extends Service {
         notification.flags |= Notification.FLAG_ONGOING_EVENT;
 
         Intent intent = new Intent(this, WorkspaceActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 
         PendingIntent contentIntent = PendingIntent.getActivity(this, 0, intent, 0);
 

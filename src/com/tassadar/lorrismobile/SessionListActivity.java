@@ -154,6 +154,7 @@ public class SessionListActivity extends FragmentActivity implements OnSessionCh
     private void openSession(Session s) {
         SessionMgr.setActiveSession(s);
         s.setLastOpenTime();
+        s.resetTabDesc();
 
         Intent i = new Intent(this, WorkspaceActivity.class);
         startActivityForResult(i,  ACTCODE_OPEN_SESSION);

@@ -25,7 +25,7 @@ import com.tassadar.lorrismobile.modules.Tab;
 
 public class Session extends SQLiteOpenHelper {
     
-    private static final int DB_VERSION = 1;
+    private static final int DB_VERSION = 2;
     
     private static final int CHANGED_NAME      = 0x01;
     private static final int CHANGED_DESC      = 0x02;
@@ -84,7 +84,8 @@ public class Session extends SQLiteOpenHelper {
                 "id INTEGER UNIQUE NOT NULL," +
                 "type INTEGER NOT NULL," +
                 "name TEXT NOT NULL," +
-                "conn_id INTEGER NOT NULL DEFAULT '-1');");
+                "conn_id INTEGER NOT NULL DEFAULT '-1'," +
+                "detail_desc TEXT DEFAULT '');");
 
         // Connections
         db.execSQL("CREATE TABLE connections (" +
@@ -95,8 +96,14 @@ public class Session extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        // TODO Auto-generated method stub
-        
+        while(oldVersion != newVersion) {
+            ++oldVersion;
+            switch(oldVersion) {
+                case 2:
+                    db.execSQL("ALTER TABLE tabs ADD COLUMN detail_desc TEXT DEFAULT '';");
+                    break;
+            }
+        }
     }
 
     public synchronized void acquireDBRef() {
@@ -139,7 +146,7 @@ public class Session extends SQLiteOpenHelper {
 
             vals.put("image", str.toByteArray());
         }
-        
+
         if((m_changed & CHANGED_LAST_OPEN) != 0)
             vals.put("last_open_time", m_last_open);
 
@@ -218,6 +225,7 @@ public class Session extends SQLiteOpenHelper {
         vals.put("type", t.getType());
         vals.put("name", t.getName());
         vals.put("conn_id", t.getLastConnId());
+        vals.put("detail_desc", t.getTabDesc());
         m_db.insert("tabs", null, vals);
     }
 
@@ -251,7 +259,8 @@ public class Session extends SQLiteOpenHelper {
 
             vals.put("name", t.getName());
             vals.put("conn_id", t.getConnId());
-            Log.e("Lorris", "Tab connection id " + t.getConnId() + "\n");
+            vals.put("detail_desc", t.getTabDesc());
+
             m_db.update("tabs", vals, "id="+ String.valueOf(t.getTabId()), null);
 
             File f = getTabDataFile(t.getTabId(), true);
@@ -418,6 +427,39 @@ public class Session extends SQLiteOpenHelper {
         return res;
     }
 
+    public ArrayList<String> loadTabDesc() {
+        if(m_openTabsDesc != null)
+            return m_openTabsDesc;
+
+        m_openTabsDesc = new ArrayList<String>();
+
+        SQLiteDatabase db = getReadableDatabase();
+        //                             0     1
+        Cursor c = db.rawQuery("SELECT name, detail_desc FROM tabs ORDER BY id;", null);
+        while(c.moveToNext()) {
+            StringBuilder b = new StringBuilder("<b>");
+            b.append(c.getString(0));
+            b.append("</b>");
+
+            String desc = c.getString(1);
+            if(desc != null && desc.length() != 0)
+                b.append(", ").append(desc);
+
+            m_openTabsDesc.add(b.toString());
+        }
+        c.close();
+        db.close();
+        return m_openTabsDesc;
+    }
+
+    public boolean hasTabDescLoaded() {
+        return m_openTabsDesc != null;
+    }
+
+    public void resetTabDesc() {
+        m_openTabsDesc = null;
+    }
+
     public String getName() {
         return m_name;
     }
@@ -511,4 +553,5 @@ public class Session extends SQLiteOpenHelper {
     private SparseIntArray m_connChanges = new SparseIntArray();
     private SQLiteDatabase m_db;
     private int m_dbRefCounter;
+    private ArrayList<String> m_openTabsDesc;
 }

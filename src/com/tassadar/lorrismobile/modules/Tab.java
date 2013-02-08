@@ -1,11 +1,14 @@
 package com.tassadar.lorrismobile.modules;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 
 import com.tassadar.lorrismobile.BlobInputStream;
 import com.tassadar.lorrismobile.BlobOutputStream;
+import com.tassadar.lorrismobile.LorrisApplication;
+import com.tassadar.lorrismobile.R;
 import com.tassadar.lorrismobile.connections.Connection;
 import com.tassadar.lorrismobile.connections.ConnectionInterface;
 import com.tassadar.lorrismobile.modules.TabListItem.TabItemClicked;
@@ -62,6 +65,17 @@ public class Tab extends Fragment implements TabItemClicked, ConnectionInterface
 
     public String getName() {
         return "Tab";
+    }
+
+    public String getTabDesc() {
+        Context ctx = getActivity();
+        if(ctx == null)
+            ctx = LorrisApplication.getAppContext();
+
+        if(m_conn == null)
+            return ctx.getString(R.string.no_connection);
+        else
+            return String.format(ctx.getString(R.string.connected_to), m_conn.getName());
     }
 
     public void setTabListItem(TabListItem it) {

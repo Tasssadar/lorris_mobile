@@ -8,7 +8,6 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
@@ -62,14 +61,12 @@ public class ConnectionsActivity extends FragmentActivity implements ConnFragmen
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        //getMenuInflater().inflate(R.menu.connections, menu);
-        return true;
-    }
-
-    @Override
     public boolean onOptionsItemSelected (MenuItem item) {
         switch(item.getItemId()) {
+            case android.R.id.home:
+                setResult(RESULT_CANCELED);
+                finish();
+                return true;
         }
         return false;
     }
@@ -131,6 +128,11 @@ public class ConnectionsActivity extends FragmentActivity implements ConnFragmen
                 p.setVisibility(visible ? View.VISIBLE : View.GONE);
         } else
             setProgressBarIndeterminateVisibility(visible);
+    }
+
+    public void on_back_clicked(View v) {
+        setResult(RESULT_CANCELED);
+        finish();
     }
 
     private ImageButton[] m_connBtns;

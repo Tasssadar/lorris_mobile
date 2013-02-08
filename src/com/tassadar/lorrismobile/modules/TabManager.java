@@ -7,15 +7,11 @@ import com.tassadar.lorrismobile.modules.Tab.TabSelectedListener;
 
 public class TabManager {
 
-    public static final int TAB_ANALYZER = 0;
-    public static final int TAB_TERMINAL = 1;
+    public static final int TAB_TERMINAL = 0;
 
     public static Tab createTab(TabSelectedListener listener, int type) {
         Tab res = null;
         switch(type) {
-            case TAB_ANALYZER:
-                res = new Analyzer();
-                break;
             case TAB_TERMINAL:
                 res = new Terminal();
                 break;

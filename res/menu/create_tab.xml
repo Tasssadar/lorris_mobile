@@ -1,7 +1,4 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:id="@+id/analyzer"
-        android:title="@string/analyzer"
-        android:showAsAction="always|withText"/>
     <item android:id="@+id/terminal"
         android:title="@string/terminal"
         android:showAsAction="always|withText"/>

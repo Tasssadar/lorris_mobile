@@ -406,9 +406,6 @@ public class WorkspaceActivity extends FragmentActivity implements TabSelectedLi
         @Override
         public boolean onMenuItemClick(MenuItem item) {
             switch(item.getItemId()) {
-            case R.id.analyzer:
-                createNewTab(TabManager.TAB_ANALYZER);
-                return true;
             case R.id.terminal:
                 createNewTab(TabManager.TAB_TERMINAL);
                 return true;

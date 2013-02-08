@@ -78,7 +78,6 @@
     </string-array>
 
     <string-array name="tab_names">
-        <item>Analyzer</item>
         <item>Terminal</item>
     </string-array>
 

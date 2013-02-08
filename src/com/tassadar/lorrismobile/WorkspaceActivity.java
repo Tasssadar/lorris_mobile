@@ -28,7 +28,9 @@ import android.view.KeyEvent;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.Window;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.LinearLayout.LayoutParams;
@@ -236,6 +238,7 @@ public class WorkspaceActivity extends FragmentActivity implements TabSelectedLi
         TabManager.addTab(t);
 
         m_connBtn.show();
+        setEmpty(false);
 
         String name = getResources().getStringArray(R.array.tab_names)[t.getType()];
         TabListItem it = new TabListItem(this, null, name);
@@ -297,6 +300,33 @@ public class WorkspaceActivity extends FragmentActivity implements TabSelectedLi
         SessionMgr.getActiveSession().setCurrTab(curr.getTabId());
     }
 
+    private void setEmpty(boolean empty) {
+        LinearLayout l = (LinearLayout)findViewById(R.id.no_tabs_layout);
+
+        if(empty && l.getChildCount() < 2) {
+            String[] names = getResources().getStringArray(R.array.tab_names);
+            for(int i = 0; i < names.length; ++i) {
+                Button b = new Button(this);
+                b.setId(TabManager.getRIdForTabType(i));
+                b.setTextSize(18);
+                b.setPadding(50, 10, 50, 10);
+                b.setLayoutParams(
+                        new LinearLayout.LayoutParams(LayoutParams.WRAP_CONTENT,
+                                LayoutParams.WRAP_CONTENT));
+                b.setOnClickListener(new OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        createTabByRId(v.getId());
+                    }
+                });
+                b.setText(names[i]);
+                l.addView(b);
+            }
+        }
+
+        l.setVisibility(empty ? View.VISIBLE : View.GONE);
+    } 
+
     private void closeTab(int idx) {
         if(idx < 0 || idx >= TabManager.size())
             return;
@@ -329,6 +359,9 @@ public class WorkspaceActivity extends FragmentActivity implements TabSelectedLi
             m_active_tab = -1;
             setActiveTab(0);
         }
+
+        if(TabManager.isEmpty())
+            setEmpty(true);
     }
 
     @Override
@@ -372,8 +405,17 @@ public class WorkspaceActivity extends FragmentActivity implements TabSelectedLi
 
     @Override
     public void onTabsLoad(ArrayList<ContentValues> values) {
-        for(ContentValues vals : values) {
-            runOnUiThread(new LoadTabRunnable(vals));
+        if(values.isEmpty()) {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    setEmpty(true);
+                }
+            });
+        }else {
+            for(ContentValues vals : values) {
+                runOnUiThread(new LoadTabRunnable(vals));
+            }
         }
     }
 
@@ -405,14 +447,17 @@ public class WorkspaceActivity extends FragmentActivity implements TabSelectedLi
     private class CreateTabListener implements OnMenuItemClickListener {
         @Override
         public boolean onMenuItemClick(MenuItem item) {
-            switch(item.getItemId()) {
+            createTabByRId(item.getItemId());
+            return true;
+        }
+    }
+
+    private void createTabByRId(int id) {
+        switch(id) {
             case R.id.terminal:
                 createNewTab(TabManager.TAB_TERMINAL);
-                return true;
-            }
-            return false;
+                break;
         }
-        
     }
 
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)

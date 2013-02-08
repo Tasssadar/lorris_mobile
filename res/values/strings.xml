@@ -51,6 +51,7 @@
     <string name="terminal_loading">Can\'t clear terminal during data load.</string>
 
     <string name="new_tab">New tab</string>
+    <string name="open_new_tab">Open new tab:</string>
     <string name="analyzer">Analyzer</string>
     <string name="terminal">Terminal</string>
     <string name="connection">Connection</string>

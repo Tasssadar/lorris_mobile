@@ -2,11 +2,12 @@ package com.tassadar.lorrismobile.modules;
 
 import android.util.SparseArray;
 
+import com.tassadar.lorrismobile.R;
 import com.tassadar.lorrismobile.Utils;
 import com.tassadar.lorrismobile.modules.Tab.TabSelectedListener;
 
 public class TabManager {
-
+ 
     public static final int TAB_TERMINAL = 0;
 
     public static Tab createTab(TabSelectedListener listener, int type) {
@@ -20,6 +21,16 @@ public class TabManager {
         }
         res.setListener(listener);
         return res;
+    }
+
+    public static int getRIdForTabType(int type) {
+        final int ids[] = { R.id.terminal };
+        try {
+            return ids[type];
+        } catch(IndexOutOfBoundsException ex) {
+            ex.printStackTrace(); 
+        }
+        return 0;
     }
 
     private static int m_id_counter = 0;

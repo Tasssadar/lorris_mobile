@@ -1,6 +1,6 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:id="@+id/add_tcp_conn"
         android:title="@string/add_tcp_conn"
-        android:showAsAction="always"
+        android:showAsAction="always|withText"
         android:icon="@drawable/ic_content_new" />
 </menu>

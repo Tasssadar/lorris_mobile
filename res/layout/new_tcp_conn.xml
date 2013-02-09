@@ -1,0 +1,27 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="10dp" >
+    <TextView android:id="@+id/error"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#CC0000"
+        android:gravity="center"
+        android:textColor="#ffffff"
+        android:visibility="gone" />
+    <EditText android:id="@+id/name" 
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/name" />
+    <EditText android:id="@+id/address" 
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/address" />
+    <EditText android:id="@+id/port" 
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:inputType="number"
+        android:hint="@string/port"/>
+</LinearLayout>

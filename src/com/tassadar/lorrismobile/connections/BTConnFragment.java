@@ -187,14 +187,6 @@ public class BTConnFragment extends ConnFragment {
         m_displayedDevices.add(device.getAddress());
     }
 
-    private void setProgressVisible(boolean visible) {
-        Activity act = getActivity();
-        if(act == null || !(act instanceof ConnectionsActivity))
-            return;
-        
-        ((ConnectionsActivity)act).setProgressIndicator(visible);
-    }
-
     private class DeviceClickedLister implements OnClickListener {
         @Override
         public void onClick(View l) {

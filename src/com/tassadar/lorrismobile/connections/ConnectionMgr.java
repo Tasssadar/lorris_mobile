@@ -32,11 +32,34 @@ public class ConnectionMgr {
         return p;
     }
 
+    static public TCPConnection createTcpConn(TCPConnProto p) {
+        int size = m_connections.size();
+        for(int i = 0; i < size; ++i) {
+            Connection c = m_connections.valueAt(i);
+            if(c.getType() != Connection.CONN_TCP)
+                continue;
+
+            TCPConnection t = (TCPConnection)c;
+            TCPConnProto tp = t.getProto();
+            if(tp.name.equals(p.name) && tp.address.equals(p.address) && tp.port == p.port)
+                return t;
+        }
+
+        TCPConnection t = new TCPConnection();
+        t.setProto(p);
+        t.setId(m_idCounter++);
+        addConnection(t);
+        return t;
+    }
+
     static public Connection createFromVals(ContentValues vals) {
         Connection c = null;
         switch(vals.getAsInteger("type")) {
             case Connection.CONN_BT_SP:
                 c = new BTSerialPort();
+                break;
+            case Connection.CONN_TCP:
+                c = new TCPConnection();
                 break;
             default:
                 return null;

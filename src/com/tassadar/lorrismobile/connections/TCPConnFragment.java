@@ -138,6 +138,8 @@ public class TCPConnFragment extends ConnFragment {
             switch(v.getId()) {
                 case R.id.tcp_list_item_layout:
                     v.setEnabled(false);
+                    TCPConnection conn = ConnectionMgr.createTcpConn(m_proto);
+                    m_interface.onConnectionSelected(conn);
                     break;
                 case R.id.edit:
                     showConnDlg(m_proto);

@@ -4,22 +4,18 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.ref.WeakReference;
-import java.util.UUID;
+import java.net.InetAddress;
+import java.net.Socket;
+import java.net.UnknownHostException;
 
-import com.tassadar.lorrismobile.BlobInputStream;
-import com.tassadar.lorrismobile.BlobOutputStream;
-
-import android.bluetooth.BluetoothAdapter;
-import android.bluetooth.BluetoothDevice;
-import android.bluetooth.BluetoothSocket;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 
+import com.tassadar.lorrismobile.BlobInputStream;
+import com.tassadar.lorrismobile.BlobOutputStream;
 
-public class BTSerialPort extends Connection {
-
-    private static final String RFCOMM_UUID = "00001101-0000-1000-8000-00805F9B34FB";
+public class TCPConnection extends Connection {
 
     private static final int STATE_OK      = 0;
     private static final int STATE_FAILED  = 1;
@@ -31,23 +27,19 @@ public class BTSerialPort extends Connection {
     private static final int WRITE_STOP = 0;
     private static final int WRITE_DATA = 1;
 
-    public BTSerialPort(BluetoothDevice device) {
-        super(Connection.CONN_BT_SP);
-        m_device = device;
+    public TCPConnection() {
+        super(CONN_TCP);
+        m_proto = new TCPConnProto();
         m_handler = new StateHandler(this);
-        m_connectThread = null;
-        m_name = device.getName();
     }
 
-    public BTSerialPort() {
-        super(Connection.CONN_BT_SP);
-        m_handler = new StateHandler(this);
-        m_connectThread = null;
+    public void setProto(TCPConnProto p) {
+        m_proto = p;
     }
 
     @Override
     public void open() {
-        if(m_device == null || m_state != ST_DISCONNECTED || m_connectThread != null)
+        if(m_socket != null || m_state != ST_DISCONNECTED || m_connectThread != null)
             return;
 
         setState(Connection.ST_CONNECTING);
@@ -57,7 +49,7 @@ public class BTSerialPort extends Connection {
 
     @Override
     public void close() {
-        if(m_device == null || m_state == ST_DISCONNECTED)
+        if(m_state == ST_DISCONNECTED)
             return;
 
         if(m_state == ST_CONNECTED)
@@ -93,48 +85,25 @@ public class BTSerialPort extends Connection {
 
     @Override
     protected void saveDataStream(BlobOutputStream str) {
-        str.writeString("address", m_device.getAddress());
-        str.writeString("name", m_name);
+        str.writeString("name", m_proto.name);
+        str.writeString("address", m_proto.address);
+        str.writeInt("port", m_proto.port);
     }
 
     @Override
     protected void loadDataStream(BlobInputStream str) {
-        String address = str.readString("address");
-        if(address == null)
-            return;
-
-        BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
-        if(adapter == null)
-            return;
-
-        try {
-            m_device = adapter.getRemoteDevice(address);
-        }catch(IllegalArgumentException ex) {
-            ex.printStackTrace();
-            return;
-        }
-
-        String n = m_device.getName();
-        if(n != null && n.length() != 0)
-            m_name = n;
-        else
-            m_name = str.readString("name");
+        m_proto.name = str.readString("name");
+        m_proto.address = str.readString("address");
+        m_proto.port = str.readInt("port");
     }
 
     @Override
     public String getName() {
-        if(m_device == null)
-            return super.getName();
-
-        if(m_name.length() == 0)
-            m_name = m_device.getName();
-        return m_name;
+        return m_proto.name;
     }
 
-    public String getAddress() {
-        if(m_device != null)
-            return m_device.getAddress();
-        return "";
+    public TCPConnProto getProto() {
+        return m_proto;
     }
 
     @Override
@@ -171,38 +140,38 @@ public class BTSerialPort extends Connection {
     }
 
     static class StateHandler extends Handler {
-        private final WeakReference<BTSerialPort> m_port; 
+        private final WeakReference<TCPConnection> m_conn; 
 
-        StateHandler(BTSerialPort port) {
+        StateHandler(TCPConnection conn) {
             super(Looper.getMainLooper());
-            m_port = new WeakReference<BTSerialPort>(port);
+            m_conn = new WeakReference<TCPConnection>(conn);
         }
 
         @Override
         public void handleMessage(Message msg)
         {
-             BTSerialPort p = m_port.get();
-             if (p == null)
+             TCPConnection c = m_conn.get();
+             if (c == null)
                  return;
              
              switch(msg.what) {
                  case SRC_CONNECT_THREAD:
                  {
-                     p.m_connectThread = null;
+                     c.m_connectThread = null;
                      if(msg.arg1 == STATE_OK) {
-                         p.m_socket = (BluetoothSocket)msg.obj;
-                         p.setState(Connection.ST_CONNECTED);
+                         c.m_socket = (Socket)msg.obj;
+                         c.setState(Connection.ST_CONNECTED);
                      }
                      else
-                         p.setState(Connection.ST_DISCONNECTED);
+                         c.setState(Connection.ST_DISCONNECTED);
                      break;
                  }
                  case SRC_POLL_THREAD:
                  {
                      if(msg.arg1 == STATE_OK)
-                         p.sendDataRead((byte[])msg.obj);
+                         c.sendDataRead((byte[])msg.obj);
                      else
-                         p.close();
+                         c.close();
                      break;
                  }
              }
@@ -213,39 +182,26 @@ public class BTSerialPort extends Connection {
 
         @Override
         public void run() {
-            BluetoothSocket socket = null;
+            InetAddress addr = null;
             try {
-                // FIXME: Is this method of using UUID correct?
-                socket = m_device.createRfcommSocketToServiceRecord(UUID.fromString(RFCOMM_UUID));
-            } catch (IOException e) {
+                addr = InetAddress.getByName(m_proto.address);
+            } catch (UnknownHostException e) {
                 e.printStackTrace();
-            }
-
-            if(socket == null) {
                 m_handler.obtainMessage(SRC_CONNECT_THREAD, STATE_FAILED, 0).sendToTarget();
                 return;
             }
 
-            BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
-            adapter.cancelDiscovery();
-
             try {
-                socket.connect();
+                Socket s = new Socket(addr, m_proto.port);
+                m_handler.obtainMessage(SRC_CONNECT_THREAD, STATE_OK, 0, s).sendToTarget();
             } catch (IOException e) {
                 e.printStackTrace();
-                try {
-                    socket.close();
-                } catch (IOException e1) {
-                    e1.printStackTrace();
-                }
                 m_handler.obtainMessage(SRC_CONNECT_THREAD, STATE_FAILED, 0).sendToTarget();
                 return;
             }
-
-            m_handler.obtainMessage(SRC_CONNECT_THREAD, STATE_OK, 0, socket).sendToTarget();
         }
     }
-
+    
     private class PollThread extends Thread {
         private volatile boolean m_run = true;
 
@@ -275,7 +231,6 @@ public class BTSerialPort extends Connection {
                     byte[] out = new byte[bytes];
                     System.arraycopy(buffer, 0, out, 0, bytes);
                     sendDataRead(out);
-                    //m_handler.obtainMessage(SRC_POLL_THREAD, STATE_OK, 0, out).sendToTarget();
                 } catch (IOException e) {
                     e.printStackTrace();
                     m_handler.obtainMessage(SRC_POLL_THREAD, STATE_FAILED, 1).sendToTarget();
@@ -343,7 +298,7 @@ public class BTSerialPort extends Connection {
             }
         }
     }
-    
+
     static class WriteHandler extends Handler {
         private final WeakReference<OutputStream> m_str; 
 
@@ -375,10 +330,9 @@ public class BTSerialPort extends Connection {
         }
     }
 
-    private BluetoothDevice m_device;
+    private TCPConnProto m_proto;
+    private Socket m_socket;
     private StateHandler m_handler;
-    private BluetoothSocket m_socket;
-    private String m_name;
     private volatile ConnectThread m_connectThread;
     private volatile WriteThread m_writeThread;
     private volatile PollThread m_pollThread;

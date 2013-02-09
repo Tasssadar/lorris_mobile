@@ -3,7 +3,6 @@ package com.tassadar.lorrismobile;
 import java.util.ArrayList;
 import java.util.LinkedList;
 
-import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
@@ -51,10 +50,6 @@ public class SessionListActivity extends FragmentActivity implements OnSessionCh
             requestWindowFeature(Window.FEATURE_NO_TITLE);
 
         setContentView(R.layout.session_list);
-
-        // FIXME: there must be way to do this correctly
-        if(Build.VERSION.SDK_INT >= 11)
-            fixActionBarTitle();
 
         getListView().setLongClickable(true);
         getListView().setOnItemLongClickListener(new OnSessionLongClick());
@@ -190,11 +185,6 @@ public class SessionListActivity extends FragmentActivity implements OnSessionCh
         Fragment f = getSupportFragmentManager().findFragmentById(R.id.detail_fragment);
         if(f != null)
             ((SessionDetailFragment)f).setVisible(!empty);
-    }
-
-    @TargetApi(11)
-    private void fixActionBarTitle() {
-        getActionBar().setTitle(R.string.title_activity_sessions);
     }
 
     private void loadSessions() {

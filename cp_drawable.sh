@@ -3,6 +3,7 @@ FOLDER_LIGHT="/home/tassadar/Android_Design_Icons_20120229/All_Icons/holo_light/
 FOLDER_DARK="/home/tassadar/Android_Design_Icons_20120229/All_Icons/holo_dark/"
 LORRIS_FOLDER="/home/tassadar/lorris_mobile"
 DARK=1
+FORCE=0
 FOLDER=""
 DPI_LIST=( mdpi hdpi xhdpi )
 
@@ -13,6 +14,8 @@ do
         DARK=0
     elif [ $arg == "-d" ] ; then
         DARK=1
+    elif [ $arg == "-f" ] ; then
+        FORCE=1
     fi
 done
 
@@ -28,7 +31,7 @@ echo ""
 
 for arg in "$@"
 do
-    if [ $arg == "-l" ] || [ $arg == "-d" ] ; then
+    if [ $arg == "-l" ] || [ $arg == "-d" ] || [ $arg == "-f" ]; then
         continue
     fi
 
@@ -40,7 +43,7 @@ do
     for dpi in ${DPI_LIST[@]}
     do
         name=$new_name
-        if [ -e $LORRIS_FOLDER/res/drawable-$dpi/$name ]; then
+        if [ $FORCE -eq 0 ] && [ -e $LORRIS_FOLDER/res/drawable-$dpi/$name ]; then
             if [ $DARK -eq 1 ]; then
                 name="${name%.png}_dark.png"
             else

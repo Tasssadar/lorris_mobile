@@ -3,6 +3,6 @@
     android:id="@+id/session_name_checked"
     android:layout_width="match_parent"
     android:layout_height="64dp"
-    android:textSize="25dp"
+    android:textSize="20sp"
     android:gravity="center|left"
     android:background="@drawable/list_selector" />

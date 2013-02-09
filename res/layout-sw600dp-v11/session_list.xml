@@ -4,11 +4,30 @@
     android:layout_height="match_parent"
     android:orientation="horizontal">
 
-    <LinearLayout android:layout_width="200dp"
+    <LinearLayout android:id="@+id/session_list_layout"
+        android:layout_width="200dp"
         android:layout_height="match_parent"
         android:background="#cccccc">
         <include layout="@layout/session_list_base" />
     </LinearLayout>
+
+    <LinearLayout android:id="@+id/layout_create_session_wide"
+         android:layout_width="match_parent"
+         android:layout_height="match_parent"
+         android:orientation="horizontal"
+         android:visibility="gone" >
+
+         <View android:layout_height="match_parent"
+              android:layout_width="match_parent"
+              android:layout_weight="1"/>
+
+         <include layout="@layout/no_session" />
+
+         <View android:layout_height="match_parent"
+              android:layout_width="match_parent"
+              android:layout_weight="1"/>
+
+     </LinearLayout>
     
     <View android:layout_width="1dp"
         android:layout_height="match_parent"

@@ -177,14 +177,21 @@ public class SessionListActivity extends FragmentActivity implements OnSessionCh
     }
 
     private void setListEmpty(boolean empty) {
-        getListView().setVisibility(empty ? View.GONE : View.VISIBLE);
-
-        ((LinearLayout)findViewById(R.id.layout_create_session))
-            .setVisibility(empty ? View.VISIBLE : View.GONE);
-
         Fragment f = getSupportFragmentManager().findFragmentById(R.id.detail_fragment);
-        if(f != null)
+        if(f == null) {
+            getListView().setVisibility(empty ? View.GONE : View.VISIBLE);
+
+            ((LinearLayout)findViewById(R.id.layout_create_session))
+                .setVisibility(empty ? View.VISIBLE : View.GONE);
+        } else {
+            ((LinearLayout)findViewById(R.id.session_list_layout))
+                .setVisibility(empty ? View.GONE: View.VISIBLE);
+
+            ((LinearLayout)findViewById(R.id.layout_create_session_wide))
+                .setVisibility(empty ? View.VISIBLE : View.GONE);
+
             ((SessionDetailFragment)f).setVisible(!empty);
+        }
     }
 
     private void loadSessions() {

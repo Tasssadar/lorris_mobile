@@ -37,10 +37,12 @@
                 android:padding="5dp"
                 android:background="@drawable/transparent_btn"
                 android:src="@drawable/device_access_usb"
-                android:onClick="on_conBtn_clicked" />
+                android:onClick="on_conBtn_clicked"
+                android:visibility="gone" />
             <View android:layout_width="match_parent"
                 android:layout_height="1dp"
-                android:background="#888888" />
+                android:background="#888888"
+                android:visibility="gone" />
     </LinearLayout>
     
     <LinearLayout android:id="@+id/conn_fragment_area"

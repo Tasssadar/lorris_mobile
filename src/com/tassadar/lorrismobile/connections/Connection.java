@@ -110,17 +110,18 @@ public class Connection {
 
         sendStateChanged(state);
 
+        int oldstate = m_state;
+        m_state = state;
+
         switch(state) {
             case ST_CONNECTED:
                 sendConnected(true);
                 break;
             case ST_DISCONNECTED:
-                if(m_state == Connection.ST_CONNECTED)
+                if(oldstate == Connection.ST_CONNECTED)
                     sendConnected(false);
                 break;
         }
-
-        m_state = state;
     }
 
     public int getState() {

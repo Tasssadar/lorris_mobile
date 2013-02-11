@@ -2,4 +2,7 @@
     <item android:id="@+id/terminal"
         android:title="@string/terminal"
         android:showAsAction="always|withText"/>
+    <item android:id="@+id/programmer"
+        android:title="@string/programmer"
+        android:showAsAction="always|withText"/>
 </menu>

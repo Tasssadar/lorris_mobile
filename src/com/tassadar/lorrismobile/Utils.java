@@ -105,4 +105,11 @@ public class Utils {
         res |= array[offset++] & 0xFF;
         return res;
     }
+
+    public static boolean byteArrayContains(final byte[] array, final byte what) {
+        for(final byte e : array)
+            if(e == what)
+                return true;
+        return false;
+    }
 }

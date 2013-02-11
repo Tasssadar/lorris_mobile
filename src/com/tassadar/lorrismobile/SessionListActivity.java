@@ -341,7 +341,6 @@ public class SessionListActivity extends FragmentActivity implements OnSessionCh
     private class OnSessionLongClick implements OnItemLongClickListener {
         @Override
         public boolean onItemLongClick(AdapterView<?> parent, View v, int pos, long id) {
-            
             Session s = m_adapter.getSession(pos);
             if(s == null)
                 return false;

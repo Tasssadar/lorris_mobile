@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 
 import android.content.Context;
+import android.util.Log;
 
 import com.tassadar.lorrismobile.modules.TabManager;
 
@@ -19,12 +20,12 @@ public class SessionMgr {
         if(extPath == null)
             return null;
 
-        File path = new File(extPath.getAbsolutePath() + "/" + name + "/");
+        File path = new File(extPath, name);
         if(path.exists())
             return null;
         path.mkdirs();
 
-        Session res = new Session(ctx, name, path.getAbsolutePath() + "/" + name + ".sqlite");
+        Session res = new Session(ctx, name, path.getAbsolutePath() + "/" + "data.sqlite");
         res.setChanged(Session.CHANGED_ALL);
         m_sessions.put(name, res);
         return res;
@@ -32,6 +33,38 @@ public class SessionMgr {
 
     public static Session get(Context ctx, String name) {
         return m_sessions.get(name);
+    }
+
+    public static Session rename(String oldName, String newName) {
+        Session s = m_sessions.get(oldName);
+
+        assert s != null : "Failed to rename session " + oldName + " to " +
+                            newName + " (Session does not exist)";
+
+        m_sessions.remove(oldName);
+        s.close();
+        s = null;
+
+        File extPath = Utils.getDataFolder(null);
+        if(extPath == null)
+            return null;
+
+        File oldPath = new File(extPath, oldName);
+        File newPath = new File(extPath, newName);
+        if(!oldPath.exists() || newPath.exists()) {
+            Log.e("Lorris", "Failed to move folder " + oldName + " to " + newName);
+            return null;
+        }
+        oldPath.renameTo(newPath);
+
+
+        s = loadSingleSession(LorrisApplication.getAppContext(), newName, extPath);
+        if(s == null) {
+            Log.e("Lorris", "Failed load renamed session " + newName);
+            return null;
+        }
+        m_sessions.put(newName, s);
+        return s;
     }
 
     public static void deleteSession(Context ctx, String name) {
@@ -67,18 +100,31 @@ public class SessionMgr {
             if(!i.isDirectory())
                 continue;
 
-            String name = i.getName();
-
-            File path = new File(f.getAbsolutePath() + "/" + name + "/" + name + ".sqlite");
-            if(!path.exists() || !path.isFile())
-                continue;
-
-            Session s = new Session(ctx, name, path.getAbsolutePath());
-            s.loadBase();
-            m_sessions.put(name, s);
+            Session s = loadSingleSession(ctx, i.getName(), f);
+            if(s != null)
+                m_sessions.put(s.getName(), s);
         }
 
         m_sessionsLoaded = true;
+    }
+
+    private static Session loadSingleSession(Context ctx, String name, File extPath) {
+        File sessionPath = new File(extPath, name);
+        File path = new File(sessionPath, "data.sqlite");
+        if(!path.exists()) {
+            File legacyPath = new File(sessionPath, name + ".sqlite");
+            if(!legacyPath.exists() || !legacyPath.isFile())
+                return null;
+
+            legacyPath.renameTo(path);
+        }
+
+        if(!path.exists() || !path.isFile())
+            return null;
+
+        Session s = new Session(ctx, name, path.getAbsolutePath());
+        s.loadBase();
+        return s;
     }
 
     public static void ensureSessionsLoaded(Context ctx) {

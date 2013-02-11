@@ -130,7 +130,7 @@ public class ConnectionsActivity extends FragmentActivity implements ConnFragmen
             setProgressBarIndeterminateVisibility(visible);
     }
 
-    public void on_back_clicked(View v) {
+    public void on_cancel_clicked(View v) {
         setResult(RESULT_CANCELED);
         finish();
     }

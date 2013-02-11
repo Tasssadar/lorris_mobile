@@ -8,6 +8,7 @@
     <string name="create_session">Create session</string>
     <string name="ok">OK</string>
     <string name="cancel">Cancel</string>
+    <string name="back">Back</string>
     <string name="erase_session_title">Erase session?</string>
     <string name="erase_session_text">Session \"%1$s\" will be permanently deleted!</string>
     <string name="erase_session_toast">Session \"%1$s\" was deleted.</string>
@@ -35,6 +36,7 @@
     <string name="delete">Delete</string>
     <string name="edit">Edit</string>
     <string name="load_session">Load session</string>
+
     <string name="toggle_keyboard">Toggle keyboard</string>
     <string name="clear">Clear</string>
     <string name="term_settings">Terminal settings</string>
@@ -50,10 +52,31 @@
     <string name="clear_on_hex">Clear data when\ntoggling hex mode:</string>
     <string name="terminal_loading">Can\'t clear terminal during data load.</string>
 
+    <string name="browse">Browse&#8230;</string>
+    <string name="type">Type:</string>
+    <string name="stop">Stop</string>
+    <string name="start">Start</string>
+    <string name="flash">Flash</string>
+    <string name="hex_file">Hex file</string>
+    <string name="no_hex">No hex file loaded.</string>
+    <string name="chip_info">Chip info</string>
+    <string name="no_chip">Chip was not yet identified.</string>
+    <string name="prog_size">&lt;b>Program size:&lt;/b> %1$s</string>
+    <string name="last_mod">&lt;b>Last modified:&lt;/b> %1$s</string>
+    <string name="invalid_hex">HEX file is invalid!\n%1$s</string>
+    <string name="chip_sign">&lt;b>Signature:&lt;/b> %1$s</string>
+    <string name="flash_mem">&lt;b>Flash memory:&lt;/b> %1$s</string>
+    <string name="eeprom">&lt;b>EEPROM:&lt;/b> %1$s</string>
+    <string name="page_size">&lt;b>Page size:&lt;/b> %1$s</string>
+    <string name="used_mem">&lt;b>Memory used by HEX file:&lt;/b> %1$d of %2$d bytes (%3$d%%)</string>
+    <string name="unknown_chip">&lt;Unknown></string>
+    <string name="switch_failed">Failed to switch mode!</string>
+
     <string name="new_tab">New tab</string>
     <string name="open_new_tab">Open new tab:</string>
     <string name="analyzer">Analyzer</string>
     <string name="terminal">Terminal</string>
+    <string name="programmer">Programmer</string>
     <string name="connection">Connection</string>
     <string name="connect">Connect</string>
     <string name="disconnect">Disconnect</string>
@@ -87,6 +110,7 @@
 
     <string-array name="tab_names">
         <item>Terminal</item>
+        <item>Programmer</item>
     </string-array>
 
     <string-array name="term_colors">
@@ -101,6 +125,10 @@
         <item>Send \\n</item>
         <item>Send \\r</item>
         <item>Send \\n\\r</item>
+    </string-array>
+
+    <string-array name="programmer_types">
+        <item>avr232boot</item>
     </string-array>
 
 </resources>

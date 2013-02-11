@@ -138,6 +138,7 @@ public class SessionDetailFragment extends Fragment {
             return;
 
         LinearLayout tab_desc = (LinearLayout)getView().findViewById(R.id.open_tabs);
+        tab_desc.removeAllViews();
 
         int size = d.size();
         for(int i = 0; i < size; ++i) {

@@ -118,8 +118,10 @@ public class WorkspaceActivity extends FragmentActivity implements TabSelectedLi
     @Override
     public void onPause() {
         super.onPause();
-        m_sessionService.saveSession(SessionMgr.getActiveSession(),
+        if(m_sessionService != null) {
+            m_sessionService.saveSession(SessionMgr.getActiveSession(),
                 TabManager.cloneTabArray(), ConnectionMgr.cloneConnArray());
+        }
         m_preAttachedFragments.clear();
     }
 
@@ -156,8 +158,11 @@ public class WorkspaceActivity extends FragmentActivity implements TabSelectedLi
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if(resultCode != Activity.RESULT_OK)
+        if(resultCode != Activity.RESULT_OK) {
+            super.onActivityResult(requestCode, resultCode, data);
             return;
+        }
+
         switch(requestCode) {
             case REQ_SET_CONN:
             {
@@ -170,6 +175,9 @@ public class WorkspaceActivity extends FragmentActivity implements TabSelectedLi
                 }
                 break;
             }
+            default:
+                super.onActivityResult(requestCode, resultCode, data);
+                break;
         }
     }
     
@@ -456,6 +464,9 @@ public class WorkspaceActivity extends FragmentActivity implements TabSelectedLi
         switch(id) {
             case R.id.terminal:
                 createNewTab(TabManager.TAB_TERMINAL);
+                break;
+            case R.id.programmer:
+                createNewTab(TabManager.TAB_PROGRAMMER);
                 break;
         }
     }

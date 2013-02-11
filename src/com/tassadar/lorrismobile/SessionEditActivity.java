@@ -42,7 +42,7 @@ public class SessionEditActivity extends Activity {
             requestWindowFeature(Window.FEATURE_NO_TITLE);
 
         setContentView(R.layout.session_edit);
-        
+
         if(Build.VERSION.SDK_INT >= 11)
             setUpActionBar();
 
@@ -248,9 +248,7 @@ public class SessionEditActivity extends Activity {
         else {
             session = SessionMgr.get(this, m_edit_name);
             if(session != null && !m_edit_name.equals(name_str)) {
-                session = null;
-                SessionMgr.deleteSession(this, m_edit_name);
-                session = SessionMgr.create(this, name_str);
+                session = SessionMgr.rename(m_edit_name, name_str);
             }
         }
 

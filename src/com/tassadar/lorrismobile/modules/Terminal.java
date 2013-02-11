@@ -383,7 +383,7 @@ public class Terminal extends Tab implements TerminalMenuListener, TerminalSetti
             t.start();
         }
     }
-    
+
     private void setLoadBarVisiblity(boolean visible) {
         View v = getView().findViewById(R.id.load_bar);
         v.setVisibility(visible ? View.VISIBLE : View.GONE);

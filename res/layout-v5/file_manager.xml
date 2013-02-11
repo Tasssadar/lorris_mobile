@@ -1,0 +1,29 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+    <RelativeLayout android:layout_width="match_parent"
+        android:layout_height="45dip"
+        android:orientation="horizontal"
+        android:background="#323232"
+        android:gravity="center|left">
+        <ImageButton android:id="@+id/action_bar_back_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_alignParentLeft="true"
+            android:background="@drawable/transparent_btn"
+            android:src="@drawable/back_icon"
+            android:onClick="on_cancel_clicked"
+            android:paddingRight="5dp"
+            android:contentDescription="@string/back" />
+        <TextView android:id="@+id/action_bar_title" 
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:textSize="18sp"
+            android:textColor="#FFFFFFFF"
+            android:layout_toRightOf="@id/action_bar_back_btn" />
+    </RelativeLayout>
+    <include layout="@layout/file_manager_base" />
+</LinearLayout>

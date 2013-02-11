@@ -2,9 +2,10 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:background="#000000" >
+    android:orientation="vertical">
+
     <include layout="@layout/workspace_top_view" />
+
     <LinearLayout 
         android:layout_width="match_parent"
         android:layout_height="match_parent">
@@ -18,6 +19,16 @@
             <View android:layout_width="match_parent"
                 android:layout_height="1dp"
                 android:background="#1b1b1b" />
+            <Button android:id="@+id/add_tab_btn"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="left|center"
+                    android:padding="5dp"
+                    android:background="@drawable/new_tab_btn"
+                    android:drawableLeft="@drawable/ic_content_new"
+                    android:textColor="#FFFFFF"
+                    android:text="@string/new_tab"
+                    android:onClick="on_add_tab_btn_clicked" />
             <ScrollView android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="1">
@@ -26,23 +37,8 @@
                     android:layout_height="wrap_content"
                     android:orientation="vertical"/>
             </ScrollView>
-            <LinearLayout android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:background="#222222">
-                <Button android:id="@+id/add_tab_btn"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="left|center"
-                    android:padding="5dp"
-                    android:background="@drawable/transparent_btn"
-                    android:drawableLeft="@drawable/ic_content_new"
-                    android:textColor="#FFFFFF"
-                    android:text="@string/new_tab"
-                    android:onClick="on_add_tab_btn_clicked" />
-            </LinearLayout>
         </LinearLayout>
-        
+
         <LinearLayout android:id="@+id/tab_content_layout"
             android:layout_width="match_parent"
             android:layout_height="match_parent">

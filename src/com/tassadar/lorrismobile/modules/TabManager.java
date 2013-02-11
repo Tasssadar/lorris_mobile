@@ -8,13 +8,17 @@ import com.tassadar.lorrismobile.modules.Tab.TabSelectedListener;
 
 public class TabManager {
  
-    public static final int TAB_TERMINAL = 0;
+    public static final int TAB_TERMINAL    = 0;
+    public static final int TAB_PROGRAMMER  = 1;
 
     public static Tab createTab(TabSelectedListener listener, int type) {
         Tab res = null;
         switch(type) {
             case TAB_TERMINAL:
                 res = new Terminal();
+                break;
+            case TAB_PROGRAMMER:
+                res = new Programmer();
                 break;
             default:
                 return null;
@@ -24,7 +28,7 @@ public class TabManager {
     }
 
     public static int getRIdForTabType(int type) {
-        final int ids[] = { R.id.terminal };
+        final int ids[] = { R.id.terminal, R.id.programmer };
         try {
             return ids[type];
         } catch(IndexOutOfBoundsException ex) {

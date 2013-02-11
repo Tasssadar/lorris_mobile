@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="#CCCCCC" >
+    <LinearLayout android:id="@+id/btn_layout"
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        android:layout_alignParentBottom="true"
+        android:orientation="horizontal"
+        android:background="#222222">
+        <LinearLayout android:id="@+id/stop_btn"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@drawable/transparent_btn"
+            android:gravity="center"
+            android:clickable="true">
+            <TextView android:id="@+id/stop_text" 
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:drawablePadding="5dp"
+                android:text="@string/stop"
+                android:textColor="#FFFFFF"
+                android:textSize="20sp"
+                android:drawableLeft="@drawable/stop"/>
+        </LinearLayout>
+        <View android:layout_width="2dp"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="3dp"
+            android:layout_marginRight="3dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"
+            android:background="#555555" />
+        <LinearLayout android:id="@+id/flash_btn"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@drawable/transparent_btn"
+            android:gravity="center"
+            android:clickable="true">
+            <TextView android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:drawablePadding="5dp"
+                android:text="@string/flash"
+                android:textColor="#FFFFFF"
+                android:textSize="20sp"
+                android:drawableLeft="@drawable/write"/>
+        </LinearLayout>
+    </LinearLayout>
+
+    <ScrollView android:id="@+id/prog_cards_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@id/btn_layout"
+        android:clipToPadding="false" />
+
+    <ProgressBar android:id="@+id/flash_progress"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/btn_layout"
+        android:max="100"
+        android:visibility="gone"
+        android:indeterminate="false"
+        style="@android:style/Widget.ProgressBar.Horizontal"/>
+</RelativeLayout>

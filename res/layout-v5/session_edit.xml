@@ -8,29 +8,24 @@
         android:orientation="horizontal"
         android:background="#323232"
         android:gravity="center|left">
-
-        <Button android:id="@+id/action_bar_back_btn"
+        <ImageButton android:id="@+id/action_bar_back_btn"
             android:layout_width="wrap_content"
-            android:background="@drawable/transparent_btn"
             android:layout_height="match_parent"
-            android:drawableLeft="@drawable/navigation_previous_item"
-            android:onClick="on_cancel_clicked" />
-
-        <ImageView android:id="@+id/action_bar_img"
-            android:layout_height="45dip"
-            android:layout_width="32dip"
-            android:gravity="center"
-            android:layout_toRightOf="@id/action_bar_back_btn"
-            android:src="@drawable/ic_launcher" />
+            android:layout_alignParentLeft="true"
+            android:paddingRight="5dp"
+            android:background="@drawable/transparent_btn"
+            android:src="@drawable/back_icon"
+            android:onClick="on_cancel_clicked"
+            android:contentDescription="@string/back" />
 
         <TextView android:id="@+id/action_bar_title" 
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:gravity="center"
             android:text="@string/new_session"
-            android:textSize="18dp"
+            android:textSize="18sp"
             android:textColor="#FFFFFFFF"
-            android:layout_toRightOf="@id/action_bar_img" />
+            android:layout_toRightOf="@id/action_bar_back_btn" />
 
         <Button android:id="@+id/save_session"
             android:layout_width="wrap_content"

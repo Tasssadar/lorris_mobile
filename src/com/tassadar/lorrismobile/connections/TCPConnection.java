@@ -282,7 +282,7 @@ public class TCPConnection extends Connection {
             }
 
             Looper.prepare();
-            
+
             m_write_handler = new WriteHandler(out);
 
             synchronized(m_handler_lock) {

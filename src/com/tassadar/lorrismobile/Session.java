@@ -432,24 +432,25 @@ public class Session extends SQLiteOpenHelper {
             return m_openTabsDesc;
 
         m_openTabsDesc = new ArrayList<String>();
-
-        SQLiteDatabase db = getReadableDatabase();
-        //                             0     1
-        Cursor c = db.rawQuery("SELECT name, detail_desc FROM tabs ORDER BY id;", null);
-        while(c.moveToNext()) {
-            StringBuilder b = new StringBuilder("<b>");
-            b.append(c.getString(0));
-            b.append("</b>");
-
-            String desc = c.getString(1);
-            if(desc != null && desc.length() != 0)
-                b.append(", ").append(desc);
-
-            m_openTabsDesc.add(b.toString());
+        synchronized(m_openTabsDesc) {
+            SQLiteDatabase db = getReadableDatabase();
+            //                             0     1
+            Cursor c = db.rawQuery("SELECT name, detail_desc FROM tabs ORDER BY id;", null);
+            while(c.moveToNext()) {
+                StringBuilder b = new StringBuilder("<b>");
+                b.append(c.getString(0));
+                b.append("</b>");
+    
+                String desc = c.getString(1);
+                if(desc != null && desc.length() != 0)
+                    b.append(", ").append(desc);
+    
+                m_openTabsDesc.add(b.toString());
+            }
+            c.close();
+            db.close();
+            return m_openTabsDesc;
         }
-        c.close();
-        db.close();
-        return m_openTabsDesc;
     }
 
     public boolean hasTabDescLoaded() {
@@ -457,7 +458,12 @@ public class Session extends SQLiteOpenHelper {
     }
 
     public void resetTabDesc() {
-        m_openTabsDesc = null;
+        if(m_openTabsDesc == null)
+            return;
+
+        synchronized(m_openTabsDesc) {
+            m_openTabsDesc = null;
+        }
     }
 
     public String getName() {

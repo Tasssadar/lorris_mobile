@@ -12,11 +12,11 @@ static inline int min(int a, int b)
 }
 
 extern "C" {
-    JNIEXPORT jbyteArray JNICALL Java_com_tassadar_lorrismobile_modules_Terminal_convertToHex16(JNIEnv *env, jobject obj, jbyteArray dataArray, jint hexPos);
-    JNIEXPORT jbyteArray JNICALL Java_com_tassadar_lorrismobile_modules_Terminal_convertToHex8(JNIEnv *env, jobject obj, jbyteArray dataArray, jint hexPos);
+    JNIEXPORT jbyteArray JNICALL Java_com_tassadar_lorrismobile_terminal_Terminal_convertToHex16(JNIEnv *env, jobject obj, jbyteArray dataArray, jint hexPos);
+    JNIEXPORT jbyteArray JNICALL Java_com_tassadar_lorrismobile_terminal_Terminal_convertToHex8(JNIEnv *env, jobject obj, jbyteArray dataArray, jint hexPos);
 };
 
-JNIEXPORT jbyteArray JNICALL Java_com_tassadar_lorrismobile_modules_Terminal_convertToHex16(JNIEnv *env, jobject obj, jbyteArray dataArray, jint hexPos)
+JNIEXPORT jbyteArray JNICALL Java_com_tassadar_lorrismobile_terminal_Terminal_convertToHex16(JNIEnv *env, jobject obj, jbyteArray dataArray, jint hexPos)
 {
     uint32_t total_len = 0;
 
@@ -80,7 +80,7 @@ JNIEXPORT jbyteArray JNICALL Java_com_tassadar_lorrismobile_modules_Terminal_con
     return resArr;
 }
 
-JNIEXPORT jbyteArray JNICALL Java_com_tassadar_lorrismobile_modules_Terminal_convertToHex8(JNIEnv *env, jobject obj, jbyteArray dataArray, jint hexPos)
+JNIEXPORT jbyteArray JNICALL Java_com_tassadar_lorrismobile_terminal_Terminal_convertToHex8(JNIEnv *env, jobject obj, jbyteArray dataArray, jint hexPos)
 {
     uint32_t total_len = 0;
     

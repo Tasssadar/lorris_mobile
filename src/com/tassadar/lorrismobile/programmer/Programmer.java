@@ -1,4 +1,4 @@
-package com.tassadar.lorrismobile.modules;
+package com.tassadar.lorrismobile.programmer;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -20,8 +20,10 @@ import com.tassadar.lorrismobile.BlobInputStream;
 import com.tassadar.lorrismobile.BlobOutputStream;
 import com.tassadar.lorrismobile.R;
 import com.tassadar.lorrismobile.filemgr.FileManagerActivity;
-import com.tassadar.lorrismobile.modules.HexFileCard.HexFileCardListener;
-import com.tassadar.lorrismobile.modules.ProgrammerImpl.ProgrammerListener;
+import com.tassadar.lorrismobile.modules.Tab;
+import com.tassadar.lorrismobile.modules.TabManager;
+import com.tassadar.lorrismobile.programmer.HexFileCard.HexFileCardListener;
+import com.tassadar.lorrismobile.programmer.ProgrammerImpl.ProgrammerListener;
 
 
 public class Programmer extends Tab implements OnClickListener, ProgrammerListener, HexFileCardListener {

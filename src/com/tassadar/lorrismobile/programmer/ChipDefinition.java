@@ -1,4 +1,4 @@
-package com.tassadar.lorrismobile.modules;
+package com.tassadar.lorrismobile.programmer;
 
 import java.io.IOException;
 import java.io.InputStream;

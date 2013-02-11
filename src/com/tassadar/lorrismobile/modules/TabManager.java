@@ -5,6 +5,8 @@ import android.util.SparseArray;
 import com.tassadar.lorrismobile.R;
 import com.tassadar.lorrismobile.Utils;
 import com.tassadar.lorrismobile.modules.Tab.TabSelectedListener;
+import com.tassadar.lorrismobile.programmer.Programmer;
+import com.tassadar.lorrismobile.terminal.Terminal;
 
 public class TabManager {
  

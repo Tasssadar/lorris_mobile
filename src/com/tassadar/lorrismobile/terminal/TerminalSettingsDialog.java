@@ -1,4 +1,4 @@
-package com.tassadar.lorrismobile.modules;
+package com.tassadar.lorrismobile.terminal;
 
 import android.app.Activity;
 import android.app.Dialog;

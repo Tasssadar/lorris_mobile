@@ -1,4 +1,4 @@
-package com.tassadar.lorrismobile.modules;
+package com.tassadar.lorrismobile.programmer;
 
 import java.io.File;
 import java.text.DecimalFormat;

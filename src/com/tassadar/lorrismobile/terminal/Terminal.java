@@ -1,4 +1,4 @@
-package com.tassadar.lorrismobile.modules;
+package com.tassadar.lorrismobile.terminal;
 
 
 import jackpal.androidterm.emulatorview.ByteQueue;
@@ -29,8 +29,10 @@ import android.widget.Toast;
 import com.tassadar.lorrismobile.BlobInputStream;
 import com.tassadar.lorrismobile.BlobOutputStream;
 import com.tassadar.lorrismobile.R;
-import com.tassadar.lorrismobile.modules.TerminalMenu.TerminalMenuListener;
-import com.tassadar.lorrismobile.modules.TerminalSettingsDialog.TerminalSettingsListener;
+import com.tassadar.lorrismobile.modules.Tab;
+import com.tassadar.lorrismobile.modules.TabManager;
+import com.tassadar.lorrismobile.terminal.TerminalMenu.TerminalMenuListener;
+import com.tassadar.lorrismobile.terminal.TerminalSettingsDialog.TerminalSettingsListener;
 
 public class Terminal extends Tab implements TerminalMenuListener, TerminalSettingsListener {
 

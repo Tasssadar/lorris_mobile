@@ -1,4 +1,4 @@
-package com.tassadar.lorrismobile.modules;
+package com.tassadar.lorrismobile.terminal;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;

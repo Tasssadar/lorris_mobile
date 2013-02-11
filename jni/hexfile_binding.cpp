@@ -5,29 +5,29 @@
 #include "chipdefs.h"
 
 extern "C" {
-    JNIEXPORT jlong JNICALL Java_com_tassadar_lorrismobile_modules_HexFile_newNative(JNIEnv *env, jobject obj);
-    JNIEXPORT void JNICALL Java_com_tassadar_lorrismobile_modules_HexFile_deleteNative(JNIEnv *env, jobject obj, jlong hex_pointer);
-    JNIEXPORT jstring JNICALL Java_com_tassadar_lorrismobile_modules_HexFile_loadFileNative(JNIEnv *env, jobject obj, jlong hex_ptr, jstring path_str);
-    JNIEXPORT jlong JNICALL Java_com_tassadar_lorrismobile_modules_HexFile_getSizeNative(JNIEnv *env, jobject obj, jlong hex_ptr);
-    JNIEXPORT jstring JNICALL Java_com_tassadar_lorrismobile_modules_HexFile_makePagesNative(JNIEnv *env, jobject obj, jlong hex_ptr, jlong chipdef_ptr, jint memId);
-    JNIEXPORT jboolean JNICALL Java_com_tassadar_lorrismobile_modules_HexFile_getNextPage(JNIEnv *env, jobject obj, jobject pageObject, jboolean skip);
-    JNIEXPORT void JNICALL Java_com_tassadar_lorrismobile_modules_HexFile_clearPages(JNIEnv *env, jobject obj);
-    JNIEXPORT jint JNICALL Java_com_tassadar_lorrismobile_modules_HexFile_getPagesCount(JNIEnv *env, jobject obj, jboolean skip);
+    JNIEXPORT jlong JNICALL Java_com_tassadar_lorrismobile_programmer_HexFile_newNative(JNIEnv *env, jobject obj);
+    JNIEXPORT void JNICALL Java_com_tassadar_lorrismobile_programmer_HexFile_deleteNative(JNIEnv *env, jobject obj, jlong hex_pointer);
+    JNIEXPORT jstring JNICALL Java_com_tassadar_lorrismobile_programmer_HexFile_loadFileNative(JNIEnv *env, jobject obj, jlong hex_ptr, jstring path_str);
+    JNIEXPORT jlong JNICALL Java_com_tassadar_lorrismobile_programmer_HexFile_getSizeNative(JNIEnv *env, jobject obj, jlong hex_ptr);
+    JNIEXPORT jstring JNICALL Java_com_tassadar_lorrismobile_programmer_HexFile_makePagesNative(JNIEnv *env, jobject obj, jlong hex_ptr, jlong chipdef_ptr, jint memId);
+    JNIEXPORT jboolean JNICALL Java_com_tassadar_lorrismobile_programmer_HexFile_getNextPage(JNIEnv *env, jobject obj, jobject pageObject, jboolean skip);
+    JNIEXPORT void JNICALL Java_com_tassadar_lorrismobile_programmer_HexFile_clearPages(JNIEnv *env, jobject obj);
+    JNIEXPORT jint JNICALL Java_com_tassadar_lorrismobile_programmer_HexFile_getPagesCount(JNIEnv *env, jobject obj, jboolean skip);
 };
 
-JNIEXPORT jlong JNICALL Java_com_tassadar_lorrismobile_modules_HexFile_newNative(JNIEnv *env, jobject obj)
+JNIEXPORT jlong JNICALL Java_com_tassadar_lorrismobile_programmer_HexFile_newNative(JNIEnv *env, jobject obj)
 {
     HexFile *hex = new HexFile();
     return (jlong)hex;
 }
 
-JNIEXPORT void JNICALL Java_com_tassadar_lorrismobile_modules_HexFile_deleteNative(JNIEnv *env, jobject obj, jlong hex_ptr)
+JNIEXPORT void JNICALL Java_com_tassadar_lorrismobile_programmer_HexFile_deleteNative(JNIEnv *env, jobject obj, jlong hex_ptr)
 {
     HexFile *hex = (HexFile*)hex_ptr;
     delete hex;
 }
 
-JNIEXPORT jstring JNICALL Java_com_tassadar_lorrismobile_modules_HexFile_loadFileNative(JNIEnv *env, jobject obj, jlong hex_ptr, jstring path_str)
+JNIEXPORT jstring JNICALL Java_com_tassadar_lorrismobile_programmer_HexFile_loadFileNative(JNIEnv *env, jobject obj, jlong hex_ptr, jstring path_str)
 {
     HexFile *hex = (HexFile*)hex_ptr;
 
@@ -45,7 +45,7 @@ JNIEXPORT jstring JNICALL Java_com_tassadar_lorrismobile_modules_HexFile_loadFil
     return env->NewStringUTF(res.c_str());
 }
 
-JNIEXPORT jlong JNICALL Java_com_tassadar_lorrismobile_modules_HexFile_getSizeNative(JNIEnv *env, jobject obj, jlong hex_ptr)
+JNIEXPORT jlong JNICALL Java_com_tassadar_lorrismobile_programmer_HexFile_getSizeNative(JNIEnv *env, jobject obj, jlong hex_ptr)
 {
     HexFile *hex = (HexFile*)hex_ptr;
     return (jlong)hex->getProgSize();
@@ -55,7 +55,7 @@ static std::vector<page> pages = std::vector<page>();
 static std::set<uint32_t> skip_pages = std::set<uint32_t>();
 static size_t curPage = 0;
 
-JNIEXPORT jstring JNICALL Java_com_tassadar_lorrismobile_modules_HexFile_makePagesNative(JNIEnv *env, jobject obj, jlong hex_ptr, jlong chipdef_ptr, jint memId)
+JNIEXPORT jstring JNICALL Java_com_tassadar_lorrismobile_programmer_HexFile_makePagesNative(JNIEnv *env, jobject obj, jlong hex_ptr, jlong chipdef_ptr, jint memId)
 {
     pages.clear();
     skip_pages.clear();
@@ -72,7 +72,7 @@ JNIEXPORT jstring JNICALL Java_com_tassadar_lorrismobile_modules_HexFile_makePag
     return env->NewStringUTF("");
 }
 
-JNIEXPORT jboolean JNICALL Java_com_tassadar_lorrismobile_modules_HexFile_getNextPage(JNIEnv *env, jobject obj, jobject pageObject, jboolean skip)
+JNIEXPORT jboolean JNICALL Java_com_tassadar_lorrismobile_programmer_HexFile_getNextPage(JNIEnv *env, jobject obj, jobject pageObject, jboolean skip)
 {
     while(curPage < pages.size())
     {
@@ -102,14 +102,14 @@ JNIEXPORT jboolean JNICALL Java_com_tassadar_lorrismobile_modules_HexFile_getNex
     return false;
 }
 
-JNIEXPORT void JNICALL Java_com_tassadar_lorrismobile_modules_HexFile_clearPages(JNIEnv *env, jobject obj)
+JNIEXPORT void JNICALL Java_com_tassadar_lorrismobile_programmer_HexFile_clearPages(JNIEnv *env, jobject obj)
 {
     pages.clear();
     skip_pages.clear();
     curPage = 0;
 }
 
-JNIEXPORT jint JNICALL Java_com_tassadar_lorrismobile_modules_HexFile_getPagesCount(JNIEnv *env, jobject obj, jboolean skip)
+JNIEXPORT jint JNICALL Java_com_tassadar_lorrismobile_programmer_HexFile_getPagesCount(JNIEnv *env, jobject obj, jboolean skip)
 {
     if(!skip)
         return pages.size();

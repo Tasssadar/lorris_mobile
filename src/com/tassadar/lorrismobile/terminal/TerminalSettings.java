@@ -1,4 +1,4 @@
-package com.tassadar.lorrismobile.modules;
+package com.tassadar.lorrismobile.terminal;
 
 import jackpal.androidterm.emulatorview.ColorScheme;
 import android.content.Context;

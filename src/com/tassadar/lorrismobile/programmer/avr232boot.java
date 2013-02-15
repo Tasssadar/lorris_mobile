@@ -132,6 +132,8 @@ public class avr232boot extends ProgrammerImpl {
         if(!sendFlashPage(memId == HexFile.MEM_FLASH))
         {
             m_listener.flashComplete(false);
+            m_hexFile.clearPages();
+            m_hexFile = null;
             return;
         }
 
@@ -179,8 +181,14 @@ public class avr232boot extends ProgrammerImpl {
                     m_listener.chipDefRead(new ChipDefinition(""));
                     break;
                 case WAIT_FLASH:
+                {
                     m_listener.flashComplete(false);
+                    if(m_hexFile != null) {
+                        m_hexFile.clearPages();
+                        m_hexFile = null;
+                    }
                     break;
+                }
             }
         }
     }

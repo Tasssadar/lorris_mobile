@@ -18,12 +18,14 @@ import android.widget.PopupWindow.OnDismissListener;
 import android.widget.TextView;
 
 import com.tassadar.lorrismobile.R;
+import com.tassadar.lorrismobile.TooltipLongClickListener;
 import com.tassadar.lorrismobile.WorkspaceActivity;
 
 public class ConnectionBtn implements ConnectionInterface, OnClickListener {
     public ConnectionBtn(ImageButton btn) {
         m_btn = btn;
         m_btn.setOnClickListener(this);
+        m_btn.setOnLongClickListener(TooltipLongClickListener.get());
     }
 
     public void setIconByState(int state) {

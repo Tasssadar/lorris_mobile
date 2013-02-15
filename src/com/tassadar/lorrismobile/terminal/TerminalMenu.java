@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 import android.widget.ImageButton;
 
 import com.tassadar.lorrismobile.R;
+import com.tassadar.lorrismobile.TooltipLongClickListener;
 
 public class TerminalMenu extends Fragment implements OnClickListener {
     public interface TerminalMenuListener {
@@ -22,14 +23,17 @@ public class TerminalMenu extends Fragment implements OnClickListener {
     public View onCreateView (LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.terminal_menu, container, false);
         
-        ImageButton b = (ImageButton)v.findViewById(R.id.clear_btn);
-        b.setOnClickListener(this);
-        b = (ImageButton)v.findViewById(R.id.toggle_keyboard);
-        b.setOnClickListener(this);
-        b = (ImageButton)v.findViewById(R.id.settings_btn);
-        b.setOnClickListener(this);
+        View b;
+        final int ids[] = {
+            R.id.clear_btn, R.id.toggle_keyboard, R.id.settings_btn, R.id.toggle_hex
+        };
+        for(int id : ids) {
+            b = v.findViewById(id);
+            b.setOnClickListener(this);
+            b.setOnLongClickListener(TooltipLongClickListener.get());
+        }
+
         b = (ImageButton)v.findViewById(R.id.toggle_hex);
-        b.setOnClickListener(this);
         b.setSelected(m_hexSelected);
         return v;
     }

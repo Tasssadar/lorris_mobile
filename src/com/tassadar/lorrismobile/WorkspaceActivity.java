@@ -66,6 +66,9 @@ public class WorkspaceActivity extends FragmentActivity implements TabSelectedLi
         m_connBtn = new ConnectionBtn((ImageButton)findViewById(R.id.conn_btn));
         m_connBtn.hide();
 
+        View v = findViewById(R.id.tab_list_btn);
+        v.setOnLongClickListener(TooltipLongClickListener.get());
+
         m_active_tab = -1;
         m_tab_panel_visible = false;
 

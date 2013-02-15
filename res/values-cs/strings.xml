@@ -1,0 +1,136 @@
+<resources>
+
+    <string name="app_name">Lorris mobile</string>
+    <string name="lorris">Lorris</string>
+    <string name="menu_settings">Nastavení</string>
+    <string name="title_activity_sessions">Sezení</string>
+    <string name="no_sessions">Nemáte žádná uložená sezení.</string>
+    <string name="create_session">Vytvořit sezení</string>
+    <string name="ok">OK</string>
+    <string name="cancel">Zrušit</string>
+    <string name="back">Zpět</string>
+    <string name="erase_session_title">Smazat sezení?</string>
+    <string name="erase_session_text">Sezení \"%1$s\" bude nevratně smazáno!</string>
+    <string name="erase_session_toast">Sezení \"%1$s\" bylo smazáno</string>
+    <string name="service">Otevřené sezení: \"%1$s\"</string>
+
+    <string name="session_name">Jméno sezení</string>
+    <string name="select_image">Vybrat obrázek&#8230;</string>
+    <string name="take_photo">Pořídit foto&#8230;</string>
+    <string name="session_desc">Poznámky, popis, &#8230;</string>
+    <string name="save_session">Uložit sezení</string>
+    <string name="new_session">Nové sezení</string>
+    <string name="edit_session">Upravit sezení</string>
+    <string name="session_image_desc">Obrázek nebo fotka přiřazená k tomuto sezení</string>
+    <string name="no_pick_handler">Žádna z aplikací na vašem telefonu neumí vybrat obrázek. Tato možnost není dostupná.</string>
+    <string name="name_taken">Sezení s tímto jménem už existuje!</string>
+    <string name="name_empty">Jméno sezení nesmí být prázdné!</string>
+    <string name="session_create_failed">Chyba při vytváření nového sezení!</string>
+
+    <string name="opened_tabs">Otevřené záložky:</string>
+    <string name="tab_btn_desc">Zobrazit záložky</string>
+    <string name="back_twice">Stiskněte tlačítko ZPĚT ještě jednou pro zavření sezení</string>
+    <string name="close_tab">Zavřít záložku</string>
+    <string name="no_connection">žádné připojení</string>
+    <string name="connected_to">připojen na \"%1$s\"</string>
+    <string name="delete">Smazat</string>
+    <string name="edit">Upravit</string>
+    <string name="load_session">Otevřít sezení</string>
+
+    <string name="toggle_keyboard">Klávesnice</string>
+    <string name="clear">Vyčistit</string>
+    <string name="term_settings">Nastavení terminálu</string>
+    <string name="toggle_hex">Hex mód</string>
+    <string name="font_size">Velikost textu:</string>
+    <string name="colors">Barvy:</string>
+    <string name="enter_key_press">Stisknutí enteru:</string>
+    <string name="hex_bpl">Hex bajty/řádek</string>
+    <string name="b8">8 B</string>
+    <string name="b16">16 B</string>
+    <string name="apply">Použít</string>
+    <string name="term_loading">Načítání dat terminálu, prosím čkejte&#8230;</string>
+    <string name="clear_on_hex">Vymazat data při\npřepínání hex módu:</string>
+    <string name="terminal_loading">Nelze vymazat terminál při načítání dat.</string>
+    <string name="enable">Povolit</string>
+
+    <string name="browse">Procházet&#8230;</string>
+    <string name="type">Typ:</string>
+    <string name="stop">Stop</string>
+    <string name="start">Start</string>
+    <string name="flash">Flash</string>
+    <string name="hex_file">Hex soubor</string>
+    <string name="no_hex">Žádný hex soubor není načtený</string>
+    <string name="chip_info">Čip</string>
+    <string name="no_chip">Čip ještě nebyl identifikován.</string>
+    <string name="prog_size">&lt;b>Velikost programu:&lt;/b> %1$s</string>
+    <string name="last_mod">&lt;b>Poslední změna:&lt;/b> %1$s</string>
+    <string name="invalid_hex">Hex soubor je špatný!\n%1$s</string>
+    <string name="chip_sign">&lt;b>Signature:&lt;/b> %1$s</string>
+    <string name="flash_mem">&lt;b>Flash paměť:&lt;/b> %1$s</string>
+    <string name="eeprom">&lt;b>EEPROM:&lt;/b> %1$s</string>
+    <string name="page_size">&lt;b>Velikost stránky:&lt;/b> %1$s</string>
+    <string name="used_mem">&lt;b>Paměť použitá HEX souborem:&lt;/b> %1$d z %2$d bajtů (%3$d%%)</string>
+    <string name="unknown_chip">&lt;Neznámý čip></string>
+    <string name="switch_failed">Nemůžu přepnout mód čipu!</string>
+    <string name="select_hex">Vyberte HEX soubor</string>
+
+    <string name="new_tab">Nová záložka</string>
+    <string name="open_new_tab">Otevřít novou záložku:</string>
+    <string name="analyzer">Analyzér</string>
+    <string name="terminal">Terminál</string>
+    <string name="programmer">Programátor</string>
+    <string name="connection">Připojení</string>
+    <string name="connect">Připojit</string>
+    <string name="disconnect">Odpojit</string>
+    <string name="connecting">Připojuji</string>
+    <string name="set_connection">Nastavit připojení</string>
+    <string name="connections">Připojení</string>
+
+    <string name="paired_devices">Spárovaná zařízení</string>
+    <string name="new_devices">Nová zařízení</string>
+    <string name="find_devices">Hledat nová zařízení</string>
+    <string name="bt_not_enabled">Bluetooth je vypnutý.</string>
+    <string name="enable_bt">Zapnout</string>
+    <string name="no_bt_adapter">Vaše zařízení nemá bluetooth.</string>
+
+    <string name="saved_connections">Uložená připojení</string>
+    <string name="add_tcp_conn">Nové TCP připojení</string>
+    <string name="name">Jméno</string>
+    <string name="address">Adresa</string>
+    <string name="port">Port</string>
+    <string name="all_fields">Musíte vyplnit všechny údaje!</string>
+    <string name="invalid_port">Neplatné číslo portu!</string>
+    <string name="erase_tcp_conn_title">Vymazat TCp připojení?</string>
+    <string name="erase_tcp_conn_text">Připojení \"%1$s\" bude nevratně smazáno!</string>
+
+    <string name="connected_devices">Připojená zařízení</string>
+
+    <string-array name="session_options">
+        <item>Upravit</item>
+        <item>Smazat</item>
+    </string-array>
+
+    <string-array name="tab_names">
+        <item>Terminál</item>
+        <item>Programátor</item>
+    </string-array>
+
+    <string-array name="term_colors">
+        <item>Černá+bílý text</item>
+        <item>Bílá+černý text</item>
+        <item>Modrá+bílý text</item>
+        <item>Černá+zelený text</item>
+    </string-array>
+
+    <string-array name="enter_key_press">
+        <item>Poslat \\r\\n</item>
+        <item>Poslat \\n</item>
+        <item>Poslat \\r</item>
+        <item>Poslat \\n\\r</item>
+    </string-array>
+
+    <string-array name="programmer_types">
+        <item>avr232boot</item>
+    </string-array>
+
+</resources>

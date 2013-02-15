@@ -123,9 +123,10 @@ public class Programmer extends Tab implements OnClickListener, ProgrammerListen
         switch(v.getId()) {
             case R.id.browse_hex:
             {
+                String title = getResources().getString(R.string.select_hex);
                 Intent i = new Intent(getActivity(), FileManagerActivity.class);
                 i.putExtra("file_suffix", ".hex");
-                i.putExtra("title", "Select HEX file");
+                i.putExtra("title", title);
 
                 String f = m_hex_card.getHexPath();
                 if(f != null)

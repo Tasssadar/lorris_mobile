@@ -51,6 +51,7 @@
     <string name="term_loading">Loading terminal data, please wait&#8230;</string>
     <string name="clear_on_hex">Clear data when\ntoggling hex mode:</string>
     <string name="terminal_loading">Can\'t clear terminal during data load.</string>
+    <string name="enable">Enable</string>
 
     <string name="browse">Browse&#8230;</string>
     <string name="type">Type:</string>
@@ -71,6 +72,7 @@
     <string name="used_mem">&lt;b>Memory used by HEX file:&lt;/b> %1$d of %2$d bytes (%3$d%%)</string>
     <string name="unknown_chip">&lt;Unknown></string>
     <string name="switch_failed">Failed to switch mode!</string>
+    <string name="select_hex">Select HEX file</string>
 
     <string name="new_tab">New tab</string>
     <string name="open_new_tab">Open new tab:</string>
@@ -88,7 +90,7 @@
     <string name="new_devices">New devices</string>
     <string name="find_devices">Find new devices</string>
     <string name="bt_not_enabled">Bluetooth is not enabled.</string>
-    <string name="enable">Enable</string>
+    <string name="enable_bt">Enable</string>
     <string name="no_bt_adapter">This device does not have bluetooth capabilities.</string>
 
     <string name="saved_connections">Saved connections</string>

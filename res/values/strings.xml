@@ -73,6 +73,8 @@
     <string name="unknown_chip">&lt;Unknown></string>
     <string name="switch_failed">Failed to switch mode!</string>
     <string name="select_hex">Select HEX file</string>
+    <string name="shupito_tunnel">Shupito tunnel</string>
+    <string name="speed">Speed:</string>
 
     <string name="new_tab">New tab</string>
     <string name="open_new_tab">Open new tab:</string>
@@ -133,4 +135,12 @@
         <item>avr232boot</item>
     </string-array>
 
+    <string-array name="tunnel_speeds">
+        <item>4800</item>
+        <item>9600</item>
+        <item>38400</item>
+        <item>57600</item>
+        <item>115200</item>
+        <item>500000</item>
+    </string-array>
 </resources>

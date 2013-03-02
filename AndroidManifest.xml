@@ -1,7 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.tassadar.lorrismobile"
-    android:versionCode="51"
-    android:versionName="51" >
+    android:versionCode="52"
+    android:versionName="52" >
 
     <uses-sdk
         android:minSdkVersion="8"
@@ -39,12 +39,6 @@
         <activity android:name="com.tassadar.lorrismobile.filemgr.FileManagerActivity" />
         <activity android:name="ShupitoTest" android:label="@string/app_name"
              android:exported="false">
-            <intent-filter>
-                <action android:name="android.hardware.usb.action.USB_DEVICE_ATTACHED" />
-            </intent-filter>
-
-            <meta-data android:name="android.hardware.usb.action.USB_DEVICE_ATTACHED"
-                android:resource="@xml/device_filter" />
         </activity>
         <service android:name=".SessionService" />
     </application>

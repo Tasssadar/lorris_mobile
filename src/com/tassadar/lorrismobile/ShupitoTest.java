@@ -9,14 +9,13 @@ import android.hardware.usb.UsbManager;
 import android.os.Bundle;
 import android.widget.TextView;
 
-import com.tassadar.usb_acm.SerialDevice;
-import com.tassadar.usb_acm.SerialDevice.SerialDeviceListener;
-import com.tassadar.usb_acm.SerialDeviceMgr;
-import com.tassadar.usb_acm.SerialDeviceMgr.SerialDeviceMgrListener;
+import com.tassadar.lorrismobile.connections.usb.SerialDevice;
+import com.tassadar.lorrismobile.connections.usb.SerialDevice.SerialDeviceListener;
+import com.tassadar.lorrismobile.connections.usb.SerialDeviceMgr;
+import com.tassadar.lorrismobile.connections.usb.SerialDeviceMgr.SerialDeviceMgrListener;
 
 @TargetApi(12)
 public class ShupitoTest extends Activity implements SerialDeviceMgrListener,SerialDeviceListener {
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -63,7 +62,7 @@ public class ShupitoTest extends Activity implements SerialDeviceMgrListener,Ser
             m_out.append("Sending \"?\" command to Shupito...\n");
 
             byte[] cmd = { '?' };
-            dev.write(cmd, 1000);
+            dev.write(cmd, 0, cmd.length, 1000);
 
             m_out.append("Getting response...\n");
         } catch(IOException ex) {
@@ -76,6 +75,12 @@ public class ShupitoTest extends Activity implements SerialDeviceMgrListener,Ser
     public void onDataRead(byte[] data) {
         m_out.append("Read: ");
         m_out.append(new String(data) + "\n");
+    }
+
+    @Override
+    public void onDisconnect() {
+        // TODO Auto-generated method stub
+        
     }
 
     private TextView m_out;

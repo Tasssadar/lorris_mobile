@@ -1,6 +1,6 @@
 #include <jni.h>
 #include <stdio.h>
-#include <string.h>
+#include <string>
 #include <stdlib.h>
 
 static inline int min(int a, int b)
@@ -14,6 +14,7 @@ static inline int min(int a, int b)
 extern "C" {
     JNIEXPORT jbyteArray JNICALL Java_com_tassadar_lorrismobile_terminal_Terminal_convertToHex16(JNIEnv *env, jobject obj, jbyteArray dataArray, jint hexPos);
     JNIEXPORT jbyteArray JNICALL Java_com_tassadar_lorrismobile_terminal_Terminal_convertToHex8(JNIEnv *env, jobject obj, jbyteArray dataArray, jint hexPos);
+    JNIEXPORT jstring JNICALL Java_com_tassadar_lorrismobile_connections_ShupitoDesc_makeGuid(JNIEnv *env, jobject obj, jbyteArray dataArray, jint offset);
 };
 
 JNIEXPORT jbyteArray JNICALL Java_com_tassadar_lorrismobile_terminal_Terminal_convertToHex16(JNIEnv *env, jobject obj, jbyteArray dataArray, jint hexPos)
@@ -142,4 +143,27 @@ JNIEXPORT jbyteArray JNICALL Java_com_tassadar_lorrismobile_terminal_Terminal_co
     env->SetByteArrayRegion(resArr, 0, total_len, res);
     free(res);
     return resArr;
+}
+
+JNIEXPORT jstring JNICALL Java_com_tassadar_lorrismobile_connections_ShupitoDesc_makeGuid(JNIEnv *env, jobject obj, jbyteArray dataArray, jint offset)
+{
+    jbyte *data = (jbyte*)env->GetByteArrayElements(dataArray, NULL);
+
+    std::string guid;
+    guid.reserve(36);
+    
+    for(int i = offset; i < offset+16; ++i)
+    {
+        static char const digits[] = "0123456789abcdef";
+        guid += digits[uint8_t(data[i]) >> 4];
+        guid += digits[uint8_t(data[i]) & 0x0F];
+    }
+
+    env->ReleaseByteArrayElements(dataArray, data, JNI_ABORT);
+    
+    guid.insert(20, "-");
+    guid.insert(16, "-");
+    guid.insert(12, "-");
+    guid.insert(8, "-");
+    return env->NewStringUTF(guid.c_str());
 }

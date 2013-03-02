@@ -72,7 +72,7 @@ public class BTConnFragment extends ConnFragment {
 
     @Override
     public void onCreateOptionsMenu (Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.conn_bt_fragment, menu);
+        inflater.inflate(R.menu.conn_bt_usb_fragment, menu);
     }
 
     @Override

@@ -7,7 +7,8 @@ import com.tassadar.lorrismobile.BlobOutputStream;
 public class Connection {
     public static final int CONN_BT_SP   = 0;
     public static final int CONN_TCP     = 1;
-    public static final int CONN_USB     = 2;
+    public static final int CONN_USB_ACM = 2;
+    public static final int CONN_SHUPITO = 3;
 
     public static final int ST_DISCONNECTED = 0;
     public static final int ST_CONNECTING   = 1;
@@ -90,10 +91,19 @@ public class Connection {
     }
 
     public void rmRef() {
-        if(--m_refCount <= 0) {
-            close();
+        if(--m_refCount <= 0)
             ConnectionMgr.removeConnection(m_id);
-        }
+    }
+
+    public void addTabRef() {
+        ++m_tabCount;
+        addRef();
+    }
+
+    public void rmTabRef() {
+        if(--m_tabCount <= 0)
+            close();
+        rmRef();
     }
 
     public void setId(int id) {
@@ -157,5 +167,6 @@ public class Connection {
     protected int m_type;
     protected int m_state;
     protected int m_refCount;
+    protected int m_tabCount;
     protected ConnectionInterface[] m_interfaces;
 }

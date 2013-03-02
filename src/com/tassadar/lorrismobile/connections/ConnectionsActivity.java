@@ -35,7 +35,10 @@ public class ConnectionsActivity extends FragmentActivity implements ConnFragmen
         m_connBtns = new ImageButton[3];
         m_connBtns[Connection.CONN_BT_SP] = (ImageButton)findViewById(R.id.con_bt_btn);
         m_connBtns[Connection.CONN_TCP] = (ImageButton)findViewById(R.id.con_tcp_btn);
-        m_connBtns[Connection.CONN_USB] = (ImageButton)findViewById(R.id.con_usb_btn);
+        m_connBtns[Connection.CONN_USB_ACM] = (ImageButton)findViewById(R.id.con_usb_btn);
+
+        if(Build.VERSION.SDK_INT >= 12 && getSystemService(USB_SERVICE) != null)
+            m_connBtns[Connection.CONN_USB_ACM].setVisibility(View.VISIBLE);
 
         m_currType = Connection.CONN_BT_SP;
         if(savedInstanceState != null) {
@@ -103,7 +106,7 @@ public class ConnectionsActivity extends FragmentActivity implements ConnFragmen
             case Connection.CONN_TCP:
                 f = new TCPConnFragment();
                 break;
-            case Connection.CONN_USB:
+            case Connection.CONN_USB_ACM:
                 f = new USBConnFragment();
                 break;
             default:

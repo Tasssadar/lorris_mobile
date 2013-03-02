@@ -190,6 +190,8 @@ public class ConnectionBtn implements ConnectionInterface, OnClickListener {
     public void disconnecting() { }
     @Override
     public void dataRead(byte[] data) { }
+    @Override
+    public void onDescRead(ShupitoDesc desc) { }
 
     private Connection m_conn;
     private ImageButton m_btn;

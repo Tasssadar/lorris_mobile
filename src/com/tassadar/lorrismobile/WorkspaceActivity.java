@@ -27,6 +27,7 @@ import android.util.TypedValue;
 import android.view.KeyEvent;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.Window;
@@ -38,6 +39,7 @@ import android.widget.PopupMenu;
 import android.widget.PopupMenu.OnMenuItemClickListener;
 import android.widget.Toast;
 
+import com.tassadar.lorrismobile.DoubleSwipeGesture.DoubleSwipeListener;
 import com.tassadar.lorrismobile.SessionService.SessionServiceListener;
 import com.tassadar.lorrismobile.connections.Connection;
 import com.tassadar.lorrismobile.connections.ConnectionBtn;
@@ -48,7 +50,7 @@ import com.tassadar.lorrismobile.modules.Tab.TabSelectedListener;
 import com.tassadar.lorrismobile.modules.TabListItem;
 import com.tassadar.lorrismobile.modules.TabManager;
 
-public class WorkspaceActivity extends FragmentActivity implements TabSelectedListener, ConnMgrListener, SessionServiceListener {
+public class WorkspaceActivity extends FragmentActivity implements TabSelectedListener, ConnMgrListener, SessionServiceListener, DoubleSwipeListener {
 
     public static final int REQ_SET_CONN = 1;
 
@@ -62,6 +64,8 @@ public class WorkspaceActivity extends FragmentActivity implements TabSelectedLi
             requestWindowFeature(Window.FEATURE_NO_TITLE);
 
         setContentView(R.layout.workspace);
+
+        m_swipeGesture = new DoubleSwipeGesture(this);
 
         m_connBtn = new ConnectionBtn((ImageButton)findViewById(R.id.conn_btn));
         m_connBtn.hide();
@@ -203,14 +207,16 @@ public class WorkspaceActivity extends FragmentActivity implements TabSelectedLi
 
     public void on_tabBtn_clicked(View v) {
         setTabPanelVisible(!m_tab_panel_visible);
-        v.setSelected(m_tab_panel_visible);
     }
 
     private void setTabPanelVisible(boolean visible) {
         if(visible == m_tab_panel_visible)
             return;
-        
+
         m_tab_panel_visible = visible;
+
+        View btn = findViewById(R.id.tab_list_btn);
+        btn.setSelected(visible);
 
         LinearLayout menuLayout = (LinearLayout)findViewById(R.id.tab_panel);
         LinearLayout contentLayout = (LinearLayout)findViewById(R.id.tab_content_layout);
@@ -502,6 +508,46 @@ public class WorkspaceActivity extends FragmentActivity implements TabSelectedLi
             showCreateTabMenuICS(v);
     }
 
+    @Override
+    public boolean dispatchTouchEvent(MotionEvent e) {
+        m_swipeGesture.onTouchEvent(e);
+        return super.dispatchTouchEvent(e);
+    }
+
+    @Override
+    public void onDoubleSwipeLeft() {
+        setTabPanelVisible(false);
+    }
+
+    @Override
+    public void onDoubleSwipeRight() {
+        setTabPanelVisible(true);
+    }
+
+    @Override
+    public void onDoubleSwipeUp() {
+        if(TabManager.size() <= 1)
+            return;
+
+        int idx = m_active_tab - 1;
+        if(idx < 0)
+            idx = TabManager.size()-1;
+
+        setActiveTab(idx);
+    }
+
+    @Override
+    public void onDoubleSwipeDown() {
+        if(TabManager.size() <= 1)
+            return;
+
+        int idx = m_active_tab + 1;
+        if(idx >= TabManager.size())
+            idx = 0;
+
+        setActiveTab(idx);
+    }
+
     private ServiceConnection m_sessionServiceConn = new ServiceConnection() {
         public void onServiceConnected(ComponentName className, IBinder service) {
             m_sessionService = ((SessionService.SessionBinder)service).getService();
@@ -519,4 +565,5 @@ public class WorkspaceActivity extends FragmentActivity implements TabSelectedLi
     private long m_lastBackPress;
     private ConnectionBtn m_connBtn;
     private ArrayList<Fragment> m_preAttachedFragments = new ArrayList<Fragment>();
+    private DoubleSwipeGesture m_swipeGesture;
 }

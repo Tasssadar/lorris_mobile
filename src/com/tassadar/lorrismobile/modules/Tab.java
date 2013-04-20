@@ -126,6 +126,9 @@ public class Tab extends Fragment implements TabItemClicked, ConnectionInterface
         if(m_conn != null) {
             m_conn.addInterface(this);
             m_conn.addTabRef();
+
+            if(m_conn.isOpen())
+                connected(true);
         }
     }
 

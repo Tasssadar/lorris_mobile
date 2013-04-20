@@ -25,8 +25,9 @@ import com.tassadar.lorrismobile.R;
 
 public class TCPConnFragment extends ConnFragment {
 
-    private static final int PROTO_ADD = 0;
-    private static final int PROTO_RM  = 1;
+    private static final int PROTO_ADD      = 0;
+    private static final int PROTO_RM       = 1;
+    private static final int PROTO_REPLACE  = 2;
 
     @Override
     public void onCreate (Bundle savedInstanceState) {
@@ -71,12 +72,18 @@ public class TCPConnFragment extends ConnFragment {
                 int act = (Integer)arg[i++];
 
                 switch(act) {
-                case PROTO_ADD:
-                    TCPConnMgr.addProto(p);
-                    break;
-                case PROTO_RM:
-                    TCPConnMgr.removeProto(p);
-                    break;
+                    case PROTO_ADD:
+                        TCPConnMgr.addProto(p);
+                        break;
+                    case PROTO_RM:
+                        TCPConnMgr.removeProto(p);
+                        break;
+                    case PROTO_REPLACE:
+                    {
+                        TCPConnProto oldProto = (TCPConnProto)arg[i++];
+                        TCPConnMgr.replaceProto(oldProto, p);
+                        break;
+                    }
                 }
             }
 
@@ -260,11 +267,10 @@ public class TCPConnFragment extends ConnFragment {
                 act[0] = p;
                 act[1] = Integer.valueOf(PROTO_ADD);
             } else {
-                act = new Object[4];
-                act[0] = m_editProto;
-                act[1] = Integer.valueOf(PROTO_RM);
-                act[2] = p;
-                act[3] = Integer.valueOf(PROTO_ADD);
+                act = new Object[3];
+                act[0] = p;
+                act[1] = Integer.valueOf(PROTO_REPLACE);
+                act[2] = m_editProto;
             }
 
             new ProtoLoader().execute(act);

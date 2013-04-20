@@ -40,8 +40,7 @@ public class ConnectionMgr {
                 continue;
 
             TCPConnection t = (TCPConnection)c;
-            TCPConnProto tp = t.getProto();
-            if(tp.name.equals(p.name) && tp.address.equals(p.address) && tp.port == p.port)
+            if(p.sameAs(t.getProto()))
                 return t;
         }
 
@@ -86,7 +85,7 @@ public class ConnectionMgr {
     static public Connection getConnection(int id) {
         return m_connections.get(id);
     }
-    
+
     static public synchronized SparseArray<Connection> cloneConnArray() {
         return Utils.cloneSparseArray(m_connections);
     }

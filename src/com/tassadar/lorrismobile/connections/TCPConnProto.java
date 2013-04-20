@@ -11,4 +11,10 @@ public class TCPConnProto implements Comparable<TCPConnProto> {
             throw new NullPointerException();
         return name.compareTo(other.name);
     }
+
+    public boolean sameAs(TCPConnProto o) {
+        return name.equals(o.name) &&
+               address.equals(o.address) &&
+               port == o.port;
+    }
 }

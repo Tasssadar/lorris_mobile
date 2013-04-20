@@ -3,13 +3,14 @@ package com.tassadar.lorrismobile.connections;
 import java.util.ArrayList;
 import java.util.Collections;
 
-import com.tassadar.lorrismobile.LorrisApplication;
-
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.SparseArray;
+
+import com.tassadar.lorrismobile.LorrisApplication;
 
 public class TCPConnMgr {
     
@@ -93,6 +94,34 @@ public class TCPConnMgr {
         m_protos.remove(p);
     }
 
+    static public void replaceProto(TCPConnProto before, TCPConnProto now) {
+        ensureDb();
+        m_db.removeProto(before.name);
+        m_db.addProto(now);
+
+        int size = m_protos.size();
+        for(int i = 0; i < size; ++i) {
+            if(m_protos.get(i).name.equals(before.name)) {
+                m_protos.set(i, now);
+                break;
+            }
+        }
+
+        SparseArray<Connection> conns = ConnectionMgr.cloneConnArray();
+        size = conns.size();
+        for(int i = 0; i < size; ++i) {
+            Connection c = conns.valueAt(i);
+            if(c.getType() != Connection.CONN_TCP)
+                continue;
+
+            TCPConnProto tp = ((TCPConnection)c).getProto();
+            if (tp.sameAs(before)) {
+                ((TCPConnection)c).setProto(now);
+                break;
+            }
+        }
+    }
+
     static public TCPConnProto getProto(String name) {
         int size = m_protos.size();
         for(int i = 0; i < size; ++i) {
@@ -118,5 +147,4 @@ public class TCPConnMgr {
 
     static private TCPConnDb m_db = null;
     static private ArrayList<TCPConnProto> m_protos = null;
-    
 }

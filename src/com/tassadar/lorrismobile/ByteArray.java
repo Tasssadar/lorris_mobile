@@ -8,6 +8,11 @@ public class ByteArray {
         clear();
     }
 
+    public ByteArray(int size) {
+        m_size = size;
+        m_data = new byte[size];
+    }
+
     private void ensureEnoughSpace(int extra) {
         int req = m_size + extra;
         if(req < m_data.length)
@@ -95,6 +100,10 @@ public class ByteArray {
         return m_data[idx];
     }
 
+    public int uAt(int idx) {
+        return (((int)m_data[idx]) & 0xFF);
+    }
+
     public void set(int idx, byte b) {
         m_data[idx] = b;
     }
@@ -139,13 +148,17 @@ public class ByteArray {
     }
 
     public void assign(byte[] data, int offset, int len) {
-        if(len > m_size)
+        if(len > m_size + 512)
+            m_data = new byte[len];
+        else if(len > m_size)
             ensureEnoughSpace(len - m_size);
-        else if(len > m_size + 512) {
-            m_data = new byte[len]; 
-        }
 
-        System.arraycopy(data, 0, m_data, 0, len);
+        System.arraycopy(data, 0, m_data, offset, len);
+        m_size = len;
+    }
+
+    public void resize(int len) {
+        ensureEnoughSpace(len - m_size);
         m_size = len;
     }
 

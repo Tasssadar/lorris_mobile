@@ -169,7 +169,7 @@ public class Terminal extends Tab implements TerminalMenuListener, TerminalSetti
             if(m_conn == null)
                 return;
 
-            if(buffer[offset] == 0x0D) // Enter key
+            if(buffer[offset] == 0x0D || buffer[offset] == 0x0A) // Enter key
                 m_conn.write(m_settings.getEnterKeyPressSeq());
             else
                 m_conn.write(buffer, offset, count);
@@ -260,6 +260,7 @@ public class Terminal extends Tab implements TerminalMenuListener, TerminalSetti
             //m_conn.write(new byte[] { 0x74, 0x7E, 0x7A, 0x33 });
     }
 
+    @Override
     public Fragment getMenuFragment() {
         return m_menu;
     }
@@ -378,7 +379,7 @@ public class Terminal extends Tab implements TerminalMenuListener, TerminalSetti
 
         byte[] data = str.readByteArray("termData");
 
-        if(data != null) {
+        if(data != null && data.length > 0) {
             LoadTermDataThread t = new LoadTermDataThread(data, true);
             m_loadThread = new WeakReference<LoadTermDataThread>(t);
             t.setName("LoadTermDataThread");

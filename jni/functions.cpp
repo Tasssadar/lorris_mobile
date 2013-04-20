@@ -15,6 +15,7 @@ extern "C" {
     JNIEXPORT jbyteArray JNICALL Java_com_tassadar_lorrismobile_terminal_Terminal_convertToHex16(JNIEnv *env, jobject obj, jbyteArray dataArray, jint hexPos);
     JNIEXPORT jbyteArray JNICALL Java_com_tassadar_lorrismobile_terminal_Terminal_convertToHex8(JNIEnv *env, jobject obj, jbyteArray dataArray, jint hexPos);
     JNIEXPORT jstring JNICALL Java_com_tassadar_lorrismobile_connections_ShupitoDesc_makeGuid(JNIEnv *env, jobject obj, jbyteArray dataArray, jint offset);
+    JNIEXPORT jstring JNICALL Java_com_tassadar_lorrismobile_programmer_avr109_makeChipId(JNIEnv *env, jobject obj, jbyteArray data);
 };
 
 JNIEXPORT jbyteArray JNICALL Java_com_tassadar_lorrismobile_terminal_Terminal_convertToHex16(JNIEnv *env, jobject obj, jbyteArray dataArray, jint hexPos)
@@ -166,4 +167,20 @@ JNIEXPORT jstring JNICALL Java_com_tassadar_lorrismobile_connections_ShupitoDesc
     guid.insert(12, "-");
     guid.insert(8, "-");
     return env->NewStringUTF(guid.c_str());
+}
+
+JNIEXPORT jstring JNICALL Java_com_tassadar_lorrismobile_programmer_avr109_makeChipId(JNIEnv *env, jobject obj, jbyteArray dataArray)
+{
+    jbyte *data = (jbyte*)env->GetByteArrayElements(dataArray, NULL);
+    std::string id = "avr:";
+    for(int i = 3; i > 0; )
+    {
+        static const char* hex = "0123456789abcdef";
+
+        uint8_t c = data[--i];
+        id += (hex[c >> 4]);
+        id += (hex[c & 0x0F]);
+    }
+    env->ReleaseByteArrayElements(dataArray, data, JNI_ABORT);
+    return env->NewStringUTF(id.c_str());
 }

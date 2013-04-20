@@ -73,6 +73,9 @@
     <string name="unknown_chip">&lt;Neznámý čip></string>
     <string name="switch_failed">Nemůžu přepnout mód čipu!</string>
     <string name="select_hex">Vyberte HEX soubor</string>
+    <string name="prog_type">Type programátoru</string>
+    <string name="avr109_settings">Nastavení AVR109</string>
+    <string name="bootseq">Sekvence pro vstup do bootloaderu:</string>
 
     <string name="new_tab">Nová záložka</string>
     <string name="open_new_tab">Otevřít novou záložku:</string>
@@ -127,10 +130,6 @@
         <item>Poslat \\n</item>
         <item>Poslat \\r</item>
         <item>Poslat \\n\\r</item>
-    </string-array>
-
-    <string-array name="programmer_types">
-        <item>avr232boot</item>
     </string-array>
 
 </resources>

@@ -7,6 +7,7 @@ import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -18,22 +19,31 @@ import android.widget.Toast;
 
 import com.tassadar.lorrismobile.BlobInputStream;
 import com.tassadar.lorrismobile.BlobOutputStream;
+import com.tassadar.lorrismobile.ByteArray;
 import com.tassadar.lorrismobile.R;
 import com.tassadar.lorrismobile.filemgr.FileManagerActivity;
 import com.tassadar.lorrismobile.modules.Tab;
 import com.tassadar.lorrismobile.modules.TabManager;
 import com.tassadar.lorrismobile.programmer.HexFileCard.HexFileCardListener;
 import com.tassadar.lorrismobile.programmer.ProgrammerImpl.ProgrammerListener;
+import com.tassadar.lorrismobile.programmer.ProgrammerMenu.ProgrammerMenuListener;
 
 
-public class Programmer extends Tab implements OnClickListener, ProgrammerListener, HexFileCardListener {
+public class Programmer extends Tab implements OnClickListener, ProgrammerListener, HexFileCardListener, ProgrammerMenuListener {
     private static final int ACTCODE_OPEN_HEX = 1;
 
     public Programmer() {
         super();
-        m_prog = new avr232boot(this);
-        m_hex_card = new HexFileCard(this);
-        m_chip_card = new ChipCard();
+
+        m_cards = new Card[Card.CARD_MAX];
+        m_cards[Card.CARD_HEX] = new HexFileCard(this);
+        m_cards[Card.CARD_CHIP] = new ChipCard();
+        m_cards[Card.CARD_AVR109] = new avr109Card();
+
+        m_menu = new ProgrammerMenu();
+        m_menu.setListener(this);
+
+        onProgTypeChanged(ProgrammerImpl.PROG_AVR232BOOT);
     }
 
     @Override
@@ -47,10 +57,17 @@ public class Programmer extends Tab implements OnClickListener, ProgrammerListen
     }
 
     @Override
+    public Fragment getMenuFragment() {
+        return m_menu;
+    }
+
+    @Override
     public void onAttach(Activity act) {
         super.onAttach(act);
         SharedPreferences p = act.getPreferences(0);
-        m_hex_card.setHexPath(p.getString("prog_hexFolder", null));
+
+        for(Card c : m_cards)
+            c.loadPrefs(p);
     }
 
     @Override
@@ -72,10 +89,9 @@ public class Programmer extends Tab implements OnClickListener, ProgrammerListen
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        m_hex_card.setEmpty();
-        m_hex_card.setView(null);
-        m_chip_card.setEmpty();
-        m_chip_card.setView(null);
+
+        for(Card c : m_cards)
+            c.setView(null);
     }
 
     @Override
@@ -86,11 +102,12 @@ public class Programmer extends Tab implements OnClickListener, ProgrammerListen
         switch(requestCode) {
             case ACTCODE_OPEN_HEX:
             {
-                m_hex_card.loadHexFile(data.getStringExtra("path"), data.getStringExtra("filename"));
+                HexFileCard h = (HexFileCard)m_cards[Card.CARD_HEX];
+                h.loadHexFile(data.getStringExtra("path"), data.getStringExtra("filename"));
                 Activity act = getActivity();
                 if(act != null) {
                     SharedPreferences.Editor e = act.getPreferences(0).edit();
-                    e.putString("prog_hexFolder", m_hex_card.getHexPath());
+                    e.putString("prog_hexFolder", h.getHexPath());
                     e.commit();
                 }
                 break;
@@ -113,10 +130,13 @@ public class Programmer extends Tab implements OnClickListener, ProgrammerListen
         View cards = View.inflate(getActivity(), R.layout.programmer_cards, null);
         scr.addView(cards);
 
-        m_hex_card.setView(cards.findViewById(R.id.prog_card_hex));
-        m_chip_card.setView(cards.findViewById(R.id.prog_card_chip));
+        m_cards[Card.CARD_HEX].setView(cards.findViewById(R.id.prog_card_hex));
+        m_cards[Card.CARD_CHIP].setView(cards.findViewById(R.id.prog_card_chip));
+        m_cards[Card.CARD_AVR109].setView(cards.findViewById(R.id.prog_card_avr109));
 
         cards.findViewById(R.id.browse_hex).setOnClickListener(this);
+
+        setCardVisibility();
     }
 
     public void onClick(View v) {
@@ -128,7 +148,7 @@ public class Programmer extends Tab implements OnClickListener, ProgrammerListen
                 i.putExtra("file_suffix", ".hex");
                 i.putExtra("title", title);
 
-                String f = m_hex_card.getHexPath();
+                String f = hexFileCard().getHexPath();
                 if(f != null)
                     i.putExtra("start_path", f);
 
@@ -143,14 +163,17 @@ public class Programmer extends Tab implements OnClickListener, ProgrammerListen
                     m_prog.switchToFlashMode(0);
                 break;
             case R.id.flash_btn:
+            {
                 v.setEnabled(false);
-                HexFile hex = m_hex_card.getHexFile();
-                ChipDefinition def = m_chip_card.getDef();
+
+                HexFile hex = hexFileCard().getHexFile();
+                ChipDefinition def = chipCard().getDef();
                 if(hex != null && def != null) {
                     setProgressBarVisible(true);
                     m_prog.flashRaw(hex, HexFile.MEM_FLASH, def);
                 }
                 break;
+            }
         }
     }
 
@@ -174,6 +197,12 @@ public class Programmer extends Tab implements OnClickListener, ProgrammerListen
     public void write(byte[] data) {
         if(m_conn != null)
             m_conn.write(data);
+    }
+
+    @Override
+    public void write(ByteArray data) {
+        if(m_conn != null)
+            m_conn.write(data.data(), 0, data.size());
     }
 
     private void setStopButtonState(boolean stop) {
@@ -243,7 +272,7 @@ public class Programmer extends Tab implements OnClickListener, ProgrammerListen
 
         @Override
         public void run() {
-            m_chip_card.setFull(m_def, m_hex_card.getHexFile());
+            chipCard().setFull(m_def, hexFileCard().getHexFile());
             checkFlashButtonEnabled();
         }
     }
@@ -263,10 +292,15 @@ public class Programmer extends Tab implements OnClickListener, ProgrammerListen
     }
 
     @Override
+    public Card getCard(int card) {
+        return m_cards[card];
+    }
+
+    @Override
     public void hexFileLoaded(HexFile f) {
-        ChipDefinition def = m_chip_card.getDef();
+        ChipDefinition def = chipCard().getDef();
         if(def != null)
-            m_chip_card.setFull(def, f);
+            chipCard().setFull(def, f);
 
         checkFlashButtonEnabled();
     }
@@ -276,14 +310,14 @@ public class Programmer extends Tab implements OnClickListener, ProgrammerListen
         if(v == null)
             return;
 
-        ChipDefinition def = m_chip_card.getDef();
+        ChipDefinition def = chipCard().getDef();
 
         View b = v.findViewById(R.id.flash_btn);
         b.setEnabled(
                 m_conn != null && m_conn.isOpen() &&
                 m_prog.isInFlashMode() && 
                 def != null && def.getName() != null && def.getName().length() != 0 &&
-                m_hex_card.getHexFile() != null
+                hexFileCard().getHexFile() != null
             );
     }
 
@@ -317,20 +351,65 @@ public class Programmer extends Tab implements OnClickListener, ProgrammerListen
     }
 
     @Override
+    public void onProgTypeChanged(int type) {
+        if(m_prog != null && type == m_prog.getType())
+            return;
+
+        switch(type) {
+            case ProgrammerImpl.PROG_AVR232BOOT:
+                m_prog = new avr232boot(this);
+                break;
+            case ProgrammerImpl.PROG_AVR109:
+                m_prog = new avr109(this);
+                break;
+        }
+
+        setCardVisibility();
+
+        m_menu.setActiveProg(type);
+    }
+
+    private void setCardVisibility() {
+        int cards = m_prog.getReqCards();
+        for(Card c : m_cards)
+            c.setVisibility((cards & (1 << c.getType())) != 0);
+    }
+
+    @Override
     protected void saveDataStream(BlobOutputStream str) {
         super.saveDataStream(str);
 
-        m_hex_card.save(str);
+        str.writeInt("progType", m_prog.getType());
+
+        for(Card c : m_cards)
+            c.save(str);
     }
 
     @Override
     protected void loadDataStream(BlobInputStream str) {
         super.loadDataStream(str);
 
-        m_hex_card.load(str);
+        int type = str.readInt("progType", ProgrammerImpl.PROG_AVR232BOOT);
+        onProgTypeChanged(type);
+
+        for(Card c : m_cards)
+            c.load(str);
     }
 
-    private HexFileCard m_hex_card;
-    private ChipCard m_chip_card;
+    private HexFileCard hexFileCard() {
+        return ((HexFileCard)m_cards[Card.CARD_HEX]);
+    }
+
+    private ChipCard chipCard() {
+        return ((ChipCard)m_cards[Card.CARD_CHIP]);
+    }
+
+    @SuppressWarnings("unused")
+    private avr109Card avr109Card() {
+        return ((avr109Card)m_cards[Card.CARD_AVR109]);
+    }
+
+    private Card m_cards[];
     private ProgrammerImpl m_prog;
+    private ProgrammerMenu m_menu;
 }

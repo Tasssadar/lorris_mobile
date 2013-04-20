@@ -6,7 +6,7 @@
     android:background="#CCCCCC" >
     <LinearLayout android:id="@+id/btn_layout"
         android:layout_width="match_parent"
-        android:layout_height="80dp"
+        android:layout_height="65dp"
         android:layout_alignParentBottom="true"
         android:orientation="horizontal"
         android:background="#222222">

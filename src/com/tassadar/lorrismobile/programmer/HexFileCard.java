@@ -19,7 +19,7 @@ import com.tassadar.lorrismobile.LorrisApplication;
 import com.tassadar.lorrismobile.R;
 
 
-public class HexFileCard {
+public class HexFileCard extends Card {
     public interface HexFileCardListener {
         void hexFileLoaded(HexFile f);
     }
@@ -43,6 +43,11 @@ public class HexFileCard {
     public HexFileCard(HexFileCardListener listener) {
         m_state = STATE_EMPTY;
         m_listener = listener;
+    }
+
+    @Override
+    public int getType() {
+        return CARD_HEX;
     }
 
     public void setView(View v) {
@@ -244,6 +249,7 @@ public class HexFileCard {
         }
     }
 
+    @Override
     public void save(BlobOutputStream str) {
         if(m_hexFilename == null || m_hexFilePath == null)
             return;
@@ -251,6 +257,7 @@ public class HexFileCard {
         str.writeString("hexFilePath", m_hexFilePath);
     }
 
+    @Override
     public void load(BlobInputStream str) {
         String filename = str.readString("hexFilename", null);
         String path = str.readString("hexFilePath", null);
@@ -259,7 +266,6 @@ public class HexFileCard {
     }
 
     private int m_state;
-    private View m_view;
     private HexFile m_hexFile;
     private String m_hexFilePath;
     private String m_hexFilename;

@@ -26,6 +26,14 @@ public class avr232boot extends ProgrammerImpl {
     }
 
     @Override
+    public int getType() { return PROG_AVR232BOOT; }
+
+    @Override
+    public int getReqCards() {
+        return (1 << Card.CARD_HEX) | (1 << Card.CARD_CHIP);
+    }
+
+    @Override
     public void switchToFlashMode(int speed_hz) {
         if(m_flash_mode)
             return;

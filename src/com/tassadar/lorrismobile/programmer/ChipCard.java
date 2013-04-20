@@ -12,18 +12,18 @@ import com.tassadar.lorrismobile.LorrisApplication;
 import com.tassadar.lorrismobile.R;
 
 
-public class ChipCard {
-    
+public class ChipCard extends Card{
+
     private static final int STATE_EMPTY    = 0x00;
     private static final int STATE_LOADING  = 0x01;
     private static final int STATE_FULL     = 0x02;
     private static final int STATE_USED_MEM = 0x04;
 
-    private static final int FULL_NAME    = 0;
-    private static final int FULL_SIGN    = 1;
-    private static final int FULL_FLASH   = 2;
-    private static final int FULL_EEPROM  = 3;
-    private static final int FULL_PAGE    = 4;
+    //private static final int FULL_NAME    = 0;
+    //private static final int FULL_SIGN    = 1;
+    //private static final int FULL_FLASH   = 2;
+    //private static final int FULL_EEPROM  = 3;
+    //private static final int FULL_PAGE    = 4;
     private static final int FULL_MAX     = 5;
     
     private static final int USED_MEM      = FULL_MAX;
@@ -35,10 +35,16 @@ public class ChipCard {
         R.id.eeprom_size, R.id.page_size
     };
 
+    @Override
+    public int getType() {
+        return CARD_CHIP;
+    }
+
     public ChipDefinition getDef() {
         return m_chipdef;
     }
 
+    @Override
     public void setView(View v) {
 
         CharSequence[] stored = null;
@@ -200,7 +206,6 @@ public class ChipCard {
         t.setText(Html.fromHtml(String.format(base, size_str)));
     }
 
-    private View m_view;
     private int m_state;
     private ChipDefinition m_chipdef;
 }

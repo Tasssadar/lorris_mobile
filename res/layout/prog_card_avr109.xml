@@ -1,0 +1,44 @@
+<LinearLayout android:id="@+id/prog_card_avr109"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:background="#FFFFFF"
+    android:layout_marginBottom="0dp"
+    android:layout_marginLeft="15dp"
+    android:layout_marginRight="15dp"
+    android:layout_marginTop="15dp"
+    android:padding="10dp">
+    <RelativeLayout android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <TextView android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:textSize="23sp"
+            android:textColor="#0099CC"
+            android:text="@string/avr109_settings"
+            android:layout_marginLeft="10dp"
+            android:layout_marginTop="5dp"/>
+        <View android:layout_width="match_parent"
+            android:layout_height="2dp"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"
+            android:layout_marginTop="40dp"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp"
+            android:background="#0099CC"/>
+    </RelativeLayout>
+
+    <LinearLayout android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginTop="5dp">
+        <TextView android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:textStyle="bold"
+            android:text="@string/bootseq"/>
+        <EditText android:id="@+id/bootseq"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:inputType="text"/>
+    </LinearLayout>
+</LinearLayout>

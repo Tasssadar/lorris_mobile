@@ -1,23 +1,34 @@
 package com.tassadar.lorrismobile.connections;
 
+import java.lang.ref.WeakReference;
+
+import android.os.Handler;
+import android.os.Message;
+
 import com.tassadar.lorrismobile.BlobInputStream;
 import com.tassadar.lorrismobile.BlobOutputStream;
 
 
 public class Connection {
-    public static final int CONN_BT_SP   = 0;
-    public static final int CONN_TCP     = 1;
-    public static final int CONN_USB_ACM = 2;
-    public static final int CONN_SHUPITO = 3;
+    public static final int CONN_BT_SP          = 0;
+    public static final int CONN_TCP            = 1;
+    public static final int CONN_USB_ACM        = 2;
+    public static final int CONN_SHUPITO        = 3;
+    public static final int CONN_SHUPITO_TUNNEL = 4;
 
     public static final int ST_DISCONNECTED = 0;
     public static final int ST_CONNECTING   = 1;
     public static final int ST_CONNECTED    = 2;
 
+    private static final int EVENT_STATE         = 0;
+    private static final int EVENT_CONNECTED     = 1;
+    private static final int EVENT_DISCONNECTING = 2;
+
     protected Connection(int type) {
         m_type = type;
         m_state = ST_DISCONNECTED;
         m_interfaces = new ConnectionInterface[0];
+        m_stateHandler = new StateEventHandler(this);
     }
 
     public void open() { }
@@ -59,23 +70,53 @@ public class Connection {
     }
 
     protected void sendConnected(boolean connected) {
-        for(ConnectionInterface i : m_interfaces)
-            i.connected(connected);
+        m_stateHandler.obtainMessage(EVENT_CONNECTED, connected ? 1 : 0, 0)
+                      .sendToTarget();
     }
 
     protected void sendStateChanged(int state) {
-        for(ConnectionInterface i : m_interfaces)
-            i.stateChanged(state);
+        m_stateHandler.obtainMessage(EVENT_STATE, state, 0)
+                      .sendToTarget();
     }
 
     protected void sendDisconnecting() {
-        for(ConnectionInterface i : m_interfaces)
-            i.disconnecting();
+        m_stateHandler.sendEmptyMessage(EVENT_DISCONNECTING);
     }
 
     protected void sendDataRead(byte[] data) {
         for(ConnectionInterface i : m_interfaces)
             i.dataRead(data);
+    }
+
+    static class StateEventHandler extends Handler {
+        private final WeakReference<Connection> m_conn;
+
+        StateEventHandler(Connection conn) {
+            m_conn = new WeakReference<Connection>(conn);
+        }
+
+        @Override
+        public void handleMessage(Message msg)
+        {
+             Connection c = m_conn.get();
+             if (c == null)
+                 return;
+
+             switch(msg.what) {
+                 case EVENT_STATE:
+                     for(ConnectionInterface i : c.m_interfaces)
+                         i.stateChanged(msg.arg1);
+                     break;
+                 case EVENT_DISCONNECTING:
+                     for(ConnectionInterface i : c.m_interfaces)
+                         i.disconnecting();
+                     break;
+                 case EVENT_CONNECTED:
+                     for(ConnectionInterface i : c.m_interfaces)
+                         i.connected(msg.arg1 == 1);
+                     break;
+             }
+        }
     }
 
     public String getName() {
@@ -118,10 +159,10 @@ public class Connection {
         if(m_state == state)
             return;
 
-        sendStateChanged(state);
-
         int oldstate = m_state;
         m_state = state;
+
+        sendStateChanged(state);
 
         switch(state) {
             case ST_CONNECTED:
@@ -169,4 +210,5 @@ public class Connection {
     protected int m_refCount;
     protected int m_tabCount;
     protected ConnectionInterface[] m_interfaces;
+    private StateEventHandler m_stateHandler;
 }

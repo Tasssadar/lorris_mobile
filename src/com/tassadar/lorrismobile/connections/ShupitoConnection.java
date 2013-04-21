@@ -9,4 +9,5 @@ public abstract class ShupitoConnection extends Connection {
 
     public abstract void sendPacket(byte[] packet);
     public abstract void requestDesc();
+    public abstract ShupitoDesc getDesc();
 }

@@ -11,7 +11,6 @@ import com.tassadar.lorrismobile.LorrisApplication;
 import com.tassadar.lorrismobile.R;
 import com.tassadar.lorrismobile.connections.Connection;
 import com.tassadar.lorrismobile.connections.ConnectionInterface;
-import com.tassadar.lorrismobile.connections.ShupitoDesc;
 import com.tassadar.lorrismobile.modules.TabListItem.TabItemClicked;
 
 public class Tab extends Fragment implements TabItemClicked, ConnectionInterface {
@@ -175,8 +174,6 @@ public class Tab extends Fragment implements TabItemClicked, ConnectionInterface
     public void disconnecting() { }
     @Override
     public void dataRead(byte[] data) { }
-    @Override
-    public void onDescRead(ShupitoDesc desc) { }
 
     private TabListItem m_tab_list_it;
     private TabSelectedListener m_listener;

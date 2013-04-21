@@ -5,5 +5,4 @@ public interface ConnectionInterface {
     void stateChanged(int state);
     void disconnecting();
     void dataRead(byte[] data);
-    void onDescRead(ShupitoDesc desc);
 }

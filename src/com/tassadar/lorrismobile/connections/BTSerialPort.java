@@ -343,7 +343,7 @@ public class BTSerialPort extends Connection {
             }
         }
     }
-    
+
     static class WriteHandler extends Handler {
         private final WeakReference<OutputStream> m_str; 
 

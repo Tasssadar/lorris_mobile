@@ -1,6 +1,9 @@
 package com.tassadar.lorrismobile.connections;
 
-import java.util.ArrayList;
+import java.util.Timer;
+import java.util.TimerTask;
+
+import android.util.Log;
 
 import com.tassadar.lorrismobile.ByteArray;
 
@@ -16,10 +19,6 @@ public class ShupitoPortConnection extends ShupitoConnection implements Connecti
 
     private static final byte[] PKT_START = new byte[] { (byte)0x80 };
 
-    public interface ShupitoDescListener {
-        public void descRead(ShupitoDesc desc);
-    }
-
     public ShupitoPortConnection() {
         super();
         m_holdsTabRef = false;
@@ -27,7 +26,6 @@ public class ShupitoPortConnection extends ShupitoConnection implements Connecti
         m_partialDesc = new ByteArray();
         m_partialPacket = new ByteArray();
         m_parserLen = 0;
-        m_descListeners = new ArrayList<ShupitoDescListener>();
     }
 
     public void setPort(Connection port) {
@@ -57,6 +55,7 @@ public class ShupitoPortConnection extends ShupitoConnection implements Connecti
         if(m_port == null)
             return;
 
+        m_readDesc = false;
         setState(ST_CONNECTING);
 
         addPortTabRef();
@@ -69,7 +68,7 @@ public class ShupitoPortConnection extends ShupitoConnection implements Connecti
             }
         } else {
             m_parserState = PST_INIT0;
-            setState(ST_CONNECTED);
+            requestDesc();
         }
     }
 
@@ -81,6 +80,10 @@ public class ShupitoPortConnection extends ShupitoConnection implements Connecti
         sendDisconnecting();
         setState(ST_DISCONNECTED);
         releasePortTabRef();
+
+        m_desc = null;
+        m_partialDesc.clear();
+        m_partialPacket.clear();
     }
 
     @Override
@@ -88,8 +91,7 @@ public class ShupitoPortConnection extends ShupitoConnection implements Connecti
         assert(packet.length >= 1 && packet.length <= 16);
         assert(packet[0] < 16);
 
-        // FIXME: is this alright?
-        packet[0] = (byte)((packet[1] << 4) | (packet.length-1));
+        packet[0] = (byte)((packet[0] << 4) | (packet.length-1));
         m_port.write(PKT_START);
         m_port.write(packet);
     }
@@ -97,7 +99,11 @@ public class ShupitoPortConnection extends ShupitoConnection implements Connecti
     @Override
     public void requestDesc() {
         if(!m_readDesc) {
-            
+            Log.i("Lorris", "ShupitoPortConnection: request descriptor");
+            m_descTimer = new Timer();
+            m_descTimeoutTask = new DescTimeoutTask();
+            m_descTimer.schedule(m_descTimeoutTask, 1000);
+
             // GC because we are expecting stream, and 
             // if android GC's during the stream, 
             // we are screwed - packet loss.
@@ -109,10 +115,7 @@ public class ShupitoPortConnection extends ShupitoConnection implements Connecti
 
 
     @Override
-    public void connected(boolean connected) {
-        // TODO Auto-generated method stub
-        
-    }
+    public void connected(boolean connected) { }
 
     // stateChanged of m_port
     @Override
@@ -124,7 +127,7 @@ public class ShupitoPortConnection extends ShupitoConnection implements Connecti
                 break;
             case ST_CONNECTED:
                 m_parserState = PST_INIT0;
-                setState(ST_CONNECTED);
+                requestDesc();
                 break;
         }
     }
@@ -135,10 +138,10 @@ public class ShupitoPortConnection extends ShupitoConnection implements Connecti
     }
 
     @Override
-    public void onDescRead(ShupitoDesc desc) { }
-
-    @Override
     public void dataRead(byte[] data) {
+        if(m_state == ST_DISCONNECTED)
+            return;
+
         for(byte b : data) {
             switch(m_parserState) {
             case PST_INIT0:
@@ -197,18 +200,20 @@ public class ShupitoPortConnection extends ShupitoConnection implements Connecti
     }
 
     private void handlePacket() {
+        Log.e("Lorris", "handle packet");
         if(m_readDesc && m_partialPacket.at(0) == 0) {
             m_partialDesc.append(m_partialPacket.data(), 1, m_partialPacket.size()-1);
             if(m_partialPacket.size() < 16) {
                 m_readDesc = false;
                 ShupitoDesc desc = new ShupitoDesc();
                 try {
+                    Log.e("Lorris", "add data");
                     desc.addData(m_partialDesc);
 
-                    int size = m_descListeners.size();
-                    for(int i = 0; i < size; ++i)
-                        m_descListeners.get(i).descRead(desc);
-
+                    if(clearTimeoutTask()) {
+                        m_desc = desc;
+                        setState(ST_CONNECTED);
+                    }
                 } catch(Exception e) {
                     e.printStackTrace();
                 }
@@ -216,6 +221,7 @@ public class ShupitoPortConnection extends ShupitoConnection implements Connecti
             }
         } else {
             sendDataRead(m_partialPacket.toByteArray());
+            Log.e("Lorris", "packet " + m_partialPacket);
         }
     }
 
@@ -236,20 +242,39 @@ public class ShupitoPortConnection extends ShupitoConnection implements Connecti
             m_port.rmTabRef();
     }
 
-    public void addDescListener(ShupitoDescListener listener) {
-        m_descListeners.add(listener);
+    @Override
+    public ShupitoDesc getDesc() {
+        return m_desc;
     }
 
-    public void rmDescListener(ShupitoDescListener listener) {
-        m_descListeners.remove(listener);
+    private boolean clearTimeoutTask() {
+        if(m_descTimer == null)
+            return false;
+
+        boolean res = m_descTimeoutTask.cancel();
+        m_descTimeoutTask = null;
+        m_descTimer = null;
+        return res;
+    }
+
+    private class DescTimeoutTask extends TimerTask {
+        @Override
+        public void run() {
+            setState(ST_DISCONNECTED);
+            releasePortTabRef();
+            m_readDesc = false;
+            clearTimeoutTask();
+        }
     }
 
     private Connection m_port;
     private boolean m_holdsTabRef;
     private int m_parserState;
     private boolean m_readDesc;
+    private ShupitoDesc m_desc;
     private ByteArray m_partialDesc;
     private ByteArray m_partialPacket;
     private int m_parserLen;
-    private ArrayList<ShupitoDescListener> m_descListeners;
+    private Timer m_descTimer;
+    private DescTimeoutTask m_descTimeoutTask;
 }

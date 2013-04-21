@@ -62,8 +62,18 @@ public class ConnectionBtn implements ConnectionInterface, OnClickListener {
 
     @Override
     public void stateChanged(int state) {
-        setIconByState(state);
-        setPopupTextByState(state);
+        m_btn.post(new StateChangedRunnable(state));
+    }
+
+    private class StateChangedRunnable implements Runnable {
+        int m_state;
+        public StateChangedRunnable(int state) {
+            m_state = state;
+        }
+        public void run() {
+            setIconByState(m_state);
+            setPopupTextByState(m_state);
+        }
     }
 
     @Override
@@ -190,8 +200,6 @@ public class ConnectionBtn implements ConnectionInterface, OnClickListener {
     public void disconnecting() { }
     @Override
     public void dataRead(byte[] data) { }
-    @Override
-    public void onDescRead(ShupitoDesc desc) { }
 
     private Connection m_conn;
     private ImageButton m_btn;

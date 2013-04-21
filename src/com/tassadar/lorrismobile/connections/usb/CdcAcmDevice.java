@@ -10,6 +10,7 @@ import android.hardware.usb.UsbDevice;
 import android.hardware.usb.UsbDeviceConnection;
 import android.hardware.usb.UsbEndpoint;
 import android.hardware.usb.UsbInterface;
+import android.util.Log;
 
 import com.tassadar.lorrismobile.ByteArray;
 
@@ -65,6 +66,8 @@ public class CdcAcmDevice extends SerialDevice {
 
         //m_waiterThread = new WaiterThread();
         //m_waiterThread.start();
+
+        m_readBuffer.open();
 
         m_readThread = new ReadThread(m_readBuffer, m_readEndpoint, m_conn);
         m_readThread.start();
@@ -155,6 +158,7 @@ public class CdcAcmDevice extends SerialDevice {
                 }
 
                 written = m_conn.bulkTransfer(m_writeEndpoint, writeBuffer, writeLength, timeoutMs);
+                Log.e("Lorris", "written " + written);
             }
             if (written <= 0) {
                 throw new IOException("Error writing " + writeLength
@@ -173,6 +177,14 @@ public class CdcAcmDevice extends SerialDevice {
 
         public ReadBuffer() {
             m_data.reserve(512);
+        }
+
+        public void open() {
+            synchronized(this) {
+                m_data.setSize(0);
+                m_data.reserve(512);
+                m_open = true;
+            }
         }
 
         public void close() {
@@ -209,6 +221,7 @@ public class CdcAcmDevice extends SerialDevice {
             m_end = e;
             m_connect = conn;
             setPriority(MAX_PRIORITY);
+            setName("CdcAcmReadThread");
         }
 
         @Override
@@ -219,8 +232,10 @@ public class CdcAcmDevice extends SerialDevice {
             int len;
             while(m_run) {
                 len = m_connect.bulkTransfer(m_end, buff, maxLen, 0);
-                if(len > 0)
+                if(len > 0) {
+                    Log.e("Lorris", "read " + len);
                     m_buff.post(buff, len);
+                }
             }
         }
 
@@ -236,6 +251,7 @@ public class CdcAcmDevice extends SerialDevice {
         public DispatchThread(ReadBuffer b) {
             m_buff = b;
             myBuff = new ByteArray();
+            setName("CdcAcmDeviceDispatchThread");
         }
 
         @Override
@@ -245,15 +261,13 @@ public class CdcAcmDevice extends SerialDevice {
                 if(!m_buff.getData(myBuff))
                     break;
 
-                if(m_listener != null && !myBuff.empty()) {
+                if(m_listener != null && !myBuff.empty())
                     m_listener.onDataRead(myBuff.toByteArray());
-                }
 
                 myBuff.setEmpty();
                 try {
                     Thread.sleep(100);
-                } catch (InterruptedException e) {
-                }
+                } catch (InterruptedException e) { }
             }
         }
         

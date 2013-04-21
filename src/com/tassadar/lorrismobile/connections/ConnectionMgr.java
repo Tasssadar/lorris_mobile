@@ -7,6 +7,7 @@ import android.content.ContentValues;
 import android.util.SparseArray;
 
 import com.tassadar.lorrismobile.Utils;
+import com.tassadar.lorrismobile.connections.usb.SerialDevice;
 
 public class ConnectionMgr {
 
@@ -49,6 +50,20 @@ public class ConnectionMgr {
         t.setId(m_idCounter++);
         addConnection(t);
         return t;
+    }
+
+    static public ShupitoTunnelConnection createShupitoTunnel(SerialDevice dev) {
+        USBACMConnection c = new USBACMConnection();
+        c.setDevice(dev);
+
+        ShupitoPortConnection s = new ShupitoPortConnection();
+        s.setPort(c);
+
+        ShupitoTunnelConnection tunnel = new ShupitoTunnelConnection();
+        tunnel.setShupitoConn(s);
+        tunnel.setId(m_idCounter++);
+        addConnection(tunnel);
+        return tunnel;
     }
 
     static public Connection createFromVals(ContentValues vals) {

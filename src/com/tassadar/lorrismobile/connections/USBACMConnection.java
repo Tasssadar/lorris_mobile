@@ -8,6 +8,7 @@ import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
+import android.util.Log;
 
 import com.tassadar.lorrismobile.connections.usb.SerialDevice;
 import com.tassadar.lorrismobile.connections.usb.SerialDevice.SerialDeviceListener;
@@ -19,7 +20,7 @@ public class USBACMConnection extends Connection implements SerialDeviceListener
     private static final int WRITE_STOP = 0;
     private static final int WRITE_DATA = 1;
 
-    private static final int WRITE_TIMEOUT = 100; // ms
+    private static final int WRITE_TIMEOUT = 5000; // ms
 
     public USBACMConnection() {
         super(CONN_USB_ACM);
@@ -103,6 +104,7 @@ public class USBACMConnection extends Connection implements SerialDeviceListener
 
     @Override
     public void onDataRead(byte[] data) {
+        Log.e("Lorris", "onDataRead");
         sendDataRead(data);
     }
 

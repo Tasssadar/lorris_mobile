@@ -9,8 +9,10 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
+import android.widget.Spinner;
 
 import com.tassadar.lorrismobile.R;
 import com.tassadar.lorrismobile.connections.usb.SerialDevice;
@@ -71,9 +73,25 @@ public class USBConnFragment extends ConnFragment implements SerialDeviceMgrList
         return false;
     }
 
-    /*private void addShupitoTunnel(UsbDevice dev) {
-        
-    }*/
+    @TargetApi(Build.VERSION_CODES.HONEYCOMB_MR1)
+    private void addShupitoTunnel(SerialDevice dev) {
+        View v = getView();
+        if(v == null)
+            return;
+
+        LinearLayout l = (LinearLayout)v.findViewById(R.id.usb_devices);
+
+        Activity act = getActivity();
+        View it = View.inflate(act, R.layout.shupito_tunnel_item, null);
+
+        Spinner s = (Spinner)it.findViewById(R.id.tunnel_speed);
+        s.setSelection(2);
+
+        LinearLayout lit = (LinearLayout)it.findViewById(R.id.shupito_tunnel_item_layout);
+        lit.setOnClickListener(new TunnelClickListener(dev));
+
+        l.addView(it);
+    }
 
     @TargetApi(Build.VERSION_CODES.HONEYCOMB_MR1)
     @Override
@@ -82,77 +100,26 @@ public class USBConnFragment extends ConnFragment implements SerialDeviceMgrList
         if (dev.getUsbDevice().getVendorId() == 0x4a61 &&
             dev.getUsbDevice().getProductId() == 0x679a)
         {
-            USBACMConnection c = new USBACMConnection();
-            c.setDevice(dev);
-
-            ShupitoPortConnection s = new ShupitoPortConnection();
-            s.setPort(c);
-
-            DescWaiter w = new DescWaiter(s);
-            s.addInterface(w);
-
-            s.open();
+            addShupitoTunnel(dev);
         }
     }
 
-    private class DescWaiter implements Runnable, ConnectionInterface {
+    private class TunnelClickListener implements OnClickListener {
+        private SerialDevice m_dev;
 
-        private ShupitoPortConnection m_conn;
-        private ShupitoDesc m_desc;
-        public DescWaiter(ShupitoPortConnection conn) {
-            m_conn = conn;
-            m_desc = null;
+        public TunnelClickListener(SerialDevice dev) {
+            m_dev = dev;
         }
 
         @Override
-        public void connected(boolean connected) {
-            if(!connected) {
-                m_conn.close();
-                m_conn.setPort(null);
-                m_conn.removeInterface(this);
-                m_conn = null;
-                return;
-            }
+        public void onClick(View v) {
+            Spinner s = (Spinner)v.findViewById(R.id.tunnel_speed);
 
-            View v = getView();
-            if(v == null)
-                return;
-
-            v.postDelayed(this, 1000);
-            m_conn.requestDesc();
+            ShupitoTunnelConnection conn = ConnectionMgr.createShupitoTunnel(m_dev);
+            conn.setTunnelSpeed(Integer.parseInt((String)s.getSelectedItem()));
+            m_interface.onConnectionSelected(conn);
         }
-
-        @Override
-        public void stateChanged(int state) { }
-        @Override
-        public void disconnecting() { }
-        @Override
-        public void dataRead(byte[] data) { }
-        @Override
-        public void onDescRead(ShupitoDesc desc) {
-            synchronized(m_conn) {
-                m_desc = desc;
-            }
-        }
-
-        @Override
-        public void run() {
-            synchronized(m_conn) {
-                if(m_desc != null) {
-                    // Shupito tunnel
-                    if(m_desc.getConfig("356e9bf7-8718-4965-94a4-0be370c8797c") != null) {
-                        
-                    }
-                }
-                m_conn.close();
-                m_conn.setPort(null);
-                m_conn.removeInterface(this);
-            }
-            m_conn = null;
-        }
-        
     }
-
 
     private SerialDeviceMgr m_mgr;
     private ShupitoPortConnection m_conn;

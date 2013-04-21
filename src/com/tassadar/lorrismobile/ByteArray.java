@@ -13,6 +13,16 @@ public class ByteArray {
         m_data = new byte[size];
     }
 
+    public ByteArray(byte[] data) {
+        clear();
+        assign(data, 0, data.length);
+    }
+
+    public ByteArray(byte[] data, int offset, int len) {
+        clear();
+        assign(data, offset, len);
+    }
+
     private void ensureEnoughSpace(int extra) {
         int req = m_size + extra;
         if(req < m_data.length)
@@ -96,6 +106,10 @@ public class ByteArray {
         append(other.data(), 0, other.size());
     }
 
+    public void append(String text) {
+        append(text.getBytes());
+    }
+
     public byte at(int idx) {
         return m_data[idx];
     }
@@ -153,13 +167,31 @@ public class ByteArray {
         else if(len > m_size)
             ensureEnoughSpace(len - m_size);
 
-        System.arraycopy(data, 0, m_data, offset, len);
+        System.arraycopy(data, offset, m_data, 0, len);
         m_size = len;
     }
 
     public void resize(int len) {
         ensureEnoughSpace(len - m_size);
+        if(m_size > len + 512) {
+            byte[] d = new byte[len];
+            System.arraycopy(m_data, 0, d, 0, len);
+            m_data = d;
+        }
         m_size = len;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder b = new StringBuilder("(");
+        b.append(m_size);
+        b.append(")[ ");
+        for(int i = 0; i < m_size; ++i) {
+            b.append(((int)m_data[i]) & 0xFF);
+            b.append(", ");
+        }
+        b.append("]");
+        return b.toString();
     }
 
     private byte[] m_data;

@@ -110,6 +110,16 @@
 
     <string name="connected_devices">Connected devices</string>
 
+    <string name="yunicontrol">YuniControl</string>
+    <string name="select_board">Select board</string>
+    <string name="cur_voltage">Current voltage: </string>
+    <string name="pot">POT</string>
+    <string name="info">INFO</string>
+    <string name="settings">SETTINGS</string>
+    <string name="timeout_info">Couldn\'t get device info!</string>
+    <string name="try_again">Try again</string>
+    <string name="board">Board</string>
+
     <string-array name="session_options">
         <item>Edit</item>
         <item>Erase</item>
@@ -118,6 +128,7 @@
     <string-array name="tab_names">
         <item>Terminal</item>
         <item>Programmer</item>
+        <item>YuniControl</item>
     </string-array>
 
     <string-array name="term_colors">

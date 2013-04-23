@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal"
+    android:layout_width="50dp"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="5dp">
+    <RadioButton android:id="@+id/button_radio"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:clickable="false"
+        android:layout_centerHorizontal="true"/>
+    <TextView android:id="@+id/button_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/button_radio"
+        android:layout_centerHorizontal="true"/>
+</RelativeLayout>

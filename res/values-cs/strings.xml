@@ -108,6 +108,10 @@
 
     <string name="connected_devices">Připojená zařízení</string>
 
+    <string name="yunicontrol">YuniControl</string>
+    <string name="info">INFO</string>
+    <string name="settings">NASTAVENÍ</string>
+
     <string-array name="session_options">
         <item>Upravit</item>
         <item>Smazat</item>
@@ -116,6 +120,7 @@
     <string-array name="tab_names">
         <item>Terminál</item>
         <item>Programátor</item>
+        <item>YuniControl</item>
     </string-array>
 
     <string-array name="term_colors">

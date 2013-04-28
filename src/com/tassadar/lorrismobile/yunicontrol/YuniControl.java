@@ -1,5 +1,7 @@
 package com.tassadar.lorrismobile.yunicontrol;
 
+import android.app.Activity;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -9,6 +11,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.tassadar.lorrismobile.BlobInputStream;
+import com.tassadar.lorrismobile.BlobOutputStream;
+import com.tassadar.lorrismobile.LorrisApplication;
 import com.tassadar.lorrismobile.R;
 import com.tassadar.lorrismobile.connections.Connection;
 import com.tassadar.lorrismobile.modules.Tab;
@@ -31,6 +36,10 @@ public class YuniControl extends Tab implements YCMenuListener,ProtocolListener 
         m_protocol.addListener(this);
 
         m_fragments = new YuniControlFragment[FRAGMENT_COUNT];
+        m_fragments[0] = new InfoFragment();
+        m_fragments[0].setProtocol(m_protocol);
+        m_fragments[1] = new SettingsFragment();
+        m_fragments[1].setProtocol(m_protocol);
     }
 
     @Override
@@ -44,10 +53,20 @@ public class YuniControl extends Tab implements YCMenuListener,ProtocolListener 
     }
 
     @Override
+    public void onAttach(Activity act) {
+        super.onAttach(act);
+        SharedPreferences p = act.getPreferences(0);
+        m_protocol.setGetDataDelay(p.getInt("yc_getDataDelay", m_protocol.getDataDelay()));
+        m_protocol.setGetDataEnabled(p.getBoolean("yc_getDataEnabled", m_protocol.getDataEnabled()));
+    }
+
+    @Override
     public View onCreateView (LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.yunicontrol, container, false);
 
         ViewPager pager = (ViewPager)v.findViewById(R.id.view_pager);
+        pager.setId(LorrisApplication.generateViewId());
+
         YCPagerAdapter adapter = new YCPagerAdapter(getActivity().getSupportFragmentManager());
         pager.setAdapter(adapter);
         return v;
@@ -70,21 +89,9 @@ public class YuniControl extends Tab implements YCMenuListener,ProtocolListener 
 
         @Override
         public Fragment getItem(int idx) {
-            YuniControlFragment res = null;
-            switch(idx) {
-                case 0:
-                    res = new InfoFragment();
-                    break;
-                case 1:
-                    res = new SettingsFragment();
-                    break;
-                default:
-                    return null;
-            }
-
-            m_fragments[idx] = res;
-            res.setProtocol(m_protocol);
-            return res;
+            if(idx >= m_fragments.length)
+                return null;
+            return m_fragments[idx];
         }
 
         @Override
@@ -103,6 +110,7 @@ public class YuniControl extends Tab implements YCMenuListener,ProtocolListener 
     public void connected(boolean connected) {
         if(connected)
             m_protocol.requestGlobalInfo();
+        m_protocol.connected(connected);
     }
 
     @Override
@@ -138,6 +146,26 @@ public class YuniControl extends Tab implements YCMenuListener,ProtocolListener 
 
     @Override
     public void onBoardChange(BoardInfo b) { }
+
+    @Override
+    protected void saveDataStream(BlobOutputStream str) {
+        super.saveDataStream(str);
+
+        str.writeString("lastBoard", m_protocol.getLastBoard());
+
+        for(YuniControlFragment f : m_fragments)
+            f.saveDataStream(str);
+    }
+
+    @Override
+    protected void loadDataStream(BlobInputStream str) {
+        super.loadDataStream(str);
+
+        m_protocol.setLastBoard(str.readString("lastBoard"));
+
+        for(YuniControlFragment f : m_fragments)
+            f.loadDataStream(str);
+    }
 
     private YuniControlMenu m_menu;
     private Protocol m_protocol;

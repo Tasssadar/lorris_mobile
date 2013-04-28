@@ -1,7 +1,6 @@
 package com.tassadar.lorrismobile.yunicontrol;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import android.app.Activity;
 import android.content.res.Configuration;
@@ -10,6 +9,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.view.ViewParent;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.LinearLayout;
@@ -23,15 +23,37 @@ import com.tassadar.lorrismobile.R;
 
 public class InfoFragment extends YuniControlFragment {
 
+    public InfoFragment() {
+        m_axes = new ArrayList<ProgressBar>();
+        m_buttons = new ArrayList<RadioButton>();
+        m_tristate = new ArrayList<Button>();
+        m_itemsVisibility = 3;
+        m_voltageFormat = "";
+    }
+
+    @Override
+    public void onAttach(Activity act) {
+        super.onAttach(act);
+        m_voltageFormat = act.getString(R.string.voltage);
+    }
+
     @Override
     public View onCreateView (LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.yunicontrol_base, container, false);
 
         m_adapter = new ArrayAdapter<CharSequence>(getActivity(), android.R.layout.simple_spinner_item);
         m_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-
-        loadContentView(v);
         return v;
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        loadContentView(getView());
+
+        BoardInfo b = m_protocol.getCurBoard();
+        if(b != null)
+            setUpFromInfo(b);
     }
 
     @Override
@@ -69,6 +91,8 @@ public class InfoFragment extends YuniControlFragment {
         View b = v.findViewById(R.id.yc_timeout_btn);
         b.setOnClickListener(m_onTryAgainClickListener);
 
+        m_voltageText = (TextView)v.findViewById(R.id.cur_voltage);
+
         setItemsVisibility(m_itemsVisibility);
     }
 
@@ -93,13 +117,14 @@ public class InfoFragment extends YuniControlFragment {
                 setText(getResources().getString(R.string.pot) + " " + ax_size);
 
                 axis_layout.addView(l);
-                m_axes.add(l);
+                m_axes.add((ProgressBar)l.findViewById(R.id.progress_bar));
                 ++ax_size;
             }
             else
             {
                 --ax_size;
-                axis_layout.removeView(m_axes.remove(ax_size));
+                ViewParent p = m_axes.remove(ax_size).getParent();
+                axis_layout.removeView((View)p);
             }
         }
     }
@@ -124,13 +149,14 @@ public class InfoFragment extends YuniControlFragment {
                 ((TextView)l.findViewById(R.id.button_text)).setText(String.valueOf(size));
 
                 btn_layout.addView(l);
-                m_buttons.add(l);
+                m_buttons.add((RadioButton)l.findViewById(R.id.button_radio));
                 ++size;
             }
             else
             {
                 --size;
-                btn_layout.removeView(m_buttons.remove(size));
+                ViewParent p = m_buttons.remove(size).getParent();
+                btn_layout.removeView((View)p);
             }
         }
     }
@@ -155,13 +181,14 @@ public class InfoFragment extends YuniControlFragment {
                 ((TextView)l.findViewById(R.id.tristate_text)).setText(String.valueOf(size));
 
                 btn_layout.addView(l);
-                m_tristate.add(l);
+                m_tristate.add((Button)l.findViewById(R.id.tristate_button));
                 ++size;
             }
             else
             {
                 --size;
-                btn_layout.removeView(m_tristate.remove(size));
+                ViewParent p = m_tristate.remove(size).getParent();
+                btn_layout.removeView((View)p);
             }
         }
     }
@@ -183,6 +210,9 @@ public class InfoFragment extends YuniControlFragment {
         p.setVisibility(state == 2 ? View.VISIBLE : View.GONE);
         p = v.findViewById(R.id.yc_timeout_text);
         p.setVisibility(state == 2 ? View.VISIBLE : View.GONE);
+
+        p = v.findViewById(R.id.yc_no_data_text);
+        p.setVisibility(state == 3 ? View.VISIBLE : View.GONE);
     }
 
     private void setUpFromInfo(BoardInfo i) {
@@ -197,6 +227,7 @@ public class InfoFragment extends YuniControlFragment {
         setAxisCount(i.potCount);
         setButtonCount(i.btnCount);
         setTristateCount(i.triStateCount);
+        setItemsVisibility(0);
     }
 
     @Override
@@ -204,11 +235,8 @@ public class InfoFragment extends YuniControlFragment {
         switch(pkt.opcode) {
             case Protocol.CMSG_POT:
             {
-                for(int i = 0; !pkt.atEnd() && i < m_axes.size(); ++i) {
-                    RelativeLayout l = m_axes.get(i);
-                    ProgressBar bar = (ProgressBar)l.findViewById(R.id.progress_bar);
-                    bar.setProgress((short)pkt.read16() + 32768);
-                }
+                for(int i = 0; !pkt.atEnd() && i < m_axes.size(); ++i)
+                    m_axes.get(i).setProgress((short)pkt.read16() + 32768);
                 break;
             }
             case Protocol.CMSG_BUTTONS:
@@ -216,31 +244,22 @@ public class InfoFragment extends YuniControlFragment {
                 int itr = 0;
                 while(!pkt.atEnd()) {
                     int s = pkt.read8();
-                    for(int i = 0; i < 8 && i+itr < m_buttons.size(); ++i) {
-                        RelativeLayout l = m_buttons.get(i+itr);
-                        RadioButton btn = (RadioButton)l.findViewById(R.id.button_radio);
-                        btn.setChecked((s & (1 << i)) != 0);
-                    }
+                    for(int i = 0; i < 8 && i+itr < m_buttons.size(); ++i)
+                        m_buttons.get(i+itr).setChecked((s & (1 << i)) != 0);
                     itr += 8;
                 }
                 break;
             }
             case Protocol.CMSG_TRISTATE:
             {
-                for(int i = 0; !pkt.atEnd() && i < m_tristate.size(); ++i) {
-                    RelativeLayout l = m_tristate.get(i);
-                    Button btn = (Button)l.findViewById(R.id.tristate_button);
-                    btn.setText(String.valueOf(pkt.read8()));
-                }
+                for(int i = 0; !pkt.atEnd() && i < m_tristate.size(); ++i)
+                    m_tristate.get(i).setText(String.valueOf(pkt.read8()));
                 break;
             }
             case Protocol.CMSG_BOARD_VOLTAGE:
             {
-                View v = getView();
-                if(v == null)
-                    break;
-                TextView t = (TextView)v.findViewById(R.id.cur_voltage);
-                t.setText(String.format("%.1f", (float)pkt.read16()/1000));
+                if(m_voltageText != null)
+                    m_voltageText.setText(String.format(m_voltageFormat, (float)pkt.read16()/1000));
                 break;
             }
         }
@@ -257,8 +276,9 @@ public class InfoFragment extends YuniControlFragment {
     @Override
     public void onInfoReceived(GlobalInfo i) {
         setItemsVisibility(i != null ? 0 : 2);
-        if(i != null && i.boards.length != 0)
-            setUpFromInfo(i.boards[0]);
+        BoardInfo b = m_protocol.getCurBoard();
+        if(b != null)
+            setUpFromInfo(b);
     }
 
     @Override
@@ -273,11 +293,13 @@ public class InfoFragment extends YuniControlFragment {
         }
     };
 
-    private List<RelativeLayout> m_axes = new ArrayList<RelativeLayout>();
-    private List<RelativeLayout> m_buttons = new ArrayList<RelativeLayout>();
-    private List<RelativeLayout> m_tristate = new ArrayList<RelativeLayout>();
+    private ArrayList<ProgressBar> m_axes;
+    private ArrayList<RadioButton> m_buttons;
+    private ArrayList<Button> m_tristate;
+    private TextView m_voltageText;
     private String m_boardName;
     private int m_itemsVisibility;
+    private String m_voltageFormat;
 
     private ArrayAdapter<CharSequence> m_adapter;
 }

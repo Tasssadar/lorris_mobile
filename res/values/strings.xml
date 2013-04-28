@@ -119,6 +119,18 @@
     <string name="timeout_info">Couldn\'t get device info!</string>
     <string name="try_again">Try again</string>
     <string name="board">Board</string>
+    <string name="data_request">Data request</string>
+    <string name="period">Period (ms)</string>
+    <string name="request_mask">Request mask</string>
+    <string name="joystick_calibration">Joystick calibration</string>
+    <string name="start_calibration">Start calibration</string>
+    <string name="no_data">No data available, please connect to YuniControl device.</string>
+    <string name="voltage">%1$.1f V</string>
+    <string name="get_cal_info">Getting calibration info</string>
+    <string name="cal_failed">ERROR: Calibration failed, please try again!</string>
+    <string name="no_cal_dev">No device to calibrate!</string>
+    <string name="calibrate">Please move all joystick axes through maximum and minimum positions, leave the joystick in default position and press "OK".</string>
+    <string name="joystick">Joystick</string>
 
     <string-array name="session_options">
         <item>Edit</item>

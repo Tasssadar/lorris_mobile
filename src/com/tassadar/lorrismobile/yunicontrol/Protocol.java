@@ -23,13 +23,17 @@ public class Protocol {
 
     private static final short DEVICE = 0x00;
 
-    public static final int SMSG_GET_DEVICE_INFO = 0xFF;
-    public static final int CMSG_DEVICE_INFO     = 0xFE;
-    public static final int SMSG_GET_DATA        = 0xFD;
-    public static final int CMSG_POT             = 0xFC;
-    public static final int CMSG_BUTTONS         = 0xFB;
-    public static final int CMSG_TRISTATE        = 0xFA;
-    public static final int CMSG_BOARD_VOLTAGE   = 0x00;
+    public static final int SMSG_GET_DEVICE_INFO      = 0xFF;
+    public static final int CMSG_DEVICE_INFO          = 0xFE;
+    public static final int SMSG_GET_DATA             = 0xFD;
+    public static final int CMSG_POT                  = 0xFC;
+    public static final int CMSG_BUTTONS              = 0xFB;
+    public static final int CMSG_TRISTATE             = 0xFA;
+    public static final int CMSG_BOARD_VOLTAGE        = 0x00;
+    public static final int SMSG_GET_CALIBRATION_INFO = 0xF9;
+    public static final int CMSG_CALIBRATION_INFO     = 0xF8;
+    public static final int SMSG_START_CALIBRATION    = 0xF7;
+    public static final int SMSG_FINISH_CALIBRATION   = 0xF6;
 
     private static final int EVENT_PACKET = 0;
     private static final int EVENT_INFO   = 1;
@@ -39,7 +43,18 @@ public class Protocol {
         m_listeners = new ProtocolListener[0];
         m_eventHandler = new EventHandler(this);
         m_timer = new Timer();
+
         m_getDataDelay = 100;
+        m_getDataMask = (0x01 | 0x02 | 0x04 | 0x08);
+        m_enableGetData = true;
+        m_lastBoard = new String();
+    }
+
+    public void connected(boolean connected) {
+        if(connected)
+            restartGetDataTask();
+        else
+            stopGetDataTask();
     }
 
     public void dataRead(byte[] data) {
@@ -120,7 +135,7 @@ public class Protocol {
             m_listeners[pos] = tmp;
         }
 
-        ProtocolListener[] newArray = new ProtocolListener[m_listeners.length+1];
+        ProtocolListener[] newArray = new ProtocolListener[m_listeners.length-1];
         System.arraycopy(m_listeners, 0, newArray, 0, newArray.length);
         m_listeners = newArray;
     }
@@ -197,12 +212,18 @@ public class Protocol {
                     m_info.boards[i].potCount = p.read8();
                     m_info.boards[i].btnCount = p.read8();
                     m_info.boards[i].triStateCount = p.read8();
+
+                    if(m_info.boards[i].name.equals(m_lastBoard))
+                        m_curBoard = i;
                 }
+
+                if(m_curBoard < cnt)
+                    m_lastBoard = m_info.boards[m_curBoard].name;
 
                 for(ProtocolListener l : m_listeners)
                     l.onInfoReceived(m_info);
 
-                startGetDataTask();
+                restartGetDataTask();
                 break;
             }
         }
@@ -218,19 +239,34 @@ public class Protocol {
         return m_info.boards[idx];
     }
 
+    public BoardInfo getCurBoard() {
+        return getBoard(m_curBoard);
+    }
+
     public void selectBoard(int board) {
         if (m_curBoard == board || m_info == null ||
             board < 0 || board >= m_info.boards.length)
             return;
 
         m_curBoard = board;
+
+        m_lastBoard = m_info.boards[board].name;
+
         for(ProtocolListener l : m_listeners)
             l.onBoardChange(m_info.boards[board]);
     }
 
-    private void startGetDataTask() {
+    private void stopGetDataTask() {
         if(m_getDataTask != null)
             m_getDataTask.cancel();
+        m_getDataTask = null;
+    }
+
+    private void restartGetDataTask() {
+        stopGetDataTask();
+
+        if(!m_enableGetData)
+            return;
 
         m_getDataTask = new GetDataTask();
         m_timer.schedule(m_getDataTask, m_getDataDelay, m_getDataDelay);
@@ -240,9 +276,38 @@ public class Protocol {
         @Override
         public void run() {
             Packet pkt = new Packet(m_curBoard, SMSG_GET_DATA);
-            pkt.write8(0x01 | 0x02 | 0x04 | 0x08 );
+            pkt.write8(m_getDataMask);
             sendPacket(pkt);
         }
+    }
+
+    public void setGetDataDelay(int delay) {
+        m_getDataDelay = delay;
+        restartGetDataTask();
+    }
+
+    public void setGetDataEnabled(boolean enable) {
+        m_enableGetData = enable;
+        restartGetDataTask();
+    }
+
+    public void setGetDataMask(int mask) {
+        m_getDataMask = mask;
+    }
+
+    public int getDataDelay() { return m_getDataDelay; }
+    public int getDataMask() { return m_getDataMask; }
+    public boolean getDataEnabled() { return m_enableGetData; }
+
+    public void setLastBoard(String name) {
+        m_lastBoard = name;
+    }
+    public String getLastBoard() {
+        return m_lastBoard;
+    }
+
+    public int getCurBoardId() {
+        return m_curBoard;
     }
 
     private Packet m_curPkt;
@@ -254,5 +319,8 @@ public class Protocol {
     private GlobalInfo m_info;
     private int m_curBoard;
     private int m_getDataDelay;
+    private int m_getDataMask;
+    private boolean m_enableGetData;
     private GetDataTask m_getDataTask;
+    private String m_lastBoard;
 }

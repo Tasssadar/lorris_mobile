@@ -2,6 +2,8 @@ package com.tassadar.lorrismobile.yunicontrol;
 
 import android.support.v4.app.Fragment;
 
+import com.tassadar.lorrismobile.BlobInputStream;
+import com.tassadar.lorrismobile.BlobOutputStream;
 import com.tassadar.lorrismobile.yunicontrol.Protocol.ProtocolListener;
 
 
@@ -19,6 +21,9 @@ public abstract class YuniControlFragment extends Fragment implements ProtocolLi
 
     @Override
     abstract public void onPacketReceived(Packet pkt);
+
+    public void saveDataStream(BlobOutputStream str) { }
+    public void loadDataStream(BlobInputStream str) { }
 
     protected Protocol m_protocol;
 }

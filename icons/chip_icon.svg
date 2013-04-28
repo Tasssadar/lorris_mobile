@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="512"
+   height="512"
+   id="svg2"
+   inkscape:label="Pozadí"
+   version="1.1"
+   inkscape:version="0.48.3.1 r9886"
+   sodipodi:docname="chip_icon.svg"
+   inkscape:export-filename="/home/tassadar/lorris_mobile/res/drawable-xhdpi/chip.png"
+   inkscape:export-xdpi="11.25"
+   inkscape:export-ydpi="11.25">
+  <defs
+     id="defs3845" />
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="0.7"
+     inkscape:cx="20.290712"
+     inkscape:cy="227.79283"
+     inkscape:document-units="px"
+     inkscape:current-layer="layer1"
+     showgrid="false"
+     inkscape:window-width="1366"
+     inkscape:window-height="720"
+     inkscape:window-x="-4"
+     inkscape:window-y="-3"
+     inkscape:window-maximized="1" />
+  <metadata
+     id="metadata3848">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Vrstva 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(0,-540.36218)">
+    <path
+       style="opacity:0.80000000000000004;fill:#ffffff;fill-opacity:1;stroke:none"
+       d="m 132.10937,602.94031 0,39.5 -46.53124,0 0,37.125 46.53124,0 0,29.84375 -46.53124,0 0,37.09375 46.53124,0 0,29.875 -46.53124,0 0,37.09375 46.53124,0 0,29.875 -46.53124,0 0,37.09375 46.53124,0 0,29.84375 -46.53124,0 0,37.125 46.53124,0 0,42.375 245.09375,0 0,-42.375 49.21875,0 0,-37.125 -49.21875,0 0,-29.84375 49.21875,0 0,-37.09375 -49.21875,0 0,-29.875 49.21875,0 0,-37.09375 -49.21875,0 0,-29.875 49.21875,0 0,-37.09375 -49.21875,0 0,-29.84375 49.21875,0 0,-37.125 -49.21875,0 0,-39.5 -245.09375,0 z"
+       id="rect3950"
+       inkscape:connector-curvature="0" />
+  </g>
+</svg>

@@ -477,6 +477,9 @@ public class WorkspaceActivity extends FragmentActivity implements TabSelectedLi
             case R.id.programmer:
                 createNewTab(TabManager.TAB_PROGRAMMER);
                 break;
+            case R.id.yunicontrol:
+                createNewTab(TabManager.TAB_YUNICONTROL);
+                break;
         }
     }
 

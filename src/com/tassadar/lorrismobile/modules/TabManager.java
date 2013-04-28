@@ -7,11 +7,13 @@ import com.tassadar.lorrismobile.Utils;
 import com.tassadar.lorrismobile.modules.Tab.TabSelectedListener;
 import com.tassadar.lorrismobile.programmer.Programmer;
 import com.tassadar.lorrismobile.terminal.Terminal;
+import com.tassadar.lorrismobile.yunicontrol.YuniControl;
 
 public class TabManager {
  
     public static final int TAB_TERMINAL    = 0;
     public static final int TAB_PROGRAMMER  = 1;
+    public static final int TAB_YUNICONTROL = 2;
 
     public static Tab createTab(TabSelectedListener listener, int type) {
         Tab res = null;
@@ -22,6 +24,9 @@ public class TabManager {
             case TAB_PROGRAMMER:
                 res = new Programmer();
                 break;
+            case TAB_YUNICONTROL:
+                res = new YuniControl();
+                break;
             default:
                 return null;
         }
@@ -30,7 +35,8 @@ public class TabManager {
     }
 
     public static int getRIdForTabType(int type) {
-        final int ids[] = { R.id.terminal, R.id.programmer };
+        // ids from /res/menu/create_tab.xml
+        final int ids[] = { R.id.terminal, R.id.programmer, R.id.yunicontrol };
         try {
             return ids[type];
         } catch(IndexOutOfBoundsException ex) {

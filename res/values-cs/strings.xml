@@ -108,6 +108,28 @@
 
     <string name="connected_devices">Připojená zařízení</string>
 
+    <string name="yunicontrol">YuniControl</string>
+    <string name="select_board">Vyberte desku</string>
+    <string name="cur_voltage">Napětí: </string>
+    <string name="pot">POT</string>
+    <string name="info">INFO</string>
+    <string name="settings">NASTAVENÍ</string>
+    <string name="timeout_info">Chyba při čtení informací o zařízení!</string>
+    <string name="try_again">Zkusit znovu</string>
+    <string name="board">Deska</string>
+    <string name="data_request">Žádání o data</string>
+    <string name="period">Perioda (ms)</string>
+    <string name="request_mask">Bit maska požadavku</string>
+    <string name="joystick_calibration">Kalibrace joysticku</string>
+    <string name="start_calibration">Spustit kalibraci</string>
+    <string name="no_data">Nejsou dostupná žádná data, prosím připojte se k YuniControl.</string>
+    <string name="voltage">%1$.1f V</string>
+    <string name="get_cal_info">Získávání kalibračních informací</string>
+    <string name="cal_failed">CHYBA: Kalibrace selhala, zkuste to prosím znova!</string>
+    <string name="no_cal_dev">Deska nemá žádné zařízení ke kalibraci</string>
+    <string name="calibrate">Pohněte s joystickem skrze všechny krajní hodnoty a poté ho nechejte v základní pozici a stiskněte "OK"</string>
+    <string name="joystick">Joystick</string>
+
     <string-array name="session_options">
         <item>Upravit</item>
         <item>Smazat</item>
@@ -116,6 +138,7 @@
     <string-array name="tab_names">
         <item>Terminál</item>
         <item>Programátor</item>
+        <item>YuniControl</item>
     </string-array>
 
     <string-array name="term_colors">

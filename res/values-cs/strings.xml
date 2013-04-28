@@ -124,6 +124,11 @@
     <string name="start_calibration">Spustit kalibraci</string>
     <string name="no_data">Nejsou dostupná žádná data, prosím připojte se k YuniControl.</string>
     <string name="voltage">%1$.1f V</string>
+    <string name="get_cal_info">Získávání kalibračních informací</string>
+    <string name="cal_failed">CHYBA: Kalibrace selhala, zkuste to prosím znova!</string>
+    <string name="no_cal_dev">Deska nemá žádné zařízení ke kalibraci</string>
+    <string name="calibrate">Pohněte s joystickem skrze všechny krajní hodnoty a poté ho nechejte v základní pozici a stiskněte "OK"</string>
+    <string name="joystick">Joystick</string>
 
     <string-array name="session_options">
         <item>Upravit</item>

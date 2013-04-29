@@ -13,6 +13,10 @@
     <string name="erase_session_text">Session \"%1$s\" will be permanently deleted!</string>
     <string name="erase_session_toast">Session \"%1$s\" was deleted.</string>
     <string name="service">Session \"%1$s\" is opened.</string>
+    <string name="save">Save</string>
+    <string name="close">Close</string>
+    <string name="saving_session">Saving session&#8230;</string>
+    <string name="session_saved">Session \"%1$s\" was saved.</string>
 
     <string name="session_name">Session name</string>
     <string name="select_image">Select image file&#8230;</string>

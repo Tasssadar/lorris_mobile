@@ -6,11 +6,13 @@ import java.util.Date;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.res.Configuration;
 import android.content.res.Resources;
@@ -106,6 +108,11 @@ public class WorkspaceActivity extends FragmentActivity implements TabSelectedLi
         }
 
         bindService(new Intent(this, SessionService.class), m_sessionServiceConn, Context.BIND_AUTO_CREATE);
+
+        IntentFilter f = new IntentFilter(SessionService.CLOSE_SESSION);
+        registerReceiver(m_sessionActReceiver, f);
+        f = new IntentFilter(SessionService.SAVE_SESSION);
+        registerReceiver(m_sessionActReceiver, f);
     }
 
     @TargetApi(11)
@@ -127,7 +134,7 @@ public class WorkspaceActivity extends FragmentActivity implements TabSelectedLi
         super.onPause();
         if(m_sessionService != null) {
             m_sessionService.saveSession(SessionMgr.getActiveSession(),
-                TabManager.cloneTabArray(), ConnectionMgr.cloneConnArray());
+                TabManager.cloneTabArray(), ConnectionMgr.cloneConnArray(), false);
         }
         m_preAttachedFragments.clear();
     }
@@ -144,6 +151,7 @@ public class WorkspaceActivity extends FragmentActivity implements TabSelectedLi
         setResult(RESULT_OK);
         m_active_tab = -1;
         unbindService(m_sessionServiceConn);
+        unregisterReceiver(m_sessionActReceiver);
 
         TabManager.takeTabArray();
         ConnectionMgr.takeConnArray();
@@ -559,6 +567,22 @@ public class WorkspaceActivity extends FragmentActivity implements TabSelectedLi
 
         public void onServiceDisconnected(ComponentName className) {
             m_sessionService = null;
+        }
+    };
+
+    private final BroadcastReceiver m_sessionActReceiver = new BroadcastReceiver() {
+        public void onReceive(Context context, Intent intent) {
+            if(intent == null)
+                return;
+
+            if(intent.getAction() == SessionService.CLOSE_SESSION) {
+                finish();
+            } else if(intent.getAction() == SessionService.SAVE_SESSION) {
+                if(m_sessionService != null) {
+                    m_sessionService.saveSession(SessionMgr.getActiveSession(),
+                        TabManager.cloneTabArray(), ConnectionMgr.cloneConnArray(), true);
+                }
+            }
         }
     };
 

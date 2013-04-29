@@ -8,16 +8,24 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Binder;
+import android.os.Handler;
 import android.os.IBinder;
+import android.os.Message;
+import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import android.util.SparseArray;
+import android.widget.Toast;
 
 import com.tassadar.lorrismobile.connections.Connection;
 import com.tassadar.lorrismobile.modules.Tab;
 
 public class SessionService extends Service {
+
+    public static final String SAVE_SESSION = "com.tassadar.lorrismobile.SAVE_SESSION";
+    public static final String CLOSE_SESSION = "com.tassadar.lorrismobile.CLOSE_SESSION";
 
     public interface SessionServiceListener {
         public void onConnsLoad(ArrayList<ContentValues> values);
@@ -53,47 +61,63 @@ public class SessionService extends Service {
         m_notificationMgr.cancel(R.string.service);
     }
 
-    // Notification.Builder is from API level 11
-    @SuppressWarnings("deprecation")
     private void showNotification() {
+        NotificationCompat.Builder b = new NotificationCompat.Builder(this);
+
         String text = String.format(getText(R.string.service).toString(),
                 SessionMgr.getActiveSession().getName());
- 
-        Notification notification = new Notification(R.drawable.ic_launcher, text,
-                System.currentTimeMillis());
 
-        notification.flags |= Notification.FLAG_ONGOING_EVENT;
+        Intent i = new Intent(this, WorkspaceActivity.class);
+        i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        PendingIntent contentIntent = PendingIntent.getActivity(this, 0, i, 0);
 
-        Intent intent = new Intent(this, WorkspaceActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        i = new Intent(CLOSE_SESSION);
+        i.putExtra("sessionName", SessionMgr.getActiveSession().getName());
+        PendingIntent closeIntent = PendingIntent.getBroadcast(this, 0, i, PendingIntent.FLAG_UPDATE_CURRENT);
 
-        PendingIntent contentIntent = PendingIntent.getActivity(this, 0, intent, 0);
+        i = new Intent(SAVE_SESSION);
+        i.putExtra("sessionName", SessionMgr.getActiveSession().getName());
+        PendingIntent saveIntent = PendingIntent.getBroadcast(this, 0, i, PendingIntent.FLAG_UPDATE_CURRENT);
 
-        notification.setLatestEventInfo(this, getText(R.string.app_name),
-                       text, contentIntent);
+        b.setContentTitle(getText(R.string.app_name))
+         .setContentText(text)
+         .setOngoing(true)
+         .setContentIntent(contentIntent)
+         .setSmallIcon(R.drawable.ic_launcher)
+         .addAction(R.drawable.content_save, getText(R.string.save), saveIntent)
+         .addAction(R.drawable.navigation_cancel, getText(R.string.close), closeIntent);
 
-        startForeground(R.string.service, notification);
+        Notification n = b.build();
+        startForeground(R.string.service, n);
     }
 
     public void saveSession(Session s, SparseArray<Tab> tabs,
-            SparseArray<Connection> conns) {
+            SparseArray<Connection> conns, boolean report) {
             Log.i("Lorris", "Spawning save thread\n");
 
             for(int i = 0; i < conns.size(); ++i)
                 conns.valueAt(i).addRef();
-            new SaveSessionThread(s, tabs, conns).start();
+            new SaveSessionThread(s, tabs, conns, report).start();
     }
 
     private class SaveSessionThread extends Thread {
         private SparseArray<Tab> m_tabs;
         private SparseArray<Connection> m_conns;
         private Session m_session;
+        private boolean m_report;
+        private ToastHandler m_handler;
 
         public SaveSessionThread(Session s, SparseArray<Tab> tabs,
-                SparseArray<Connection> conns) {
+                SparseArray<Connection> conns, boolean report) {
             m_tabs = tabs;
             m_conns = conns;
             m_session = s;
+            m_report = report;
+
+            if(m_report) {
+                Toast.makeText(SessionService.this, R.string.saving_session, Toast.LENGTH_SHORT).show();
+                m_handler = new ToastHandler(SessionService.this);
+            }
         }
 
         @Override
@@ -109,7 +133,27 @@ public class SessionService extends Service {
                     m_conns.valueAt(i).rmRef();
 
                 Log.i("Lorris", "Session " + m_session.getName() + " saved\n");
+                if(m_report)
+                    m_handler.obtainMessage(0, m_session.getName()).sendToTarget();
             }
+        }
+    }
+
+    private static class ToastHandler extends Handler {
+        private WeakReference<Context> m_ctx;
+
+        public ToastHandler(Context ctx) {
+            m_ctx = new WeakReference<Context>(ctx);
+        }
+
+        @Override
+        public void handleMessage(Message msg) {
+            Context c = m_ctx.get();
+            if(c == null)
+                return;
+
+            String text = String.format(c.getText(R.string.session_saved).toString(), (String)msg.obj);
+            Toast.makeText(c, text, Toast.LENGTH_SHORT).show();
         }
     }
 

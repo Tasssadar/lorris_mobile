@@ -68,6 +68,7 @@ public class WorkspaceActivity extends FragmentActivity implements TabSelectedLi
         setContentView(R.layout.workspace);
 
         m_swipeGesture = new DoubleSwipeGesture(this);
+        m_swipeGestureEnabled = true;
 
         m_connBtn = new ConnectionBtn((ImageButton)findViewById(R.id.conn_btn));
         m_connBtn.hide();
@@ -323,6 +324,8 @@ public class WorkspaceActivity extends FragmentActivity implements TabSelectedLi
 
         m_active_tab = idx;
         SessionMgr.getActiveSession().setCurrTab(curr.getTabId());
+
+        m_swipeGestureEnabled = curr.enableSwipeGestures();
     }
 
     private void setEmpty(boolean empty) {
@@ -469,6 +472,7 @@ public class WorkspaceActivity extends FragmentActivity implements TabSelectedLi
         }
     }
 
+    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     private class CreateTabListener implements OnMenuItemClickListener {
         @Override
         public boolean onMenuItemClick(MenuItem item) {
@@ -487,6 +491,9 @@ public class WorkspaceActivity extends FragmentActivity implements TabSelectedLi
                 break;
             case R.id.yunicontrol:
                 createNewTab(TabManager.TAB_YUNICONTROL);
+                break;
+            case R.id.joystick:
+                createNewTab(TabManager.TAB_JOYSTICK);
                 break;
         }
     }
@@ -521,7 +528,8 @@ public class WorkspaceActivity extends FragmentActivity implements TabSelectedLi
 
     @Override
     public boolean dispatchTouchEvent(MotionEvent e) {
-        m_swipeGesture.onTouchEvent(e);
+        if(m_swipeGestureEnabled)
+            m_swipeGesture.onTouchEvent(e);
         return super.dispatchTouchEvent(e);
     }
 
@@ -593,4 +601,5 @@ public class WorkspaceActivity extends FragmentActivity implements TabSelectedLi
     private ConnectionBtn m_connBtn;
     private ArrayList<Fragment> m_preAttachedFragments = new ArrayList<Fragment>();
     private DoubleSwipeGesture m_swipeGesture;
+    private boolean m_swipeGestureEnabled;
 }

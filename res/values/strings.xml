@@ -136,6 +136,11 @@
     <string name="calibrate">Please move all joystick axes through maximum and minimum positions, leave the joystick in default position and press "OK".</string>
     <string name="joystick">Joystick</string>
 
+    <string name="button_type">Button type</string>
+    <string name="press_buttons">Press buttons</string>
+    <string name="max_val">Max val</string>
+    <string name="lock_axis3">Lock</string>
+
     <string-array name="session_options">
         <item>Edit</item>
         <item>Erase</item>
@@ -145,6 +150,7 @@
         <item>Terminal</item>
         <item>Programmer</item>
         <item>YuniControl</item>
+        <item>Joystick</item>
     </string-array>
 
     <string-array name="term_colors">

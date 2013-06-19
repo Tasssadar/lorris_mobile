@@ -143,6 +143,7 @@
         <item>Terminál</item>
         <item>Programátor</item>
         <item>YuniControl</item>
+        <item>Joystick</item>
     </string-array>
 
     <string-array name="term_colors">

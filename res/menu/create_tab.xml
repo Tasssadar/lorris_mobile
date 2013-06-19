@@ -8,4 +8,7 @@
     <item android:id="@+id/yunicontrol"
         android:title="@string/yunicontrol"
         android:showAsAction="always|withText"/>
+    <item android:id="@+id/joystick"
+        android:title="@string/joystick"
+        android:showAsAction="always|withText"/>
 </menu>

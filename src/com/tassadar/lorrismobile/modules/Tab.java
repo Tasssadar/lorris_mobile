@@ -93,7 +93,7 @@ public class Tab extends Fragment implements TabItemClicked, ConnectionInterface
     }
 
     public boolean enableSwipeGestures() {
-        return false;
+        return true;
     }
 
     public void setActive(boolean active) {

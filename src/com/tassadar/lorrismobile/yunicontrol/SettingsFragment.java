@@ -25,6 +25,9 @@ public class SettingsFragment extends YuniControlFragment implements OnCheckedCh
 
     @Override
     public View onCreateView (LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        if(m_protocol == null)
+            return null;
+
         View v = inflater.inflate(R.layout.yunicontrol_settings, container, false);
 
         EditText t = (EditText)v.findViewById(R.id.get_data_period);

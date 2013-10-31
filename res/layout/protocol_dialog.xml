@@ -1,0 +1,35 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:padding="4dp">
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/type"/>
+    <RadioGroup android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+        <RadioButton android:id="@+id/protocol_avakar"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/protocol_avakar"/>
+        <RadioButton android:id="@+id/protocol_lego"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/protocol_lego"/>
+    </RadioGroup>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/max_val"/>
+    <EditText android:id="@+id/max_val"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:minEms="6"
+        android:background="@android:drawable/editbox_background"
+        android:inputType="number"
+        android:singleLine="true" />
+</LinearLayout>

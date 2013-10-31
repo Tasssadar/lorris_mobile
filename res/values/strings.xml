@@ -138,8 +138,11 @@
 
     <string name="button_type">Button type</string>
     <string name="press_buttons">Press buttons</string>
-    <string name="max_val">Max val</string>
+    <string name="max_val">Maximum value:</string>
     <string name="lock_axis3">Lock</string>
+    <string name="protocol_avakar">Avakar\'s</string>
+    <string name="protocol_lego">Lego</string>
+    <string name="protocol">Protocol</string>
 
     <string-array name="session_options">
         <item>Edit</item>

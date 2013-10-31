@@ -13,7 +13,7 @@ import com.tassadar.lorrismobile.TooltipLongClickListener;
 public class JoystickMenu extends Fragment implements OnClickListener {
     public interface JoystickMenuListener {
         void onBtnTypeClicked();
-        void onMaxValueClicked();
+        void onProtocolClicked();
         void onLockChanged(boolean lock);
     }
 
@@ -23,7 +23,7 @@ public class JoystickMenu extends Fragment implements OnClickListener {
         
         View b;
         final int ids[] = {
-            R.id.btn_type, R.id.max_val, R.id.lock_axis3
+            R.id.btn_type, R.id.protocol, R.id.lock_axis3
         };
         for(int id : ids) {
             b = v.findViewById(id);
@@ -80,8 +80,8 @@ public class JoystickMenu extends Fragment implements OnClickListener {
                 setPressSelected(!m_pressSelected);
                 m_listener.onBtnTypeClicked();
                 break;
-            case R.id.max_val:
-                m_listener.onMaxValueClicked();
+            case R.id.protocol:
+                m_listener.onProtocolClicked();
                 break;
             case R.id.lock_axis3:
                 setLockSelected(!m_lockSelected);

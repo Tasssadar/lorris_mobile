@@ -8,11 +8,13 @@ public abstract class Protocol extends TimerTask {
 
     public static final int AVAKAR = 0;
     public static final int LEGO   = 1;
+    public static final int CHESSBOT   = 2;
 
     public static Protocol getProtocol(int type, Connection conn) {
         switch(type) {
-            case AVAKAR: return new ProtocolAvakar(conn);
-            case LEGO:   return new ProtocolLego(conn);
+            case AVAKAR:        return new ProtocolAvakar(conn);
+            case LEGO:          return new ProtocolLego(conn);
+            case CHESSBOT:      return new ProtocolChessbot(conn);
             default:
                 return null;
         }

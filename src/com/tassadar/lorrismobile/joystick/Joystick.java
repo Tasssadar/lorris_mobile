@@ -264,6 +264,9 @@ public class Joystick extends Tab implements JoystickListener, OnCheckedChangeLi
             case Protocol.LEGO:
                 ((RadioButton)layout.findViewById(R.id.protocol_lego)).setChecked(true);
                 break;
+            case Protocol.CHESSBOT:
+                ((RadioButton)layout.findViewById(R.id.protocol_chessbot)).setChecked(true);
+                break;
         }
 
         builder.setView(layout);
@@ -292,8 +295,10 @@ public class Joystick extends Tab implements JoystickListener, OnCheckedChangeLi
         int protocol = 0;
         if(((RadioButton)m_maxValDialog.findViewById(R.id.protocol_avakar)).isChecked())
             protocol = Protocol.AVAKAR;
-        else
+        else if(((RadioButton)m_maxValDialog.findViewById(R.id.protocol_lego)).isChecked())
             protocol = Protocol.LEGO;
+        else
+            protocol = Protocol.CHESSBOT;
 
         if(m_protocol != protocol) {
             m_protocol = protocol;

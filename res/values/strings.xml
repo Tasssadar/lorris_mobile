@@ -142,6 +142,7 @@
     <string name="lock_axis3">Lock</string>
     <string name="protocol_avakar">Avakar\'s</string>
     <string name="protocol_lego">Lego</string>
+    <string name="protocol_chessbot">Chessbot</string>
     <string name="protocol">Protocol</string>
 
     <string-array name="session_options">

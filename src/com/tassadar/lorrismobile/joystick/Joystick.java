@@ -36,7 +36,7 @@ import com.tassadar.lorrismobile.modules.TabManager;
 public class Joystick extends Tab implements JoystickListener, OnCheckedChangeListener,
     OnClickListener, JoystickMenuListener, android.content.DialogInterface.OnClickListener {
 
-    private static final int BUTTON_COUNT = 8;
+    public static final int BUTTON_COUNT = 8;
     private static final int SEND_PERIOD = 50;
 
     public Joystick() {

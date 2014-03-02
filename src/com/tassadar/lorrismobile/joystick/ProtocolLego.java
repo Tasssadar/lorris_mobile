@@ -71,10 +71,13 @@ public class ProtocolLego extends Protocol {
             return;
 
         synchronized(m_lock) {
-            sendLegoMsg("axis_0", m_axes[0]);
-            sendLegoMsg("axis_1", m_axes[1]);
-            sendLegoMsg("axis_2", m_axes[2]);
-            sendLegoMsg("buttons", m_buttons);
+            sendLegoMsg("a0", m_axes[0]);
+            sendLegoMsg("a1", m_axes[1]);
+            sendLegoMsg("a2", m_axes[2]);
+
+            for(int i = 0; i < Joystick.BUTTON_COUNT; ++i) {
+                sendLegoMsg("b" + String.valueOf(i), ((m_buttons & (1 << i)) != 0));
+            }
         }
     }
 

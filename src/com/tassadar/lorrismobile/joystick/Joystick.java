@@ -13,6 +13,7 @@ import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -100,6 +101,15 @@ public class Joystick extends Tab implements JoystickListener, OnCheckedChangeLi
         getAxis3(null).setProgress(axis3);
 
         onLockChanged(m_menu.isLockSelected());
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if(keyCode == KeyEvent.KEYCODE_MENU) {
+            onProtocolClicked();
+            return true;
+        }
+        return false;
     }
 
     private void fillContainer(View v) {

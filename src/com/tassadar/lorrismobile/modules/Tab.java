@@ -4,6 +4,7 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
+import android.view.KeyEvent;
 
 import com.tassadar.lorrismobile.BlobInputStream;
 import com.tassadar.lorrismobile.BlobOutputStream;
@@ -43,6 +44,10 @@ public class Tab extends Fragment implements TabItemClicked, ConnectionInterface
         if(m_conn != null)
             m_lastConnId = m_conn.getId(); 
         setConnection(null);
+    }
+
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        return false;
     }
 
     public void setListener(TabSelectedListener listener) {

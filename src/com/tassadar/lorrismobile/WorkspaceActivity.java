@@ -169,6 +169,13 @@ public class WorkspaceActivity extends FragmentActivity implements TabSelectedLi
                 m_lastBackPress = curr;
                 return true;
         }
+
+        if(m_active_tab != -1) {
+            Tab tab = TabManager.getTabByPos(m_active_tab);
+            if(tab.onKeyDown(keyCode, event))
+                return true;
+        }
+
         return super.onKeyDown(keyCode, event);
     }
 

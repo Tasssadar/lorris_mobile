@@ -93,7 +93,7 @@ public class ChipDefinition {
         return getMemPageSizeNative(m_def_ptr, memId);
     }
 
-    static { System.loadLibrary("programmer"); }
+    static { System.loadLibrary("lorris_native"); }
     private native long newNative(String sign);
     private native void deleteNative(long def_ptr);
     private native String getNameNative(long def_ptr);

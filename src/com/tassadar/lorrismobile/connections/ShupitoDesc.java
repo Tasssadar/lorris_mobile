@@ -149,7 +149,7 @@ public class ShupitoDesc {
         return new int[] { offset, base_cmd };
     }
 
-    static { System.loadLibrary("functions"); }
+    static { System.loadLibrary("lorris_native"); }
     private native String makeGuid(byte[] data, int offset);
 
     private String m_guid;

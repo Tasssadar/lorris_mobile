@@ -450,7 +450,7 @@ public class Terminal extends Tab implements TerminalMenuListener, TerminalSetti
     private native byte[] convertToHex16(byte[] dataArray, int hexPos);
     private native byte[] convertToHex8(byte[] dataArray, int hexPos);
     static {
-        System.loadLibrary("functions");
+        System.loadLibrary("lorris_native");
     }
 
     private TermSession m_termSession;

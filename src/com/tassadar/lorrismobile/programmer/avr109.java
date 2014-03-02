@@ -309,7 +309,7 @@ public class avr109 extends ProgrammerImpl {
     }
 
     private native String makeChipId(byte[] dataArray);
-    static { System.loadLibrary("functions"); }
+    static { System.loadLibrary("lorris_native"); }
 
     private boolean m_flash_mode;
     private int m_wait_type;

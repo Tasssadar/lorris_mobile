@@ -48,7 +48,7 @@ public class HexFile {
         return true;
     }
 
-    static { System.loadLibrary("programmer"); }
+    static { System.loadLibrary("lorris_native"); }
     private native long newNative();
     private native void deleteNative(long hex_ptr);
     private native String loadFileNative(long hex_ptr, String path);

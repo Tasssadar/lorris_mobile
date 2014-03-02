@@ -1,7 +1,11 @@
 package com.tassadar.lorrismobile;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.nio.ByteBuffer;
 import java.util.HashMap;
+import java.util.Map;
 
 public class BlobInputStream {
     public BlobInputStream(byte[] data) {
@@ -86,6 +90,50 @@ public class BlobInputStream {
 
     public boolean readBool(String key) {
         return readBool(key, false);
+    }
+
+    public Map<String, Object> readHashMap(String key) {
+        Map<String, Object> res = new HashMap<String, Object>();
+        int len = getLen(key);
+
+        if(len == -1)
+            return res;
+
+        try {
+            ByteArrayInputStream byteArrayStr = new ByteArrayInputStream(m_buff.array(),
+                    m_buff.position(), len);
+            ObjectInputStream in = new ObjectInputStream(byteArrayStr);
+
+            final int count = in.readInt();
+            for(int i = 0; i < count; ++i) {
+                String it_key = in.readUTF();
+                int type = in.readInt();
+                switch(type) {
+                    case BlobDataTypes.NULL:
+                        res.put(it_key, null);
+                        break;
+                    case BlobDataTypes.STRING:
+                        res.put(it_key, in.readUTF());
+                        break;
+                    case BlobDataTypes.INT:
+                        res.put(it_key, in.readInt());
+                        break;
+                    case BlobDataTypes.BOOLEAN:
+                        res.put(it_key, in.readBoolean());
+                        break;
+                    case BlobDataTypes.UNKNOWN:
+                    default:
+                        res.put(it_key, null);
+                        break;
+                }
+            }
+
+            in.close();
+            byteArrayStr.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return res;
     }
 
     public boolean containsKey(String key) {

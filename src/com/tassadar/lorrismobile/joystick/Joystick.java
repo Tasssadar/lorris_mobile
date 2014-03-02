@@ -1,6 +1,8 @@
 package com.tassadar.lorrismobile.joystick;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Timer;
 
 import android.app.Activity;
@@ -44,6 +46,7 @@ public class Joystick extends Tab implements JoystickListener, OnCheckedChangeLi
         m_menu.setListener(this);
 
         m_protocol = Protocol.AVAKAR;
+        Protocol.initializeProperties(m_protocolProps);
     }
 
     @Override
@@ -204,7 +207,7 @@ public class Joystick extends Tab implements JoystickListener, OnCheckedChangeLi
         if(m_sendTask != null)
             m_sendTask.cancel();
 
-        m_sendTask = Protocol.getProtocol(m_protocol, m_conn);
+        m_sendTask = Protocol.getProtocol(m_protocol, m_conn, m_protocolProps);
         m_sendTimer.scheduleAtFixedRate(m_sendTask, SEND_PERIOD, SEND_PERIOD);
         m_sendTask.setAxis3(getAxis3(null).getProgress());
         m_sendTask.setButtons(m_btnMask);
@@ -255,6 +258,20 @@ public class Joystick extends Tab implements JoystickListener, OnCheckedChangeLi
         View layout = inflater.inflate(R.layout.protocol_dialog, (ViewGroup) getView(), false);
         TextView t = (TextView)layout.findViewById(R.id.max_val);
         t.setText(String.valueOf(joy.getMaxValue()));
+        t = (TextView)layout.findViewById(R.id.device_id);
+        t.setText("0x" + Integer.toHexString((Integer)m_protocolProps.get(ProtocolChessbot.PROP_DEVICE_ID)));
+
+        RadioButton b = (RadioButton)layout.findViewById(R.id.protocol_chessbot);
+        b.setOnCheckedChangeListener(new OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton btn, boolean checked) {
+                ViewGroup layout = (ViewGroup)btn.getRootView();
+                View v = layout.findViewById(R.id.device_id_title);
+                v.setVisibility(checked ? View.VISIBLE : View.GONE);
+                v = layout.findViewById(R.id.device_id);
+                v.setVisibility(checked ? View.VISIBLE : View.GONE);
+        }
+        });
 
         switch(m_protocol)
         {
@@ -268,7 +285,7 @@ public class Joystick extends Tab implements JoystickListener, OnCheckedChangeLi
                 ((RadioButton)layout.findViewById(R.id.protocol_chessbot)).setChecked(true);
                 break;
         }
-
+        
         builder.setView(layout);
         m_maxValDialog = builder.create();
         m_maxValDialog.show();
@@ -292,18 +309,30 @@ public class Joystick extends Tab implements JoystickListener, OnCheckedChangeLi
             e.printStackTrace();
         }
 
-        int protocol = 0;
-        if(((RadioButton)m_maxValDialog.findViewById(R.id.protocol_avakar)).isChecked())
+        int protocol;
+        if(((RadioButton)m_maxValDialog.findViewById(R.id.protocol_avakar)).isChecked()) {
             protocol = Protocol.AVAKAR;
-        else if(((RadioButton)m_maxValDialog.findViewById(R.id.protocol_lego)).isChecked())
+        } else if(((RadioButton)m_maxValDialog.findViewById(R.id.protocol_lego)).isChecked()) {
             protocol = Protocol.LEGO;
-        else
+        } else {
             protocol = Protocol.CHESSBOT;
+
+            try {
+                TextView t = (TextView)m_maxValDialog.findViewById(R.id.device_id);
+                Integer val = Integer.decode(t.getText().toString());
+                m_protocolProps.put(ProtocolChessbot.PROP_DEVICE_ID, val);
+            } catch(NumberFormatException e) {
+                e.printStackTrace();
+            }
+        }
 
         if(m_protocol != protocol) {
             m_protocol = protocol;
             if(m_sendTask != null)
                 createProtocol();
+        } else {
+            if(m_sendTask != null)
+                m_sendTask.loadProperies(m_protocolProps);
         }
 
         m_maxValDialog.dismiss();
@@ -321,6 +350,7 @@ public class Joystick extends Tab implements JoystickListener, OnCheckedChangeLi
         str.writeInt("axis3Val", m_joyView.getAxis3Value());
 
         str.writeInt("protocol", m_protocol);
+        str.writeHashMap("protocolProps", m_protocolProps);
     }
 
     @Override
@@ -337,6 +367,9 @@ public class Joystick extends Tab implements JoystickListener, OnCheckedChangeLi
         getAxis3(null).setProgress(str.readInt("axis3Val", 500));
 
         m_protocol = str.readInt("protocol", Protocol.AVAKAR);
+        m_protocolProps.putAll(str.readHashMap("protocolProps"));
+        if(m_sendTask != null)
+            m_sendTask.loadProperies(m_protocolProps);
     }
     
     private SeekBar getAxis3(View v) {
@@ -355,4 +388,5 @@ public class Joystick extends Tab implements JoystickListener, OnCheckedChangeLi
     private AlertDialog m_maxValDialog;
     private JoystickView m_joyView;
     private int m_protocol;
+    private Map<String, Object> m_protocolProps = new HashMap<String, Object>();
 }

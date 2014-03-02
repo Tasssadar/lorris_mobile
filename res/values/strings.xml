@@ -144,6 +144,7 @@
     <string name="protocol_lego">Lego</string>
     <string name="protocol_chessbot">Chessbot</string>
     <string name="protocol">Protocol</string>
+    <string name="device_id">Device ID:</string>
 
     <string-array name="session_options">
         <item>Edit</item>

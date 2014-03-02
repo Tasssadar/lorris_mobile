@@ -2,6 +2,8 @@ package com.tassadar.lorrismobile;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.ObjectOutputStream;
+import java.util.Map;
 
 import android.util.Log;
 
@@ -61,6 +63,41 @@ public class BlobOutputStream {
     public void writeBool(String key, boolean val) {
         byte[] array = { (byte)(val ? 1 : 0) };
         writePackage(key, array);
+    }
+
+    public void writeHashMap(String key, Map<String, Object> map) {
+        ByteArrayOutputStream byteArrayStr = new ByteArrayOutputStream();
+        try {
+            ObjectOutputStream out = new ObjectOutputStream(byteArrayStr);
+            out.writeInt(map.size());
+
+            for (Map.Entry<String, Object> entry : map.entrySet()) {
+                out.writeUTF(entry.getKey());
+                Object val = entry.getValue();
+                if(val == null) {
+                    out.writeInt(BlobDataTypes.NULL);
+                }else if(val instanceof String) {
+                    out.writeInt(BlobDataTypes.STRING);
+                    out.writeUTF((String)val);
+                } else if(val instanceof Integer) {
+                    out.writeInt(BlobDataTypes.INT);
+                    out.writeInt((Integer)val);
+                } else if(val instanceof Boolean) {
+                    out.writeInt(BlobDataTypes.BOOLEAN);
+                    out.writeBoolean((Boolean)val);
+                } else {
+                    out.writeInt(BlobDataTypes.UNKNOWN);
+                    Log.e("Lorris", "Failed to save memeber of class " +
+                            val.getClass().getName() + " in writeHashMap!");
+                }
+            }
+            out.close();
+            byteArrayStr.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        writePackage(key, byteArrayStr.toByteArray());
     }
 
     private ByteArrayOutputStream m_str;

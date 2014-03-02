@@ -143,6 +143,17 @@ public class JoystickView extends SurfaceView implements SurfaceHolder.Callback,
         return m_axis3Value;
     }
 
+    public boolean isInvertedX() { return m_invertX; }
+    public boolean isInvertedY() { return m_invertY; }
+
+    public void setInvertX(boolean invert) {
+        m_invertX = invert;
+    }
+
+    public void setInvertY(boolean invert) {
+        m_invertY = invert;
+    }
+
     @Override
     public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
         //int val = ((progress-500)*m_maxValue)/1000;

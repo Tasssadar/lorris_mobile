@@ -145,6 +145,9 @@
     <string name="protocol_chessbot">Chessbot</string>
     <string name="protocol">Protocol</string>
     <string name="device_id">Device ID:</string>
+    <string name="invert_left_right">Invert left/right</string>
+    <string name="invert_forward_backward">Invert forward/backward</string>
+    <string name="swap_axes">Swap axes</string>
 
     <string-array name="session_options">
         <item>Edit</item>

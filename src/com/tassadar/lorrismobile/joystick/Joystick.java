@@ -17,6 +17,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.LinearLayout;
@@ -44,6 +45,8 @@ public class Joystick extends Tab implements JoystickListener, OnCheckedChangeLi
 
         m_menu = new JoystickMenu();
         m_menu.setListener(this);
+
+        m_swapAxes = false;
 
         m_protocol = Protocol.AVAKAR;
         Protocol.initializeProperties(m_protocolProps);
@@ -146,8 +149,15 @@ public class Joystick extends Tab implements JoystickListener, OnCheckedChangeLi
 
     @Override
     public void onValueChanged(int ax1, int ax2) {
-        if(m_sendTask != null)
+        if(m_sendTask != null) {
+            if(m_swapAxes) {
+                ax1 ^= ax2;
+                ax2 ^= ax1;
+                ax1 ^= ax2;
+            }
+
             m_sendTask.setAxes(ax1, ax2);
+        }
     }
 
     @Override
@@ -261,6 +271,13 @@ public class Joystick extends Tab implements JoystickListener, OnCheckedChangeLi
         t = (TextView)layout.findViewById(R.id.device_id);
         t.setText("0x" + Integer.toHexString((Integer)m_protocolProps.get(ProtocolChessbot.PROP_DEVICE_ID)));
 
+        CheckBox c = (CheckBox)layout.findViewById(R.id.swap_axes);
+        c.setChecked(m_swapAxes);
+        c = (CheckBox)layout.findViewById(R.id.invert_forward_backward);
+        c.setChecked(m_joyView.isInvertedY());
+        c = (CheckBox)layout.findViewById(R.id.invert_left_right);
+        c.setChecked(m_joyView.isInvertedX());
+
         RadioButton b = (RadioButton)layout.findViewById(R.id.protocol_chessbot);
         b.setOnCheckedChangeListener(new OnCheckedChangeListener() {
             @Override
@@ -309,6 +326,13 @@ public class Joystick extends Tab implements JoystickListener, OnCheckedChangeLi
             e.printStackTrace();
         }
 
+        CheckBox c = (CheckBox)m_maxValDialog.findViewById(R.id.swap_axes);
+        m_swapAxes = c.isChecked();
+        c = (CheckBox)m_maxValDialog.findViewById(R.id.invert_forward_backward);
+        m_joyView.setInvertY(c.isChecked());
+        c = (CheckBox)m_maxValDialog.findViewById(R.id.invert_left_right);
+        m_joyView.setInvertX(c.isChecked());
+
         int protocol;
         if(((RadioButton)m_maxValDialog.findViewById(R.id.protocol_avakar)).isChecked()) {
             protocol = Protocol.AVAKAR;
@@ -351,6 +375,10 @@ public class Joystick extends Tab implements JoystickListener, OnCheckedChangeLi
 
         str.writeInt("protocol", m_protocol);
         str.writeHashMap("protocolProps", m_protocolProps);
+
+        str.writeBool("invertX", m_joyView.isInvertedX());
+        str.writeBool("invertY", m_joyView.isInvertedY());
+        str.writeBool("swapAxes", m_swapAxes);
     }
 
     @Override
@@ -370,6 +398,10 @@ public class Joystick extends Tab implements JoystickListener, OnCheckedChangeLi
         m_protocolProps.putAll(str.readHashMap("protocolProps"));
         if(m_sendTask != null)
             m_sendTask.loadProperies(m_protocolProps);
+
+        m_joyView.setInvertX(str.readBool("invertX", false));
+        m_joyView.setInvertY(str.readBool("invertY", false));
+        m_swapAxes = str.readBool("swapAxes", m_swapAxes);
     }
     
     private SeekBar getAxis3(View v) {
@@ -389,4 +421,5 @@ public class Joystick extends Tab implements JoystickListener, OnCheckedChangeLi
     private JoystickView m_joyView;
     private int m_protocol;
     private Map<String, Object> m_protocolProps = new HashMap<String, Object>();
+    private boolean m_swapAxes;
 }

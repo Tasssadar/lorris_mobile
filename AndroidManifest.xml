@@ -1,7 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.tassadar.lorrismobile"
-    android:versionCode="70"
-    android:versionName="70" >
+    android:versionCode="71"
+    android:versionName="71" >
 
     <uses-sdk
         android:minSdkVersion="8"

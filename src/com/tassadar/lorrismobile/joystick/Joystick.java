@@ -86,6 +86,16 @@ public class Joystick extends Tab implements JoystickListener, OnCheckedChangeLi
     }
 
     @Override
+    public void onDestroy() {
+        super.onDestroy();
+
+        if(m_sendTask != null) {
+            m_sendTask.cancel();
+            m_sendTask = null;
+        }
+    }
+
+    @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
 

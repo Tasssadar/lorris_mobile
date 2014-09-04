@@ -53,6 +53,11 @@ public class YuniControl extends Tab implements YCMenuListener,ProtocolListener 
     }
 
     @Override
+    protected boolean keepScreenOn() {
+        return m_conn != null && m_conn.isOpen();
+    }
+
+    @Override
     public void onAttach(Activity act) {
         super.onAttach(act);
         SharedPreferences p = act.getPreferences(0);

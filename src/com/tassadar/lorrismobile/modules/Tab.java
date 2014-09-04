@@ -1,10 +1,13 @@
 package com.tassadar.lorrismobile.modules;
 
+import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.KeyEvent;
+import android.view.Window;
+import android.view.WindowManager;
 
 import com.tassadar.lorrismobile.BlobInputStream;
 import com.tassadar.lorrismobile.BlobOutputStream;
@@ -23,6 +26,7 @@ public class Tab extends Fragment implements TabItemClicked, ConnectionInterface
     public Tab() {
         super();
         m_lastConnId = -1;
+        m_active = false;
     }
 
     @Override
@@ -35,6 +39,14 @@ public class Tab extends Fragment implements TabItemClicked, ConnectionInterface
             str.close();
             m_loadData = null;
         }
+    }
+
+    @Override
+    public void onAttach(Activity act) {
+        super.onAttach(act);
+        Window w = act.getWindow();
+        if(w != null && keepScreenOn() && isActive())
+            w.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
     }
 
     @Override
@@ -71,6 +83,10 @@ public class Tab extends Fragment implements TabItemClicked, ConnectionInterface
         return "Tab";
     }
 
+    protected boolean keepScreenOn() {
+        return false;
+    }
+
     public String getTabDesc() {
         Context ctx = getActivity();
         if(ctx == null)
@@ -101,8 +117,22 @@ public class Tab extends Fragment implements TabItemClicked, ConnectionInterface
     }
 
     public void setActive(boolean active) {
+        m_active = active;
         if(m_tab_list_it != null)
             m_tab_list_it.setActive(active);
+
+        if (keepScreenOn() && getActivity() != null && getActivity().getWindow() != null) {
+            Window w = getActivity().getWindow();
+            if (active) {
+                w.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+            } else {
+                w.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+            }
+        }
+    }
+
+    public boolean isActive() {
+        return m_active;
     }
 
     @Override
@@ -183,6 +213,7 @@ public class Tab extends Fragment implements TabItemClicked, ConnectionInterface
     @Override
     public void dataRead(byte[] data) { }
 
+    private boolean m_active;
     private TabListItem m_tab_list_it;
     private TabSelectedListener m_listener;
     protected Connection m_conn;

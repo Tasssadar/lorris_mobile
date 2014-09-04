@@ -370,6 +370,8 @@ public class WorkspaceActivity extends FragmentActivity implements TabSelectedLi
         if(t == null)
             return;
 
+        t.setActive(false);
+
         LinearLayout l = (LinearLayout)findViewById(R.id.tab_list);
         l.removeView(t.getTabListItem().getView());
 

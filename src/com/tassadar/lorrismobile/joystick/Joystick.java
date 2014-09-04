@@ -64,6 +64,11 @@ public class Joystick extends Tab implements JoystickListener, OnCheckedChangeLi
     }
 
     @Override
+    protected boolean keepScreenOn() {
+        return m_conn != null && m_conn.isOpen();
+    }
+
+    @Override
     public Fragment getMenuFragment() {
         return m_menu;
     }

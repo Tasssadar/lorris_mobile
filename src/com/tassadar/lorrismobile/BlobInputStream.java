@@ -10,13 +10,14 @@ import java.util.Map;
 public class BlobInputStream {
     public BlobInputStream(byte[] data) {
         m_buff = ByteBuffer.wrap(data);
+        loadKeys();
     }
 
     public void close() {
         m_buff = null;
     }
 
-    public void loadKeys() {
+    private void loadKeys() {
         byte[] buff = new byte[64];
         m_buff.rewind();
         m_keys.clear();

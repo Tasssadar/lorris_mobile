@@ -89,16 +89,16 @@ public class Joystick extends Tab implements JoystickListener, OnCheckedChangeLi
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
 
+        BlobOutputStream out = new BlobOutputStream();
         JoystickView j = (JoystickView)getView().findViewById(R.id.joystick_view);
-
-        int axis3 = getAxis3(null).getProgress();
-        int maxVal = j.getMaxValue();
+        j.saveDataStream(out);
 
         fillContainer(getView());
 
+        BlobInputStream in = new BlobInputStream(out.toByteArray());
         j = (JoystickView)getView().findViewById(R.id.joystick_view);
-        j.setMaxValue(maxVal);
-        getAxis3(null).setProgress(axis3);
+        j.loadDataStream(in);
+        getAxis3(null).setProgress(in.readInt("axis3Val", 500));
 
         onLockChanged(m_menu.isLockSelected());
     }
@@ -380,15 +380,12 @@ public class Joystick extends Tab implements JoystickListener, OnCheckedChangeLi
         str.writeBool("pressBtns", m_menu.isPressSelected());
         str.writeBool("lockAxis3", m_menu.isLockSelected());
 
-        str.writeInt("maxVal", m_joyView.getMaxValue());
-        str.writeInt("axis3Val", m_joyView.getAxis3Value());
-
         str.writeInt("protocol", m_protocol);
         str.writeHashMap("protocolProps", m_protocolProps);
 
-        str.writeBool("invertX", m_joyView.isInvertedX());
-        str.writeBool("invertY", m_joyView.isInvertedY());
         str.writeBool("swapAxes", m_swapAxes);
+
+        m_joyView.saveDataStream(str);
     }
 
     @Override
@@ -400,8 +397,6 @@ public class Joystick extends Tab implements JoystickListener, OnCheckedChangeLi
         onBtnTypeClicked();
         onLockChanged(m_menu.isLockSelected());
 
-        m_joyView.setMaxValue(str.readInt("maxVal", m_joyView.getMaxValue()));
-
         getAxis3(null).setProgress(str.readInt("axis3Val", 500));
 
         m_protocol = str.readInt("protocol", Protocol.AVAKAR);
@@ -409,9 +404,9 @@ public class Joystick extends Tab implements JoystickListener, OnCheckedChangeLi
         if(m_sendTask != null)
             m_sendTask.loadProperies(m_protocolProps);
 
-        m_joyView.setInvertX(str.readBool("invertX", false));
-        m_joyView.setInvertY(str.readBool("invertY", false));
         m_swapAxes = str.readBool("swapAxes", m_swapAxes);
+
+        m_joyView.loadDataStream(str);
     }
     
     private SeekBar getAxis3(View v) {

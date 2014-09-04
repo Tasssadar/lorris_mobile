@@ -31,7 +31,6 @@ public class Tab extends Fragment implements TabItemClicked, ConnectionInterface
 
         if(m_loadData != null) {
             BlobInputStream str = new BlobInputStream(m_loadData);
-            str.loadKeys();
             loadDataStream(str);
             str.close();
             m_loadData = null;

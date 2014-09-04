@@ -12,6 +12,8 @@ import android.view.SurfaceView;
 import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
 
+import com.tassadar.lorrismobile.BlobInputStream;
+import com.tassadar.lorrismobile.BlobOutputStream;
 import com.tassadar.lorrismobile.Utils;
 
 
@@ -125,6 +127,19 @@ public class JoystickView extends SurfaceView implements SurfaceHolder.Callback,
         distY = (((distY*1000)/m_radius)*m_maxValue)/1000;
 
         m_listener.onValueChanged(distY, distX);
+    }
+
+    public void saveDataStream(BlobOutputStream str) {
+        str.writeInt("maxVal", m_maxValue);
+        str.writeInt("axis3Val", m_axis3Value);
+        str.writeBool("invertX", m_invertX);
+        str.writeBool("invertY", m_invertY);
+    }
+
+    public void loadDataStream(BlobInputStream str) {
+        m_maxValue = str.readInt("maxVal", m_maxValue);
+        m_invertX = str.readBool("invertX", false);
+        m_invertY = str.readBool("invertY", false);
     }
 
     public void setListener(JoystickListener l) {

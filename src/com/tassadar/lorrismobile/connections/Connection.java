@@ -196,7 +196,6 @@ public class Connection {
 
     public void loadData(byte[] data) {
         BlobInputStream str = new BlobInputStream(data);
-        str.loadKeys();
         loadDataStream(str);
         str.close();
     }

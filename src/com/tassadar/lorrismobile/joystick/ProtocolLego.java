@@ -30,13 +30,13 @@ import com.tassadar.lorrismobile.connections.Connection;
 //  15  0x65                The value field can contain:
 //  16  0x6C                - Text (length: variable, ends with 0x00) ---> string
 //  17  0x6C                - Number (length: 4 bytes)                ---> float (Single)
-//  18  0x6F                - Logic (lengt01h: 1 byte)                ---> bool
+//  18  0x6F                - Logic (length: 1 byte)                  ---> bool
 //  19  0x00
 
 public class ProtocolLego extends Protocol {
 
-    private Object m_lock = new Object();
-    private Integer[] m_axes = { 0, 0, 0 };
+    private final Object m_lock = new Object();
+    private Integer[] m_axes = new Integer[10];
     private Integer m_buttons = 0;
 
     protected ProtocolLego(Connection conn) {
@@ -44,7 +44,12 @@ public class ProtocolLego extends Protocol {
     }
 
     @Override
-    public void setAxes(int ax1, int ax2) {
+    public int getType() {
+        return Protocol.LEGO;
+    }
+
+    @Override
+    public void setMainAxes(int ax1, int ax2) {
         synchronized(m_lock) {
             m_axes[0] = -ax2;
             m_axes[1] = ax1;
@@ -52,9 +57,9 @@ public class ProtocolLego extends Protocol {
     }
 
     @Override
-    public void setAxis3(int ax3) {
+    public void setExtraAxis(int id, int value) {
         synchronized(m_lock) {
-            m_axes[2] = ax3;
+            m_axes[id + 2] = value;
         }
     }
 
@@ -71,9 +76,9 @@ public class ProtocolLego extends Protocol {
             return;
 
         synchronized(m_lock) {
-            sendLegoMsg("a0", m_axes[0]);
-            sendLegoMsg("a1", m_axes[1]);
-            sendLegoMsg("a2", m_axes[2]);
+            for(int i = 0; i < m_extraAxesCount + 2; ++i) {
+                sendLegoMsg("a" + String.valueOf(i), m_axes[i]);
+            }
 
             for(int i = 0; i < Joystick.BUTTON_COUNT; ++i) {
                 sendLegoMsg("b" + String.valueOf(i), ((m_buttons & (1 << i)) != 0));

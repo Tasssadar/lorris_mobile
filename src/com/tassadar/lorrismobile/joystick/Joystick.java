@@ -13,6 +13,7 @@ import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,6 +22,7 @@ import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.SeekBar;
@@ -36,7 +38,7 @@ import com.tassadar.lorrismobile.modules.Tab;
 import com.tassadar.lorrismobile.modules.TabManager;
 
 public class Joystick extends Tab implements JoystickListener, OnCheckedChangeListener,
-    OnClickListener, JoystickMenuListener, android.content.DialogInterface.OnClickListener {
+    OnClickListener, JoystickMenuListener, DialogInterface.OnClickListener, JoystickExtraAxis.OnExtraAxisChangedListener {
 
     public static final int BUTTON_COUNT = 8;
     private static final int SEND_PERIOD = 50;
@@ -51,6 +53,7 @@ public class Joystick extends Tab implements JoystickListener, OnCheckedChangeLi
 
         m_protocol = Protocol.AVAKAR;
         Protocol.initializeProperties(m_protocolProps);
+        m_protocolProps.put(Protocol.PROP_MAX_AXIS_VAL, 32767);
     }
 
     @Override
@@ -87,6 +90,7 @@ public class Joystick extends Tab implements JoystickListener, OnCheckedChangeLi
     public View onCreateView (LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.joystick_container, container, false);
         fillContainer(v);
+        setExtraAxesCount(Protocol.getDefaultExtraAxes(m_protocol));
         return v;
     }
 
@@ -113,7 +117,6 @@ public class Joystick extends Tab implements JoystickListener, OnCheckedChangeLi
         BlobInputStream in = new BlobInputStream(out.toByteArray());
         j = (JoystickView)getView().findViewById(R.id.joystick_view);
         j.loadDataStream(in);
-        getAxis3(null).setProgress(in.readInt("axis3Val", 500));
 
         onLockChanged(m_menu.isLockSelected());
     }
@@ -141,8 +144,9 @@ public class Joystick extends Tab implements JoystickListener, OnCheckedChangeLi
         j.setListener(this);
         m_joyView = j;
 
-        SeekBar axis3 = (SeekBar)joyLayout.findViewById(R.id.axis3);
-        axis3.setOnSeekBarChangeListener(j);
+        for(JoystickExtraAxis a : m_extraAxes) {
+            a.setBar(addExtraAxisWidget(joyLayout));
+        }
 
         addButtons(joyLayout);
     }
@@ -181,14 +185,15 @@ public class Joystick extends Tab implements JoystickListener, OnCheckedChangeLi
                 ax1 ^= ax2;
             }
 
-            m_sendTask.setAxes(ax1, ax2);
+            m_sendTask.setMainAxes(ax1, ax2);
         }
     }
 
     @Override
-    public void onAxis3Changed(int ax3) {
-        if(m_sendTask != null)
-            m_sendTask.setAxis3(ax3);
+    public void onExtraAxisChanged(int id, int value) {
+        if(m_sendTask != null) {
+            m_sendTask.setExtraAxis(id, ((value-500)*m_joyView.getMaxValue()*2)/1000);
+        }
     }
 
     @Override
@@ -244,15 +249,17 @@ public class Joystick extends Tab implements JoystickListener, OnCheckedChangeLi
 
         m_sendTask = Protocol.getProtocol(m_protocol, m_conn, m_protocolProps);
         m_sendTimer.scheduleAtFixedRate(m_sendTask, SEND_PERIOD, SEND_PERIOD);
-        m_sendTask.setAxis3(getAxis3(null).getProgress());
+        for(int i = 0; i < m_extraAxes.size(); ++i)
+            onExtraAxisChanged(i, m_extraAxes.get(i).getValue());
         m_sendTask.setButtons(m_btnMask);
     }
 
     @Override
     public void onLockChanged(boolean locked) {
-        SeekBar b = getAxis3(null);
-        b.setEnabled(!locked);
-        b.setClickable(!locked);
+        for(JoystickExtraAxis a : m_extraAxes) {
+            a.getBar().setEnabled(!locked);
+            a.getBar().setClickable(!locked);
+        }
 
         Utils.lockScreenOrientation(getActivity(), locked);
     }
@@ -270,6 +277,21 @@ public class Joystick extends Tab implements JoystickListener, OnCheckedChangeLi
         m_btnMask = 0;
         if(m_sendTask != null)
             m_sendTask.setButtons(0);
+    }
+
+    private static void updateDialogExtraAxesCnt(int protocol, EditText extraAxesEdit) {
+        int val = Protocol.getDefaultExtraAxes(protocol);
+        try {
+            val = Integer.valueOf(extraAxesEdit.getText().toString());
+        } catch(NumberFormatException e) {
+            // Ignore
+        }
+
+        if(val < 0)
+            val = 0;
+        else if(val > Protocol.getMaxExtraAxes(protocol))
+            val = Protocol.getMaxExtraAxes(protocol);
+        extraAxesEdit.setText(String.valueOf(val));
     }
 
     @Override
@@ -295,6 +317,8 @@ public class Joystick extends Tab implements JoystickListener, OnCheckedChangeLi
         t.setText(String.valueOf(joy.getMaxValue()));
         t = (TextView)layout.findViewById(R.id.device_id);
         t.setText("0x" + Integer.toHexString((Integer)m_protocolProps.get(ProtocolChessbot.PROP_DEVICE_ID)));
+        t = (TextView)layout.findViewById(R.id.extra_axes);
+        t.setText(String.valueOf(m_extraAxes.size()));
 
         CheckBox c = (CheckBox)layout.findViewById(R.id.swap_axes);
         c.setChecked(m_swapAxes);
@@ -303,7 +327,18 @@ public class Joystick extends Tab implements JoystickListener, OnCheckedChangeLi
         c = (CheckBox)layout.findViewById(R.id.invert_left_right);
         c.setChecked(m_joyView.isInvertedX());
 
-        RadioButton b = (RadioButton)layout.findViewById(R.id.protocol_chessbot);
+        RadioButton b = (RadioButton)layout.findViewById(R.id.protocol_avakar);
+        b.setOnCheckedChangeListener(new OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton btn, boolean checked) {
+                if (checked) {
+                    ViewGroup layout = (ViewGroup) btn.getRootView();
+                    updateDialogExtraAxesCnt(Protocol.AVAKAR, (EditText) layout.findViewById(R.id.extra_axes));
+                }
+            }
+        });
+
+        b = (RadioButton)layout.findViewById(R.id.protocol_chessbot);
         b.setOnCheckedChangeListener(new OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton btn, boolean checked) {
@@ -312,7 +347,21 @@ public class Joystick extends Tab implements JoystickListener, OnCheckedChangeLi
                 v.setVisibility(checked ? View.VISIBLE : View.GONE);
                 v = layout.findViewById(R.id.device_id);
                 v.setVisibility(checked ? View.VISIBLE : View.GONE);
+
+                if(checked)
+                    updateDialogExtraAxesCnt(Protocol.CHESSBOT, (EditText)layout.findViewById(R.id.extra_axes));
         }
+        });
+
+        b = (RadioButton)layout.findViewById(R.id.protocol_lego);
+        b.setOnCheckedChangeListener(new OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton btn, boolean checked) {
+                if (checked) {
+                    ViewGroup layout = (ViewGroup) btn.getRootView();
+                    updateDialogExtraAxesCnt(Protocol.LEGO, (EditText) layout.findViewById(R.id.extra_axes));
+                }
+            }
         });
 
         switch(m_protocol)
@@ -347,6 +396,7 @@ public class Joystick extends Tab implements JoystickListener, OnCheckedChangeLi
             if(val <= 0)
                 throw new NumberFormatException("max val is negative");
             joy.setMaxValue(val);
+            m_protocolProps.put(Protocol.PROP_MAX_AXIS_VAL, val);
         } catch(NumberFormatException e) {
             e.printStackTrace();
         }
@@ -375,6 +425,20 @@ public class Joystick extends Tab implements JoystickListener, OnCheckedChangeLi
             }
         }
 
+        EditText t = (EditText)m_maxValDialog.findViewById(R.id.extra_axes);
+        int extra_axes = Protocol.getDefaultExtraAxes(protocol);
+        try {
+            extra_axes = Integer.valueOf(t.getText().toString());
+            if(extra_axes < 0)
+                extra_axes = 0;
+            else if(extra_axes > Protocol.getMaxExtraAxes(protocol))
+                extra_axes = Protocol.getMaxExtraAxes(protocol);
+        } catch(NumberFormatException e) {
+            // Ignore
+        }
+
+        m_protocolProps.put(Protocol.PROP_EXTRA_AXES, extra_axes);
+
         if(m_protocol != protocol) {
             m_protocol = protocol;
             if(m_sendTask != null)
@@ -383,6 +447,8 @@ public class Joystick extends Tab implements JoystickListener, OnCheckedChangeLi
             if(m_sendTask != null)
                 m_sendTask.loadProperies(m_protocolProps);
         }
+
+        setExtraAxesCount(extra_axes);
 
         m_maxValDialog.dismiss();
         m_maxValDialog = null;
@@ -401,6 +467,10 @@ public class Joystick extends Tab implements JoystickListener, OnCheckedChangeLi
         str.writeBool("swapAxes", m_swapAxes);
 
         m_joyView.saveDataStream(str);
+
+        str.writeInt("extraAxesCnt", m_extraAxes.size());
+        for(JoystickExtraAxis a : m_extraAxes)
+            a.saveDataStream(str);
     }
 
     @Override
@@ -412,8 +482,6 @@ public class Joystick extends Tab implements JoystickListener, OnCheckedChangeLi
         onBtnTypeClicked();
         onLockChanged(m_menu.isLockSelected());
 
-        getAxis3(null).setProgress(str.readInt("axis3Val", 500));
-
         m_protocol = str.readInt("protocol", Protocol.AVAKAR);
         m_protocolProps.putAll(str.readHashMap("protocolProps"));
         if(m_sendTask != null)
@@ -422,14 +490,67 @@ public class Joystick extends Tab implements JoystickListener, OnCheckedChangeLi
         m_swapAxes = str.readBool("swapAxes", m_swapAxes);
 
         m_joyView.loadDataStream(str);
+
+        int extraAxesCnt = str.readInt("extraAxesCnt", -1);
+        if(extraAxesCnt != -1) {
+            setExtraAxesCount(extraAxesCnt);
+            for(JoystickExtraAxis a : m_extraAxes)
+                a.loadDataStream(str);
+        }
     }
-    
-    private SeekBar getAxis3(View v) {
+
+    private SeekBar addExtraAxisWidget(View v) {
+        SeekBar bar = new SeekBar(v.getContext());
+        bar.setEnabled(!m_menu.isLockSelected());
+        bar.setClickable(!m_menu.isLockSelected());
+
+        LinearLayout l = (LinearLayout)v.findViewById(R.id.extra_axes_layout);
+        LinearLayout.LayoutParams p = new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        l.addView(bar, p);
+
+        return bar;
+    }
+
+    private void addExtraAxis(View v) {
         if(v == null)
             v = getView();
         if(v == null)
-            return null;
-        return (SeekBar)v.findViewById(R.id.axis3);
+            return;
+
+        SeekBar bar = addExtraAxisWidget(v);
+        m_extraAxes.add(new JoystickExtraAxis(m_extraAxes.size(), bar, this));
+    }
+
+    private void rmExtraAxis(View v) {
+        if(v == null)
+            v = getView();
+        if(v == null)
+            return;
+
+        int idx = m_extraAxes.size()-1;
+        JoystickExtraAxis ax = m_extraAxes.get(idx);
+        m_extraAxes.remove(idx);
+
+        LinearLayout l = (LinearLayout)v.findViewById(R.id.extra_axes_layout);
+        l.removeView(ax.getBar());
+    }
+
+    private void setExtraAxesCount(int count) {
+        int current = m_extraAxes.size();
+        View v = getView();
+        if(v == null)
+            return;
+
+        while(current != count) {
+            if(current > count) {
+                rmExtraAxis(v);
+                --current;
+            } else {
+                addExtraAxis(v);
+                ++current;
+            }
+        }
     }
 
     private ArrayList<ToggleButton> m_buttons = new ArrayList<ToggleButton>();
@@ -442,4 +563,5 @@ public class Joystick extends Tab implements JoystickListener, OnCheckedChangeLi
     private int m_protocol;
     private Map<String, Object> m_protocolProps = new HashMap<String, Object>();
     private boolean m_swapAxes;
+    private ArrayList<JoystickExtraAxis> m_extraAxes = new ArrayList<JoystickExtraAxis>();
 }

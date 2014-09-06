@@ -148,6 +148,7 @@
     <string name="invert_left_right">Invert left/right</string>
     <string name="invert_forward_backward">Invert forward/backward</string>
     <string name="swap_axes">Swap axes</string>
+    <string name="extra_axes">Extra axes:</string>
 
     <string-array name="session_options">
         <item>Edit</item>

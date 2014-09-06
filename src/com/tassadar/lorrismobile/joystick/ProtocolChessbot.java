@@ -8,10 +8,11 @@ public class ProtocolChessbot extends Protocol {
 
     public static String PROP_DEVICE_ID = "chessbot_deviceId";
 
-    private static final byte SMSG_SET_MOTOR_POWER_16 = 4;
+    private static final byte SMSG_SET_MOTOR_POWER_16 = 0x04;
+    private static final byte SMSG_SET_SERVOS_16 = 0x06;
     private static final byte DEFAULT_DEVICE_ID = 0x01;
 
-    private Object m_lock = new Object();
+    private final Object m_lock = new Object();
     private byte[] m_data = new byte[8];
 
     static public void initializeProperties(Map<String, Object> props) {
@@ -27,7 +28,14 @@ public class ProtocolChessbot extends Protocol {
     }
 
     @Override
+    public int getType() {
+        return Protocol.CHESSBOT;
+    }
+
+    @Override
     public void loadProperies(Map<String,Object> props) {
+        super.loadProperies(props);
+
         if(props.containsKey(PROP_DEVICE_ID)) {
             synchronized(m_lock) {
                 m_data[1] = ((Integer)props.get(PROP_DEVICE_ID)).byteValue();
@@ -36,7 +44,7 @@ public class ProtocolChessbot extends Protocol {
     }
 
     @Override
-    public void setAxes(int ax1, int ax2) {
+    public void setMainAxes(int ax1, int ax2) {
         final int r = ((ax1 - (ax2/3)));
         final int l = ((ax1 + (ax2/3))); 
 
@@ -49,8 +57,23 @@ public class ProtocolChessbot extends Protocol {
     }
 
     @Override
-    public void setAxis3(int ax3) {
-        
+    public void setExtraAxis(int id, int value) {
+        if(m_conn == null)
+            return;
+
+        byte[] data = new byte[7];
+        data[0] = (byte)0xFF;
+        synchronized(m_lock) {
+            data[1] = m_data[1]; // device id
+        }
+        data[2] = 4; // len
+        data[3] = SMSG_SET_SERVOS_16;
+
+        data[4] = (byte) id;
+        data[5] = (byte)(value >> 8);
+        data[6] = (byte)(value);
+
+        m_conn.write(data);
     }
 
     @Override

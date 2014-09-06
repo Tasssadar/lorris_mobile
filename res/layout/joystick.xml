@@ -9,12 +9,11 @@
         android:layout_height="wrap_content"
         android:gravity="center"
         android:orientation="horizontal" />
-    <SeekBar
-        android:id="@+id/axis3"
+    <LinearLayout android:id="@+id/extra_axes_layout"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:progress="500"
-        android:max="1000"/>
+        android:orientation="vertical">
+    </LinearLayout>
     <View android:layout_width="match_parent"
         android:layout_height="1dp"
         android:background="#1B1B1B" />

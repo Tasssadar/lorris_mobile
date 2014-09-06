@@ -17,7 +17,7 @@ import com.tassadar.lorrismobile.BlobOutputStream;
 import com.tassadar.lorrismobile.Utils;
 
 
-public class JoystickView extends SurfaceView implements SurfaceHolder.Callback, OnSeekBarChangeListener {
+public class JoystickView extends SurfaceView implements SurfaceHolder.Callback {
 
     public JoystickView(Context context) {
         super(context);
@@ -52,7 +52,6 @@ public class JoystickView extends SurfaceView implements SurfaceHolder.Callback,
 
         m_invertX = m_invertY = false;
         m_maxValue = 32767;
-        m_axis3Value = 500;
     }
 
     @Override
@@ -131,7 +130,6 @@ public class JoystickView extends SurfaceView implements SurfaceHolder.Callback,
 
     public void saveDataStream(BlobOutputStream str) {
         str.writeInt("maxVal", m_maxValue);
-        str.writeInt("axis3Val", m_axis3Value);
         str.writeBool("invertX", m_invertX);
         str.writeBool("invertY", m_invertY);
     }
@@ -154,10 +152,6 @@ public class JoystickView extends SurfaceView implements SurfaceHolder.Callback,
         m_maxValue = val;
     }
 
-    public int getAxis3Value() {
-        return m_axis3Value;
-    }
-
     public boolean isInvertedX() { return m_invertX; }
     public boolean isInvertedY() { return m_invertY; }
 
@@ -169,20 +163,6 @@ public class JoystickView extends SurfaceView implements SurfaceHolder.Callback,
         m_invertY = invert;
     }
 
-    @Override
-    public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-        //int val = ((progress-500)*m_maxValue)/1000;
-
-        m_axis3Value = progress;
-        int val = ((progress-500)*1000)/1000;
-        m_listener.onAxis3Changed(val);
-    }
-
-    @Override
-    public void onStartTrackingTouch(SeekBar seekBar) { }
-
-    @Override
-    public void onStopTrackingTouch(SeekBar seekBar) { }
 
     private Paint m_linePaint;
     private Paint m_circlePaint;
@@ -193,5 +173,4 @@ public class JoystickView extends SurfaceView implements SurfaceHolder.Callback,
     private boolean m_invertX;
     private boolean m_invertY;
     private int m_maxValue;
-    private int m_axis3Value;
 }

@@ -40,6 +40,17 @@
             android:background="@android:drawable/editbox_background"
             android:inputType="number"
             android:singleLine="true" />
+        <TextView android:id="@+id/extra_axes_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/extra_axes" />
+        <EditText android:id="@+id/extra_axes"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:minEms="6"
+            android:background="@android:drawable/editbox_background"
+            android:inputType="number"
+            android:singleLine="true" />
         <TextView android:id="@+id/device_id_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

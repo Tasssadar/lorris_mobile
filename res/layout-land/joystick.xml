@@ -12,14 +12,13 @@
         android:gravity="center"
         android:layout_height="match_parent"
         android:orientation="vertical" />
-    <SeekBar
-        android:id="@+id/axis3"
+    <LinearLayout android:id="@+id/extra_axes_layout"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
         android:layout_weight="1"
-        android:progress="500"
-        android:max="1000" />
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_gravity="center_vertical">
+    </LinearLayout>
     <com.tassadar.lorrismobile.joystick.JoystickView
         android:id="@+id/joystick_view"
         android:layout_width="0dp"

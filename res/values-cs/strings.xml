@@ -159,5 +159,14 @@
         <item>Poslat \\r</item>
         <item>Poslat \\n\\r</item>
     </string-array>
+    <string name="button_type">Typ tlačítek</string>
+    <string name="device_id">ID zařízení:</string>
+    <string name="extra_axes">Extra osy:</string>
+    <string name="invert_forward_backward">Prohodit dopředu/dozadu</string>
+    <string name="invert_left_right">Prohodit levá/pravá</string>
+    <string name="lock_axis3">Uzamknout</string>
+    <string name="max_val">Maximální hodnota os:</string>
+    <string name="protocol">Protokol</string>
+    <string name="swap_axes">Prohodit osy</string>
 
 </resources>

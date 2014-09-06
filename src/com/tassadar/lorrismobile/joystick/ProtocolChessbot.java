@@ -8,8 +8,10 @@ public class ProtocolChessbot extends Protocol {
 
     public static String PROP_DEVICE_ID = "chessbot_deviceId";
 
+    private static final byte SMSG_BINARY_VALUES = 0x02;
     private static final byte SMSG_SET_MOTOR_POWER_16 = 0x04;
     private static final byte SMSG_SET_SERVOS_16 = 0x06;
+
     private static final byte DEFAULT_DEVICE_ID = 0x01;
 
     private final Object m_lock = new Object();
@@ -78,6 +80,28 @@ public class ProtocolChessbot extends Protocol {
 
     @Override
     public void setButtons(int buttons) {
+        if(m_conn == null)
+            return;
+
+        byte[] data = new byte[5 + (int)Math.ceil(((double)Joystick.BUTTON_COUNT)/8)];
+        data[0] = (byte)0xFF;
+        synchronized(m_lock) {
+            data[1] = m_data[1]; // device id
+        }
+        data[2] = (byte)(data.length - 3); // len
+        data[3] = SMSG_BINARY_VALUES;
+
+        data[4] = (byte) Joystick.BUTTON_COUNT;
+        int data_idx = 4;
+        for(int i = 0; i < Joystick.BUTTON_COUNT; ++i) {
+            final int byte_idx = i % 8;
+            if(byte_idx == 0)
+                ++data_idx;
+            if((buttons & (1 << i)) != 0)
+                data[data_idx] |= (1 << byte_idx);
+        }
+
+        m_conn.write(data);
     }
 
     @Override

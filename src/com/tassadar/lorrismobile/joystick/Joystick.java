@@ -87,10 +87,21 @@ public class Joystick extends Tab implements JoystickListener, OnCheckedChangeLi
     }
 
     @Override
+    public void setActive(boolean active) {
+        super.setActive(active);
+
+        // SurfaceView doesn't work properly in Fragment, .hide won't really hide it
+        // because it is a separate "window". TextureView fixes this, but is API >= 14.
+        // This isn't optimal, but actually works.
+        if(m_joyView != null)
+            m_joyView.setVisibility(active ? View.VISIBLE : View.INVISIBLE);
+    }
+
+    @Override
     public View onCreateView (LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.joystick_container, container, false);
         fillContainer(v);
-        setExtraAxesCount(Protocol.getDefaultExtraAxes(m_protocol));
+        setExtraAxesCount(v, Protocol.getDefaultExtraAxes(m_protocol));
         return v;
     }
 
@@ -137,7 +148,8 @@ public class Joystick extends Tab implements JoystickListener, OnCheckedChangeLi
         LinearLayout l = (LinearLayout)v.findViewById(R.id.joystick_container);
         l.removeAllViews();
 
-        LayoutInflater inflater = LayoutInflater.from(getActivity());
+        LayoutInflater inflater = (LayoutInflater)getActivity().getSystemService
+                (Context.LAYOUT_INFLATER_SERVICE);
         View joyLayout = inflater.inflate(R.layout.joystick, l, true);
 
         JoystickView j = (JoystickView)joyLayout.findViewById(R.id.joystick_view);
@@ -448,7 +460,7 @@ public class Joystick extends Tab implements JoystickListener, OnCheckedChangeLi
                 m_sendTask.loadProperies(m_protocolProps);
         }
 
-        setExtraAxesCount(extra_axes);
+        setExtraAxesCount(null, extra_axes);
 
         m_maxValDialog.dismiss();
         m_maxValDialog = null;
@@ -493,7 +505,7 @@ public class Joystick extends Tab implements JoystickListener, OnCheckedChangeLi
 
         int extraAxesCnt = str.readInt("extraAxesCnt", -1);
         if(extraAxesCnt != -1) {
-            setExtraAxesCount(extraAxesCnt);
+            setExtraAxesCount(null, extraAxesCnt);
             for(JoystickExtraAxis a : m_extraAxes)
                 a.loadDataStream(str);
         }
@@ -501,13 +513,14 @@ public class Joystick extends Tab implements JoystickListener, OnCheckedChangeLi
 
     private SeekBar addExtraAxisWidget(View v) {
         SeekBar bar = new SeekBar(v.getContext());
-        bar.setEnabled(!m_menu.isLockSelected());
-        bar.setClickable(!m_menu.isLockSelected());
 
         LinearLayout l = (LinearLayout)v.findViewById(R.id.extra_axes_layout);
         LinearLayout.LayoutParams p = new LinearLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         l.addView(bar, p);
+
+        bar.setEnabled(!m_menu.isLockSelected());
+        bar.setClickable(!m_menu.isLockSelected());
 
         return bar;
     }
@@ -536,9 +549,10 @@ public class Joystick extends Tab implements JoystickListener, OnCheckedChangeLi
         l.removeView(ax.getBar());
     }
 
-    private void setExtraAxesCount(int count) {
+    private void setExtraAxesCount(View v, int count) {
         int current = m_extraAxes.size();
-        View v = getView();
+        if(v == null)
+            v = getView();
         if(v == null)
             return;
 

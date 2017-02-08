@@ -46,7 +46,9 @@ public class ProtocolChessbot extends Protocol {
     }
 
     @Override
-    public void setMainAxes(int ax1, int ax2) {
+    public void setMainAxes(double ax1d, double ax2d) {
+        final int ax1 = (int)ax1d;
+        final int ax2 = (int)ax2d;
         final int r = ((ax1 - (ax2/3)));
         final int l = ((ax1 + (ax2/3))); 
 
@@ -59,9 +61,11 @@ public class ProtocolChessbot extends Protocol {
     }
 
     @Override
-    public void setExtraAxis(int id, int value) {
+    public void setExtraAxis(int id, double valueDouble) {
         if(m_conn == null)
             return;
+
+        final int value = (int)valueDouble;
 
         byte[] data = new byte[7];
         data[0] = (byte)0xFF;

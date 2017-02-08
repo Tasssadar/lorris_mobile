@@ -7,4 +7,5 @@ public class BlobDataTypes {
     public static final int INT        = 3;
     public static final int BYTEARRAY  = 4;
     public static final int BOOLEAN    = 5;
+    public static final int DOUBLE     = 6;
 }

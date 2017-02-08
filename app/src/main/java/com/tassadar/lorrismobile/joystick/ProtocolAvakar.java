@@ -19,7 +19,9 @@ public class ProtocolAvakar extends Protocol {
     }
 
     @Override
-    public void setMainAxes(int ax1, int ax2) {
+    public void setMainAxes(double ax1d, double ax2d) {
+        final int ax1 = (int)ax1d;
+        final int ax2 = (int)ax2d;
         synchronized(m_lock) {
             m_data[4] = (byte)ax1;
             m_data[5] = (byte)(ax1 >> 8);
@@ -29,9 +31,9 @@ public class ProtocolAvakar extends Protocol {
     }
 
     @Override
-    public void setExtraAxis(int id, int value) {
+    public void setExtraAxis(int id, double valueDouble) {
         // Convert to 0-1000 range
-        value = (value+m_maxAxisVal)*500/m_maxAxisVal;
+        final int value = (int)((valueDouble+m_maxAxisVal)*500/m_maxAxisVal);
 
         synchronized(m_lock) {
             int idx = id == 0 ? 8 : 6;

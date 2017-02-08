@@ -1,9 +1,0 @@
-<component name="libraryTable">
-  <library name="emulatorview">
-    <CLASSES>
-      <root url="jar://$PROJECT_DIR$/libs/emulatorview.jar!/" />
-    </CLASSES>
-    <JAVADOC />
-    <SOURCES />
-  </library>
-</component>

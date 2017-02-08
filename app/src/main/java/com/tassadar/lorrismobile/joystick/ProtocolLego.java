@@ -36,7 +36,7 @@ import com.tassadar.lorrismobile.connections.Connection;
 public class ProtocolLego extends Protocol {
 
     private final Object m_lock = new Object();
-    private Integer[] m_axes = new Integer[10];
+    private Float[] m_axes = new Float[10];
     private Integer m_buttons = 0;
 
     protected ProtocolLego(Connection conn) {
@@ -49,17 +49,17 @@ public class ProtocolLego extends Protocol {
     }
 
     @Override
-    public void setMainAxes(int ax1, int ax2) {
+    public void setMainAxes(double ax1, double ax2) {
         synchronized(m_lock) {
-            m_axes[0] = -ax2;
-            m_axes[1] = ax1;
+            m_axes[0] = (float)-ax2;
+            m_axes[1] = (float)ax1;
         }
     }
 
     @Override
-    public void setExtraAxis(int id, int value) {
+    public void setExtraAxis(int id, double value) {
         synchronized(m_lock) {
-            m_axes[id + 2] = value;
+            m_axes[id + 2] = (float)value;
         }
     }
 
@@ -81,7 +81,7 @@ public class ProtocolLego extends Protocol {
             }
 
             for(int i = 0; i < Joystick.BUTTON_COUNT; ++i) {
-                sendLegoMsg("b" + String.valueOf(i), ((m_buttons & (1 << i)) != 0));
+                sendLegoMsg("b" + String.valueOf(i), Boolean.valueOf((m_buttons & (1 << i)) != 0));
             }
         }
     }

@@ -5,6 +5,9 @@
 **    See README and COPYING
 ***********************************************/
 
+#include <stdlib.h>
+#include <algorithm>
+
 #include "hexfile.h"
 #include "chipdefs.h"
 
@@ -211,7 +214,7 @@ uint32_t HexFile::getProgSize() const
 {   
     uint32_t res = 0;
     for(regionMap::const_iterator itr = m_data.begin(); itr != m_data.end(); ++itr)
-        res = std::max(res, itr->first + itr->second.size());
+        res = std::max(res, uint32_t(itr->first + itr->second.size()));
     return res;
 }
 

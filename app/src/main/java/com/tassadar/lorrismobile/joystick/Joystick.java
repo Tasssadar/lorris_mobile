@@ -53,7 +53,7 @@ public class Joystick extends Tab implements JoystickListener, OnCheckedChangeLi
 
         m_protocol = Protocol.AVAKAR;
         Protocol.initializeProperties(m_protocolProps);
-        m_protocolProps.put(Protocol.PROP_MAX_AXIS_VAL, 32767);
+        m_protocolProps.put(Protocol.PROP_MAX_AXIS_VAL_DOUBLE, 32767.0);
     }
 
     @Override
@@ -189,12 +189,12 @@ public class Joystick extends Tab implements JoystickListener, OnCheckedChangeLi
     }
 
     @Override
-    public void onValueChanged(int ax1, int ax2) {
+    public void onValueChanged(double ax1, double ax2) {
         if(m_sendTask != null) {
             if(m_swapAxes) {
-                ax1 ^= ax2;
-                ax2 ^= ax1;
-                ax1 ^= ax2;
+                double tmp = ax1;
+                ax1 = ax2;
+                ax2 = tmp;
             }
 
             m_sendTask.setMainAxes(ax1, ax2);
@@ -404,11 +404,11 @@ public class Joystick extends Tab implements JoystickListener, OnCheckedChangeLi
 
         try {
             TextView t = (TextView)m_maxValDialog.findViewById(R.id.max_val);
-            int val = Integer.parseInt(t.getText().toString());
+            double val = Double.parseDouble(t.getText().toString());
             if(val <= 0)
                 throw new NumberFormatException("max val is negative");
             joy.setMaxValue(val);
-            m_protocolProps.put(Protocol.PROP_MAX_AXIS_VAL, val);
+            m_protocolProps.put(Protocol.PROP_MAX_AXIS_VAL_DOUBLE, val);
         } catch(NumberFormatException e) {
             e.printStackTrace();
         }

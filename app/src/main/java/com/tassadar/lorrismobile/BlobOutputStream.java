@@ -3,6 +3,7 @@ package com.tassadar.lorrismobile;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
+import java.nio.ByteBuffer;
 import java.util.Map;
 
 import android.util.Log;
@@ -65,6 +66,12 @@ public class BlobOutputStream {
         writePackage(key, array);
     }
 
+    public void writeDouble(String key, double val) {
+        ByteBuffer buf = ByteBuffer.allocate(8);
+        buf.putDouble(val);
+        writePackage(key, buf.array());
+    }
+
     public void writeHashMap(String key, Map<String, Object> map) {
         ByteArrayOutputStream byteArrayStr = new ByteArrayOutputStream();
         try {
@@ -84,7 +91,10 @@ public class BlobOutputStream {
                     out.writeInt((Integer)val);
                 } else if(val instanceof Boolean) {
                     out.writeInt(BlobDataTypes.BOOLEAN);
-                    out.writeBoolean((Boolean)val);
+                    out.writeBoolean((Boolean) val);
+                } else if(val instanceof Double) {
+                    out.writeInt(BlobDataTypes.DOUBLE);
+                    out.writeDouble((Double) val);
                 } else {
                     out.writeInt(BlobDataTypes.UNKNOWN);
                     Log.e("Lorris", "Failed to save memeber of class " +

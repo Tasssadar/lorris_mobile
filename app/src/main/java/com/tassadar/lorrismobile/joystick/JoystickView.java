@@ -6,6 +6,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Paint.Style;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -120,20 +121,25 @@ public class JoystickView extends SurfaceView implements SurfaceHolder.Callback 
         distX = Utils.clamp(distX, m_radius);
         distY = Utils.clamp(distY, m_radius);
 
-        distX = (((distX*1000)/m_radius)*m_maxValue)/1000;
-        distY = (((distY*1000)/m_radius)*m_maxValue)/1000;
+        double ax1 = (((distX*1000)/m_radius)*m_maxValue)/1000;
+        double ax2 = (((distY*1000)/m_radius)*m_maxValue)/1000;
 
-        m_listener.onValueChanged(distY, distX);
+        Log.i("Lorris", String.format("axes %f %f", ax1, ax2));
+        m_listener.onValueChanged(ax1, ax2);
     }
 
     public void saveDataStream(BlobOutputStream str) {
-        str.writeInt("maxVal", m_maxValue);
+        str.writeDouble("maxValDouble", m_maxValue);
         str.writeBool("invertX", m_invertX);
         str.writeBool("invertY", m_invertY);
     }
 
     public void loadDataStream(BlobInputStream str) {
-        m_maxValue = str.readInt("maxVal", m_maxValue);
+        if(str.containsKey("maxValDouble")) {
+            m_maxValue = str.readDouble("maxValDouble", m_maxValue);
+        } else {
+            m_maxValue = (double)str.readInt("maxVal", (int)m_maxValue);
+        }
         m_invertX = str.readBool("invertX", false);
         m_invertY = str.readBool("invertY", false);
     }
@@ -142,11 +148,11 @@ public class JoystickView extends SurfaceView implements SurfaceHolder.Callback 
         m_listener = l;
     }
 
-    public int getMaxValue() {
+    public double getMaxValue() {
         return m_maxValue;
     }
 
-    public void setMaxValue(int val) {
+    public void setMaxValue(double val) {
         m_maxValue = val;
     }
 
@@ -170,5 +176,5 @@ public class JoystickView extends SurfaceView implements SurfaceHolder.Callback 
     private JoystickListener m_listener;
     private boolean m_invertX;
     private boolean m_invertY;
-    private int m_maxValue;
+    private double m_maxValue;
 }

@@ -12,7 +12,8 @@ public abstract class Protocol extends TimerTask {
     public static final int CHESSBOT   = 2;
 
     public static String PROP_EXTRA_AXES = "extra_axes_cnt";
-    public static String PROP_MAX_AXIS_VAL = "max_axis_val";
+    public static String PROP_MAX_AXIS_VAL_LEGACY = "max_axis_val";
+    public static String PROP_MAX_AXIS_VAL_DOUBLE = "max_axis_val_double";
 
     public static Protocol getProtocol(int type, Connection conn, Map<String, Object> props) {
         Protocol res;
@@ -62,8 +63,10 @@ public abstract class Protocol extends TimerTask {
         if(props.containsKey(PROP_EXTRA_AXES)) {
             setExtraAxesCount((Integer)props.get(PROP_EXTRA_AXES));
         }
-        if(props.containsKey(PROP_MAX_AXIS_VAL)) {
-            m_maxAxisVal = (Integer)props.get(PROP_MAX_AXIS_VAL);
+        if(props.containsKey(PROP_MAX_AXIS_VAL_DOUBLE)) {
+            m_maxAxisVal = (Double)props.get(PROP_MAX_AXIS_VAL_DOUBLE);
+        } else if(props.containsKey(PROP_MAX_AXIS_VAL_LEGACY)) {
+            m_maxAxisVal = (Integer)props.get(PROP_MAX_AXIS_VAL_LEGACY);
         }
     }
 
@@ -72,12 +75,12 @@ public abstract class Protocol extends TimerTask {
     }
 
     public abstract int getType();
-    public abstract void setMainAxes(int ax1, int ax2);
-    public void setExtraAxis(int id, int value) { }
+    public abstract void setMainAxes(double ax1, double ax2);
+    public void setExtraAxis(int id, double value) { }
     public abstract void setButtons(int buttons);
     public abstract void send();
 
     protected int m_extraAxesCount;
-    protected int m_maxAxisVal;
+    protected double m_maxAxisVal;
     protected Connection m_conn;
 }

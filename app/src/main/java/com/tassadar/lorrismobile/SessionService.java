@@ -83,9 +83,14 @@ public class SessionService extends Service {
          .setContentText(text)
          .setOngoing(true)
          .setContentIntent(contentIntent)
-         .setSmallIcon(R.drawable.ic_launcher)
          .addAction(R.drawable.content_save, getText(R.string.save), saveIntent)
          .addAction(R.drawable.navigation_cancel, getText(R.string.close), closeIntent);
+
+        if(android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+            b.setSmallIcon(R.drawable.chip);
+        } else {
+            b.setSmallIcon(R.drawable.ic_launcher);
+        }
 
         Notification n = b.build();
         startForeground(R.string.service, n);

@@ -93,6 +93,13 @@ public class BlobInputStream {
         return readBool(key, false);
     }
 
+    public double readDouble(String key, double def) {
+        int len = getLen(key);
+        if(len == -1)
+            return def;
+        return m_buff.getDouble();
+    }
+
     public Map<String, Object> readHashMap(String key) {
         Map<String, Object> res = new HashMap<String, Object>();
         int len = getLen(key);
@@ -121,6 +128,9 @@ public class BlobInputStream {
                         break;
                     case BlobDataTypes.BOOLEAN:
                         res.put(it_key, in.readBoolean());
+                        break;
+                    case BlobDataTypes.DOUBLE:
+                        res.put(it_key, in.readDouble());
                         break;
                     case BlobDataTypes.UNKNOWN:
                     default:

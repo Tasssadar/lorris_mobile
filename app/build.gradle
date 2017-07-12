@@ -3,13 +3,13 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 25
-    buildToolsVersion "25.0.2"
+    buildToolsVersion "25.0.3"
     defaultConfig {
         applicationId "com.tassadar.lorrismobile"
         minSdkVersion 9
         targetSdkVersion 22
-        versionCode 79
-        versionName "79"
+        versionCode 80
+        versionName "80"
         externalNativeBuild {
             cmake {
                 cppFlags "-fexceptions"
@@ -31,9 +31,9 @@ android {
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile "com.android.support:support-core-utils:25.1.1"
-    compile "com.android.support:support-compat:25.1.1"
-    compile "com.android.support:support-core-ui:25.1.1"
-    compile "com.android.support:support-fragment:25.1.1"
+    compile "com.android.support:support-core-utils:25.3.1"
+    compile "com.android.support:support-compat:25.3.1"
+    compile "com.android.support:support-core-ui:25.3.1"
+    compile "com.android.support:support-fragment:25.3.1"
 
 }

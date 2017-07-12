@@ -7,11 +7,16 @@
     <View android:layout_width="1dp"
         android:layout_height="match_parent"
         android:background="#1B1B1B" />
-    <LinearLayout android:id="@+id/layout_buttons"
+    <ScrollView
         android:layout_width="wrap_content"
-        android:gravity="center"
         android:layout_height="match_parent"
-        android:orientation="vertical" />
+        android:gravity="center">
+        <LinearLayout android:id="@+id/layout_buttons"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:orientation="vertical" />
+    </ScrollView>
     <LinearLayout android:id="@+id/extra_axes_layout"
         android:layout_width="0dp"
         android:layout_weight="1"

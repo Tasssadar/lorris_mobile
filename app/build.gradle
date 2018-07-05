@@ -8,8 +8,8 @@ android {
         applicationId "com.tassadar.lorrismobile"
         minSdkVersion 9
         targetSdkVersion 22
-        versionCode 81
-        versionName "81"
+        versionCode 82
+        versionName "82"
         externalNativeBuild {
             cmake {
                 cppFlags "-fexceptions"

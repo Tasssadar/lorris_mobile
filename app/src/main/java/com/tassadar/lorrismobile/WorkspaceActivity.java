@@ -86,7 +86,8 @@ public class WorkspaceActivity extends FragmentActivity implements TabSelectedLi
         if(s == null && savedInstanceState != null) {
             s = SessionMgr.get(this, savedInstanceState.getString("activeSession"));
             if(s == null) {
-                Log.e("Lorris", "Failed to get active session, will probably crash.\n");
+                finish();
+                return;
             }
             SessionMgr.setActiveSession(s);
         }
@@ -406,6 +407,7 @@ public class WorkspaceActivity extends FragmentActivity implements TabSelectedLi
         int idx = TabManager.getTabPos(tabId);
         if(idx == -1)
             return;
+        setTabPanelVisible(false);
         setActiveTab(idx);
     }
 
